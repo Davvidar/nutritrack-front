@@ -1,0 +1,7 @@
+{
+  "name": "nutricrack",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
