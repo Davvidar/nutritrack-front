@@ -1,0 +1,48 @@
+.week-container {
+  background-color: var(--ion-color-primary);
+  padding: 10px 0 20px;
+  
+  .month-title {
+    text-align: center;
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    font-weight: 300;
+    text-transform: capitalize;
+  }
+  
+  .week-slider {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+    
+    .day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 40px;
+      color: white;
+      
+      .day-letter {
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+      
+      .day-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 0.9rem;
+      }
+      
+      &.active .day-number {
+        background-color: #000;
+        font-weight: 500;
+      }
+    }
+  }
+}

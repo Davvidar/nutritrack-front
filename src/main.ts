@@ -1,14 +1,26 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
+import { provideHttpClient } from '@angular/common/http';
+import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideRouter } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { logoGoogle, logoFacebook, arrowForward } from 'ionicons/icons';
 
-import { routes } from './app/app.routes';
+import 'swiper/element/bundle';
+
 import { AppComponent } from './app/app.component';
+import { routes } from './app/app.routes';
+
+// Registrar iconos de marca
+addIcons({
+  'logo-google': logoGoogle,
+  'logo-facebook': logoFacebook,
+  'arrow-forward': arrowForward
+});
 
 bootstrapApplication(AppComponent, {
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
-  ],
-});
+    provideHttpClient(),
+    provideRouter(routes)
+  ]
+}).catch(err => console.error(err));

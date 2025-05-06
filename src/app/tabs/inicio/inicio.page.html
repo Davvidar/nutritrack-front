@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="success">
+    <ion-title class="ion-text-center">nutritrack</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Week Slider Component -->
+  <app-week-slider 
+    [week]="week"
+    (dayChange)="onDaySelected($event)"
+    (weekChange)="loadWeek($event)">
+  </app-week-slider>
+  
+  <!-- Metrics Summary Component -->
+  <app-metrics-summary
+    [dailyGoals]="dailyGoals"
+    [currentConsumption]="currentConsumption">
+  </app-metrics-summary>
+  
+  <!-- Meals Section -->
+  <div class="meals-container">
+    <!-- Desayuno -->
+    <app-meal-accordion 
+      title="Desayuno" 
+      [items]="mealItems.desayuno"
+      (addItem)="addMeal('desayuno')">
+    </app-meal-accordion>
+    
+    <!-- Almuerzo -->
+    <app-meal-accordion 
+      title="Almuerzo" 
+      [items]="mealItems.almuerzo"
+      (addItem)="addMeal('almuerzo')">
+    </app-meal-accordion>
+    
+    <!-- Comida -->
+    <app-meal-accordion 
+      title="Comida" 
+      [items]="mealItems.comida"
+      (addItem)="addMeal('comida')">
+    </app-meal-accordion>
+    
+    <!-- Merienda -->
+    <app-meal-accordion 
+      title="Merienda" 
+      [items]="mealItems.merienda"
+      (addItem)="addMeal('merienda')">
+    </app-meal-accordion>
+    
+    <!-- Cena -->
+    <app-meal-accordion 
+      title="Cena" 
+      [items]="mealItems.cena"
+      (addItem)="addMeal('cena')">
+    </app-meal-accordion>
+  </div>
+</ion-content>
+

@@ -1,0 +1,81 @@
+ion-content {
+    --background: url("../../assets/pesas.png"); /* Imagen de fondo */
+    --background-size: cover; /* Cubrir todo el área */
+    --background-position: center; /* Centrar la imagen */
+    --background-repeat: no-repeat; /* No repetir la imagen */
+    
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    height: 100%;
+  }
+  
+  .logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    margin-top: 20px;
+  
+    img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 15px;
+    }
+  
+    h1 {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #222428; /* Color del texto principal */
+      text-align: center;
+      line-height: 1.2;
+      padding: 10px; /* Espacio alrededor del texto */
+      border-radius: 10px; /* Bordes redondeados */
+    }
+  }
+  
+  ion-button {
+    --border-radius: 10px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .btn-google {
+    --background: #000000;
+    --color: #ffffff;
+  
+    ion-icon {
+      color: #db4437;
+    }
+  }
+  
+  .btn-facebook {
+    --background: #3b5998;
+    --color: #fff;
+  }
+  
+  .btn-email {
+    --background: #689f38;
+    --color: #fff;
+  }
+  
+  .register-text {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    color: #ffffff;
+    text-align: center;
+    padding: 5px; /* Espacio alrededor del texto */
+    border-radius: 5px; /* Bordes redondeados */
+  
+    a {
+      color: #689f38;
+      text-decoration: none;
+    }
+  }

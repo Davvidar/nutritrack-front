@@ -1,0 +1,194 @@
+// Asegúrate de tener la fuente Work Sans importada (ver nota al inicio)
+
+ion-content.login-content {
+    // Variables de color (ajusta según tu paleta exacta)
+    --nutri-green: #6dbd3c; // Verde principal del logo y botón
+    --nutri-black: #000000; // Negro para título y botón Google
+    --nutri-text-dark: #333333; // Texto oscuro principal
+    --nutri-text-medium: #555555; // Texto secundario (labels, "No tienes cuenta?")
+    --nutri-text-light: #888888; // Iconos y texto de placeholder
+    --nutri-border-color: #dcdcdc; // Borde de los inputs
+    --nutri-separator-color: #cccccc; // Color del separador OR
+    --nutri-background: #ffffff; // Fondo
+  
+    --background: var(--nutri-background);
+    font-family: 'Work Sans', sans-serif;
+    color: var(--nutri-text-dark);
+  
+    // Centrar contenido y añadir padding general
+    // Usamos un contenedor interno si es necesario o aplicamos flex directamente
+    // Este enfoque asume que el contenido debe poder scrollarse si es necesario
+    // y se centra usando márgenes automáticos en los bloques principales
+    // y text-align/flex en contenedores específicos.
+    // Para un centrado vertical absoluto (menos común en scroll):
+    // display: flex; flex-direction: column; justify-content: center;
+  
+    // Añadimos padding general al contenido
+    // --padding-start y --padding-end controlan el padding interno de ion-content
+    --padding-start: 25px;
+    --padding-end: 25px;
+    --padding-top: 40px; // Ajusta según necesites
+    --padding-bottom: 40px;
+  }
+  
+  .login-header {
+    text-align: center;
+    margin-bottom: 45px; // Espacio después de la cabecera
+  
+    .logo {
+      width: 80px; // Ajusta el tamaño del logo
+      height: 80px;
+      margin-bottom: 15px;
+    }
+  
+    .title {
+      font-size: 2.5rem; // Tamaño grande para 'nutritrack'
+      font-weight: 700; // Más grueso
+      color: var(--nutri-black);
+      margin: 0 0 8px 0;
+      line-height: 1.2;
+    }
+  
+    .subtitle {
+      font-size: 1rem;
+      color: var(--nutri-text-medium);
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+  
+  .login-form {
+    width: 100%;
+    margin-bottom: 25px; // Espacio después del formulario
+  }
+  
+  .form-field {
+    margin-bottom: 20px; // Espacio entre campos del formulario
+    width: 100%;
+  }
+  
+  .input-label {
+    display: block; // Asegura que esté en su propia línea
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--nutri-text-dark);
+    margin-bottom: 8px;
+    padding-left: 5px; // Pequeño indentado
+  }
+  
+  ion-item.input-item {
+    --border-color: var(--nutri-border-color);
+    --border-radius: 17px;
+    --border-width: 1px;
+    --padding-start: 10px; // Espacio antes del icono
+    --inner-padding-end: 10px; // Espacio después del input/antes del icono final
+    --background: var(--nutri-background); // Fondo del input
+    --highlight-color-focused: var(--nutri-green); // Color del borde al enfocar (opcional)
+    --min-height: 50px; // Altura estándar
+    margin-bottom: 0; // Quitamos margen inferior si .form-field ya lo tiene
+  
+    ion-icon {
+      color: var(--nutri-text-light);
+      font-size: 1.2rem; // Tamaño de iconos
+      margin-right: 5px; // Espacio entre icono y texto
+    }
+  
+    ion-icon[slot="end"].toggle-pass {
+      margin-left: 5px;
+      margin-right: 0; // Sin margen extra a la derecha
+      cursor: pointer;
+    }
+  
+    ion-input {
+      --placeholder-color: var(--nutri-text-light);
+      --placeholder-opacity: 1;
+      --padding-start: 5px; // Padding interno del input
+      color: var(--nutri-text-dark);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+  
+  // Botón principal de Login
+  ion-button.login-button {
+    --background: var(--nutri-green);
+    --background-activated: #5aa030; // Un poco más oscuro al pulsar
+    --background-focused: var(--nutri-green);
+    --color: var(--nutri-background); // Texto blanco
+    --border-radius: 17px;
+    --padding-top: 15px;
+    --padding-bottom: 15px;
+    height: 50px; // Altura fija
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: none; // Sin mayúsculas automáticas
+    margin-top: 10px; // Espacio sobre el botón
+  
+    ion-icon {
+      font-size: 1.3rem; // Icono de flecha un poco más grande
+      margin-left: 8px;
+    }
+  }
+  
+  // Separador OR
+  .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    margin: 30px 0; // Espacio vertical alrededor del separador
+  
+    .line {
+      flex-grow: 1;
+      height: 1px;
+      background-color: var(--nutri-separator-color);
+    }
+  
+    .or-text {
+      flex-shrink: 0;
+      padding: 0 15px; // Espacio alrededor de OR
+      font-size: 0.9rem;
+      color: var(--nutri-text-medium);
+      font-weight: 500;
+    }
+  }
+  
+  // Botón de Google
+  ion-button.google-button {
+    --background: var(--nutri-black);
+    --background-activated: #333333;
+    --background-focused: var(--nutri-black);
+    --color: var(--nutri-background); // Texto blanco
+    --border-radius: 17px;
+    --padding-top: 15px;
+    --padding-bottom: 15px;
+    height: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: none;
+    margin-bottom: 30px; // Espacio después del botón Google
+  
+    ion-icon {
+      font-size: 1.4rem; // Ajusta si usas el icono de Ionicons
+      margin-right: 12px; // Más espacio para el logo de Google
+    }
+  }
+  
+  // Texto y enlace de Registro
+  .register-text {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--nutri-text-medium);
+    font-weight: 500;
+    margin: 0; // Resetear margen por si acaso
+  
+    a {
+      color: var(--nutri-green);
+      font-weight: 600;
+      text-decoration: none; // Sin subrayado
+  
+      &:hover {
+        text-decoration: underline; // Subrayado opcional al pasar el ratón
+      }
+    }
+  }

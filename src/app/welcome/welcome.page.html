@@ -1,0 +1,29 @@
+<ion-content>
+  <div class="login-header">
+    <img src="assets/logo.png" alt="logo nutriTrack" class="logo" />
+    <h1 class="title">nutritrack</h1> <p class="subtitle">Inicia sesión para acceder</p>
+  </div>
+
+  <!-- Google -->
+  <ion-button expand="block" fill="solid" class="btn-google">
+    <ion-icon slot="start" name="logo-google"></ion-icon>
+    Iniciar sesión con Google
+  </ion-button>
+
+  <!-- Facebook -->
+  <ion-button expand="block" fill="solid" class="btn-facebook">
+    <ion-icon slot="start" name="logo-facebook"></ion-icon>
+    Iniciar sesión con Facebook
+  </ion-button>
+
+  <!-- Email -->
+  <ion-button expand="block" fill="solid" class="btn-email" routerLink="/auth/login">
+    <ion-icon slot="start" name="mail-outline"></ion-icon>
+    Iniciar sesión con Email
+  </ion-button>
+
+  <p class="register-text">
+    No tienes cuenta?
+    <a routerLink="/auth/register">Regístrate</a>
+  </p>
+</ion-content>

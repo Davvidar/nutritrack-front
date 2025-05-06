@@ -10,6 +10,12 @@
  */
 
 /* Core CSS required for Ionic components to work properly */
+/* styles.scss */
+/* @import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+ */
+
 @import "@ionic/angular/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
@@ -35,3 +41,10 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}

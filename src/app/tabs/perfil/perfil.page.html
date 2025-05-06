@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="success">
+    <ion-title>Mi Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()" fill="clear">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </ng-container>
+
+  <ng-container *ngIf="error">
+    <p class="error">{{ error }}</p>
+  </ng-container>
+
+  <ion-list *ngIf="profile">
+    <ion-item>
+      <ion-label>Nombre</ion-label>
+      <ion-text>{{ profile.nombre }} {{ profile.apellido }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Correo</ion-label>
+      <ion-text>{{ profile.correo }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Peso (kg)</ion-label>
+      <ion-text>{{ profile.peso }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Altura (cm)</ion-label>
+      <ion-text>{{ profile.altura }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Sexo</ion-label>
+      <ion-text>{{ profile.sexo }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Edad</ion-label>
+      <ion-text>{{ profile.edad }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Objetivo</ion-label>
+      <ion-text>{{ profile.objetivo }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Actividad</ion-label>
+      <ion-text>{{ profile.actividad }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Proteínas (g)</ion-label>
+      <ion-text>{{ profile.objetivosNutricionales['calorias'] }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Proteínas (g)</ion-label>
+      <ion-text>{{ profile.objetivosNutricionales['proteinas'] }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Carbohidratos (g)</ion-label>
+      <ion-text>{{ profile.objetivosNutricionales['carbohidratos'] }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Grasas (g)</ion-label>
+      <ion-text>{{ profile.objetivosNutricionales['grasas'] }}</ion-text>
+    </ion-item>
+  </ion-list>
+</ion-content>

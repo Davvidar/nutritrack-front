@@ -1,0 +1,68 @@
+ion-header {
+    ion-toolbar:first-child {
+      background: #377a0a;
+      .ion-title {
+        font-weight: bold;
+      }
+      ion-button {
+        ion-icon { color: #fff; }
+      }
+    }
+  
+    ion-toolbar:last-child {
+      ion-searchbar {
+        --background: #f0f0f0;
+        --border-radius: 20px;
+        margin: 0.5rem 1rem;
+      }
+      ion-segment {
+        margin: 0 1rem 0.5rem;
+        ion-segment-button {
+          font-weight: 500;
+          --color-checked: #3880ff;
+        }
+      }
+    }
+  }
+  
+  ion-content {
+    ion-list {
+      margin: 0;
+  
+      ion-item {
+        --background: #fff;
+        margin: 0.5rem 1rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+  
+        ion-label {
+          h2 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+          }
+          .macros {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+  
+            span {
+              font-size: 0.85rem;
+              font-weight: 500;
+  
+              &.calories { color: #8e44ad; }
+              &.protein  { color: #f1c40f; }
+              &.carbs    { color: #e67e22; }
+              &.fat      { color: #3498db; }
+            }
+          }
+        }
+  
+        ion-icon {
+          color: #999;
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,12 @@
+<div class="week-container">
+  <!-- <div class="month-title">{{ monthTitle }}</div> -->
+  <div class="week-slider" #weekSlider>
+    <div class="day" 
+         *ngFor="let day of week" 
+         [class.active]="day.active"
+         (click)="selectDay(day)">
+      <div class="day-letter">{{ day.letter }}</div>
+      <div class="day-number">{{ day.date | date:'d' }}</div>
+    </div>
+  </div>
+</div>

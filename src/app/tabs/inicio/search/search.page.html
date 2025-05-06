@@ -1,0 +1,50 @@
+<ion-header>
+    <ion-toolbar color="success">
+      <ion-title>Buscar</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="onSegmentChange({ detail: { value: segment } })">
+          <ion-icon name="options-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onScanBarcode()">
+          <ion-icon name="scan-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        (ionInput)="onSearchChange()"
+        placeholder="Buscar"
+        showCancelButton="never">
+      </ion-searchbar>
+      <ion-segment value="todos" (ionChange)="onSegmentChange($event)">
+        <ion-segment-button value="todos">
+          Todos
+        </ion-segment-button>
+        <ion-segment-button value="tuyos">
+          Tuyos
+        </ion-segment-button>
+        <ion-segment-button value="recetas">
+          Recetas
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <ion-list>
+      <ion-item *ngFor="let item of filteredItems" (click)="onSelect(item)">
+        <ion-label>
+          <h2>{{ item.nombre }}</h2>
+          <div class="macros">
+            <span class="calories">{{ hasKey(item, 'calorias') ? (item.calorias + ' kcal') : '' }}</span>
+            <span class="protein">{{ hasKey(item, 'proteinas') ? (item.proteinas + 'g') : '' }}</span>
+            <span class="carbs">{{ hasKey(item, 'carbohidratos') ? (item.carbohidratos + 'g') : '' }}</span>
+            <span class="fat">{{ hasKey(item, 'grasas') ? (item.grasas + 'g') : '' }}</span>
+          </div>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  `;

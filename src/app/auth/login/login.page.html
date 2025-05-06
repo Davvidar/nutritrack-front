@@ -1,0 +1,73 @@
+<ion-content [fullscreen]="true" class="login-content">
+
+  <div class="login-header">
+    <img src="assets/logo.png" alt="logo nutriTrack" class="logo" />
+    <h1 class="title">nutritrack</h1> <p class="subtitle">Inicia sesión para acceder</p>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+    <div class="form-field">
+      <ion-label class="input-label" position="stacked">Email</ion-label>
+      <ion-item fill="outline" shape="round" lines="none" class="input-item">
+        <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+        <ion-input
+          formControlName="correo"
+          type="email"
+          placeholder="Introduce tu email..."
+          inputmode="email"
+          aria-label="Email">
+        </ion-input>
+      </ion-item>
+      </div>
+
+    <div class="form-field">
+      <ion-label class="input-label" position="stacked">Contraseña</ion-label>
+      <ion-item fill="outline" shape="round" lines="none" class="input-item">
+        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+        <ion-input
+          formControlName="password"
+          [type]="passwordType"
+          placeholder="***************"
+          aria-label="Contraseña">
+        </ion-input>
+        <ion-icon
+          slot="end"
+          [name]="passwordIcon"
+          aria-label="Mostrar u ocultar contraseña"
+          class="toggle-pass"
+          (click)="togglePasswordVisibility()">
+        </ion-icon>
+      </ion-item>
+       </div>
+
+    <ion-button
+      expand="block"
+      class="login-button"
+      type="submit"
+      shape="round"
+      [disabled]="loginForm.invalid">
+      Iniciar sesión
+      <ion-icon slot="end" name="arrow-forward" aria-hidden="true"></ion-icon>
+    </ion-button>
+  </form>
+
+  <div class="separator">
+    <span class="line"></span>
+    <span class="or-text">OR</span>
+    <span class="line"></span>
+  </div>
+
+  <ion-button
+    expand="block"
+    shape="round"
+    class="google-button">
+    <ion-icon slot="start" name="logo-google" aria-hidden="true"></ion-icon>
+    Iniciar sesión con Google
+  </ion-button>
+
+  <p class="register-text">
+    No tienes cuenta? <a routerLink="/auth/register">Regístrate</a>
+  </p>
+
+</ion-content>

@@ -1,0 +1,100 @@
+/* src/app/tabs/tabs.page.scss */
+/* 
+
+:host { 
+  --nutri-tab-background: #f0f0f0;      
+  --nutri-tab-icon-color: #404040;      
+  --nutri-tab-selected-bg: #cce8cc;     
+  --nutri-tab-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
+  --nutri-tab-border-radius: 35px;      
+  --nutri-tab-margin-horizontal: 20px;  
+  --nutri-tab-margin-bottom: 25px;      
+  --nutri-tab-height: 65px;             
+  --nutri-tab-selected-circle-size: 50px; 
+}
+
+
+ion-tab-bar {
+  position: absolute; 
+  bottom: var(--nutri-tab-margin-bottom);
+  left: var(--nutri-tab-margin-horizontal);
+  right: var(--nutri-tab-margin-horizontal);
+  width: auto; 
+
+  --background: var(--nutri-tab-background); 
+  height: var(--nutri-tab-height);
+  border-radius: var(--nutri-tab-border-radius); 
+  box-shadow: var(--nutri-tab-shadow);         
+  border-top: none; 
+  --border-color: transparent; 
+
+  
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px; 
+}
+
+
+ion-tab-button {
+  --padding-start: 10px; 
+  --padding-end: 10px;
+  --padding-top: 5px;
+  --padding-bottom: 5px;
+  --ripple-color: transparent; 
+  --color: var(--nutri-tab-icon-color); 
+  background: transparent; 
+  max-width: 100px; 
+  position: relative; 
+  overflow: visible; 
+}
+
+
+.icon-wrapper {
+  position: relative; 
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  z-index: 1; 
+  color: var(--nutri-tab-icon-color);
+}
+
+ion-icon {
+  font-size: 1.9rem; 
+  color: black; 
+  transition: color 0.2s ease-in-out; 
+
+}
+
+
+ion-tab-button.tab-selected {
+  
+  --color: var(--nutri-tab-icon-color);
+
+  .icon-wrapper::before { 
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1; 
+
+    width: var(--nutri-tab-selected-circle-size);
+    height: var(--nutri-tab-selected-circle-size);
+    background-color: var(--nutri-tab-selected-bg); 
+    border-radius: 50%; 
+
+    
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    
+    opacity: 1;
+    transition: opacity 0.25s ease-in-out, transform 0.2s ease-in-out;
+    transform-origin: center; 
+  }
+
+  
+  
+  
+  
+} */

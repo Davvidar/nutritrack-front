@@ -1,2 +1,51 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+// src/theme/variables.scss
+
+  
+  ion-item.input-item {
+    --border-color: var(--nutri-border-color);
+    --border-radius: 17px;
+    --border-width: 1px;
+    --padding-start: 10px; // Espacio antes del icono
+    --inner-padding-end: 10px; // Espacio después del input/antes del icono final
+    --background: var(--nutri-background); // Fondo del input
+    --highlight-color-focused: var(--nutri-green); // Color del borde al enfocar (opcional)
+    --min-height: 50px; // Altura estándar
+    margin-bottom: 0; // Quitamos margen inferior si .form-field ya lo tiene
+  
+    ion-icon {
+      color: var(--nutri-text-light);
+      font-size: 1.2rem; // Tamaño de iconos
+      margin-right: 5px; // Espacio entre icono y texto
+    }
+  
+    ion-icon[slot="end"].toggle-pass {
+      margin-left: 5px;
+      margin-right: 0; // Sin margen extra a la derecha
+      cursor: pointer;
+    }
+  
+    ion-input {
+      --placeholder-color: var(--nutri-text-light);
+      --placeholder-opacity: 1;
+      --padding-start: 5px; // Padding interno del input
+      color: var(--nutri-text-dark);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+
+:root {
+    /* …otras variables… */
+  
+    --ion-color-primary:    #538D38;
+    --ion-color-primary-rgb: 83,141,56;
+    --ion-color-primary-contrast:    #ffffff;
+    --ion-color-primary-contrast-rgb: 255,255,255;
+    --ion-color-primary-shade:       #4a7a33;
+    --ion-color-primary-tint:        #6b9a4d;
+  
+    /* …resto del tema… */
+  }
+  

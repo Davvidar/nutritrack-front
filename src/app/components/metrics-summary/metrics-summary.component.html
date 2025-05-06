@@ -1,0 +1,54 @@
+<!-- src/app/components/metrics-summary/metrics-summary.component.html -->
+<div class="nutrition-bar">
+    <div class="nutrient-section">
+      <div class="nutrient-header">
+        <div class="nutrient-icon calories-icon">k</div>
+        <div class="nutrient-values">
+          <div class="main-value">{{ currentConsumption.calories | number:'1.0-0' }}/</div>
+          <div class="target-value">{{ dailyGoals.calories | number:'1.0-0' }} kcal</div>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar calories-bar" [style.width.%]="caloriesProgress"></div>
+      </div>
+    </div>
+    
+    <div class="nutrient-section">
+      <div class="nutrient-header">
+        <div class="nutrient-icon protein-icon">P</div>
+        <div class="nutrient-values">
+          <div class="main-value">{{ currentConsumption.protein | number:'1.0-0' }}/</div>
+          <div class="target-value">{{ dailyGoals.protein | number:'1.0-0' }} g</div>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar protein-bar" [style.width.%]="proteinProgress"></div>
+      </div>
+    </div>
+    
+    <div class="nutrient-section">
+      <div class="nutrient-header">
+        <div class="nutrient-icon carbs-icon">H</div>
+        <div class="nutrient-values">
+          <div class="main-value">{{ currentConsumption.carbs | number:'1.0-0' }}/</div>
+          <div class="target-value">{{ dailyGoals.carbs | number:'1.0-0' }} g</div>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar carbs-bar" [style.width.%]="carbsProgress"></div>
+      </div>
+    </div>
+    
+    <div class="nutrient-section">
+      <div class="nutrient-header">
+        <div class="nutrient-icon fat-icon">G</div>
+        <div class="nutrient-values">
+          <div class="main-value">{{ currentConsumption.fat | number:'1.0-0' }}/</div>
+          <div class="target-value">{{ dailyGoals.fat | number:'1.0-0' }} g</div>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar fat-bar" [style.width.%]="fatProgress"></div>
+      </div>
+    </div>
+  </div>
