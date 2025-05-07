@@ -1,8 +1,7 @@
 // src/app/services/daily-log.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment.prod';
 
@@ -10,6 +9,7 @@ export interface MealItemDTO {
   productId: string;
   cantidad: number; // en gramos
 }
+
 export interface MealItem {
   name: string;
   calorias: number;
@@ -18,6 +18,7 @@ export interface MealItem {
   grasas: number;
   cantidad: number; // Added property
 }
+
 export interface DailyLog {
   _id: string;
   fecha: string; // ISO string
@@ -51,16 +52,12 @@ export interface SummaryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class DailyLogService {
-  private readonly API = environment.API_URL + '/dailyLogs';
+  private readonly API = environment.API_URL + '/dailyLogs'; // URL corregida
 
   constructor(
     private http: HttpClient,
     private auth: AuthService
   ) {}
-
-  private headers(): HttpHeaders {
-    return this.auth.getAuthHeaders();
-  }
 
   /**
    * Obtiene el DailyLog completo para la fecha indicada.
@@ -70,7 +67,7 @@ export class DailyLogService {
     const params = new HttpParams().set('fecha', fecha.toISOString());
     return this.http.get<DailyLog>(
       `${this.API}/por-fecha`,
-      { headers: this.headers(), params }
+      { headers: this.auth.getAuthHeaders(), params }
     );
   }
 
@@ -81,7 +78,7 @@ export class DailyLogService {
     const params = new HttpParams().set('fecha', fecha.toISOString());
     return this.http.get<SummaryResponse>(
       `${this.API}/resumen`,
-      { headers: this.headers(), params }
+      { headers: this.auth.getAuthHeaders(), params }
     );
   }
 
@@ -95,13 +92,13 @@ export class DailyLogService {
       return this.http.put<DailyLog>(
         `${this.API}/${log._id}`,
         log,
-        { headers: this.headers() }
+        { headers: this.auth.getAuthHeaders() }
       );
     }
     return this.http.post<DailyLog>(
       this.API,
       log,
-      { headers: this.headers() }
+      { headers: this.auth.getAuthHeaders() }
     );
   }
 }

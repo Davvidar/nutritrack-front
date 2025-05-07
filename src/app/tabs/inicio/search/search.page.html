@@ -1,50 +1,80 @@
 <ion-header>
-    <ion-toolbar color="success">
-      <ion-title>Buscar</ion-title>
-      <ion-buttons slot="end">
-        <ion-button (click)="onSegmentChange({ detail: { value: segment } })">
-          <ion-icon name="options-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="onScanBarcode()">
-          <ion-icon name="scan-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-    <ion-toolbar>
+  <ion-toolbar color="success">
+    <ion-title>{{ mealParam | titlecase }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/inicio"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="onScanBarcode()">
+        <ion-icon name="scan-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Barra de búsqueda -->
+  <div class="search-bar-container">
+    <div class="search-bar">
       <ion-searchbar
         [(ngModel)]="searchQuery"
         (ionInput)="onSearchChange()"
         placeholder="Buscar"
-        showCancelButton="never">
+        mode="md"
+        animated="true"
+        class="product-search">
       </ion-searchbar>
-      <ion-segment value="todos" (ionChange)="onSegmentChange($event)">
-        <ion-segment-button value="todos">
-          Todos
-        </ion-segment-button>
-        <ion-segment-button value="tuyos">
-          Tuyos
-        </ion-segment-button>
-        <ion-segment-button value="recetas">
-          Recetas
-        </ion-segment-button>
-      </ion-segment>
-    </ion-toolbar>
-  </ion-header>
+      <ion-button fill="clear" class="filter-button">
+        <ion-icon name="options-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
   
-  <ion-content>
-    <ion-list>
-      <ion-item *ngFor="let item of filteredItems" (click)="onSelect(item)">
-        <ion-label>
-          <h2>{{ item.nombre }}</h2>
-          <div class="macros">
-            <span class="calories">{{ hasKey(item, 'calorias') ? (item.calorias + ' kcal') : '' }}</span>
-            <span class="protein">{{ hasKey(item, 'proteinas') ? (item.proteinas + 'g') : '' }}</span>
-            <span class="carbs">{{ hasKey(item, 'carbohidratos') ? (item.carbohidratos + 'g') : '' }}</span>
-            <span class="fat">{{ hasKey(item, 'grasas') ? (item.grasas + 'g') : '' }}</span>
-          </div>
-        </ion-label>
-        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-      </ion-item>
-    </ion-list>
-  </ion-content>
-  `;
+  <!-- Segmentos de filtro -->
+  <div class="segment-container">
+    <ion-segment [(ngModel)]="segment" (ionChange)="onSegmentChange($event)" mode="md">
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="tuyos">
+        <ion-label>Tuyos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="recetas">
+        <ion-label>Recetas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Lista de productos/recetas -->
+  <div class="items-list" *ngIf="!loading && !error">
+    <div *ngFor="let item of filteredItems" class="product-card" (click)="onSelect(item)">
+      <div class="product-content">
+        <div class="product-name">Nombre producto</div>
+        <div class="product-macros">
+          <span class="calories">600 kcal</span>
+          <span class="protein">10g</span>
+          <span class="carbs">70g</span>
+          <span class="fat">24g</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Mensaje si no hay resultados -->
+    <div class="no-results" *ngIf="filteredItems.length === 0">
+      <p>No se encontraron resultados</p>
+      <ion-button fill="outline" (click)="goToCreateProduct()">Crear nuevo producto</ion-button>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-container" *ngIf="error">
+    <p>{{ error }}</p>
+    <ion-button (click)="loadData()">Reintentar</ion-button>
+  </div>
+</ion-content>

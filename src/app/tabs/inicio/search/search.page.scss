@@ -1,68 +1,208 @@
+:host {
+  --ion-background-color: #6ab04c;
+  --text-color: #333333;
+  --macro-calories-color: #8c63d0;
+  --macro-protein-color: #10ac84;
+  --macro-carbs-color: #f0932b;
+  --macro-fat-color: #686de0;
+}
+
 ion-header {
-    ion-toolbar:first-child {
-      background: #377a0a;
-      .ion-title {
-        font-weight: bold;
-      }
+  ion-toolbar {
+    --background: #6ab04c;
+    --color: white;
+    
+    ion-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    ion-back-button {
+      --color: white;
+    }
+    
+    ion-buttons {
       ion-button {
-        ion-icon { color: #fff; }
+        --color: white;
       }
     }
+  }
+}
+
+.search-bar-container {
+  padding: 10px 15px;
+  background-color: #6ab04c;
+  margin-bottom: 0;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   
-    ion-toolbar:last-child {
-      ion-searchbar {
-        --background: #f0f0f0;
-        --border-radius: 20px;
-        margin: 0.5rem 1rem;
+  .product-search {
+    --background: white;
+    --placeholder-color: #999;
+    --placeholder-opacity: 0.8;
+    --box-shadow: none;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 12px;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .filter-button {
+    margin-right: 4px;
+    font-size: 20px;
+    --color: #6ab04c;
+    --padding-start: 4px;
+    --padding-end: 10px;
+  }
+}
+
+.segment-container {
+  background-color: white;
+  border-radius: 0 0 28px 28px;
+  margin-bottom: 10px;
+  padding: 0 15px 10px;
+  
+  ion-segment {
+    --background: transparent;
+    
+    ion-segment-button {
+      --indicator-color: #6ab04c;
+      --indicator-height: 3px;
+      --color: #777;
+      --color-checked: #6ab04c;
+      min-height: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: none;
+      
+      &::part(indicator) {
+        bottom: -1px;
       }
-      ion-segment {
-        margin: 0 1rem 0.5rem;
-        ion-segment-button {
+    }
+  }
+}
+
+.items-list {
+  padding: 0 15px;
+  
+  .product-card {
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: visible;
+    
+    .product-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      
+      .product-name {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 5px;
+      }
+      
+      .product-macros {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 16px;
+        
+        span {
+          font-size: 14px;
           font-weight: 500;
-          --color-checked: #3880ff;
+          
+          &.calories {
+            color: var(--macro-calories-color);
+          }
+          
+          &.protein {
+            color: var(--macro-protein-color);
+          }
+          
+          &.carbs {
+            color: var(--macro-carbs-color);
+          }
+          
+          &.fat {
+            color: var(--macro-fat-color);
+          }
         }
+      }
+      
+      .chevron-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #bbb;
+        font-size: 18px;
       }
     }
   }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
   
-  ion-content {
-    ion-list {
-      margin: 0;
+  ion-spinner {
+    --color: white;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: white;
+  text-align: center;
+  padding: 0 20px;
   
-      ion-item {
-        --background: #fff;
-        margin: 0.5rem 1rem;
-        border-radius: 12px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-        padding: 1rem;
-  
-        ion-label {
-          h2 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-          }
-          .macros {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-  
-            span {
-              font-size: 0.85rem;
-              font-weight: 500;
-  
-              &.calories { color: #8e44ad; }
-              &.protein  { color: #f1c40f; }
-              &.carbs    { color: #e67e22; }
-              &.fat      { color: #3498db; }
-            }
-          }
-        }
-  
-        ion-icon {
-          color: #999;
-        }
-      }
-    }
+  p {
+    margin-bottom: 20px;
   }
   
+  ion-button {
+    --background: white;
+    --color: #6ab04c;
+  }
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 150px;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  
+  p {
+    margin-bottom: 20px;
+  }
+  
+  ion-button {
+    --background: white;
+    --color: #6ab04c;
+  }
+}

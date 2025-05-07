@@ -12,13 +12,14 @@ import { MealAccordionComponent, MealItem } from '../../components/meal-accordio
 import { DailyLogService, DailyLog, SummaryResponse } from '../../services/daily-log.service';
 import { ProductService, Product } from '../../services/product.service';
 import { AuthService, UserProfile } from '../../services/auth.service';
-import { Observable, forkJoin as rxjsForkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
   imports: [IonicModule, CommonModule, WeekSliderComponent, MetricsSummaryComponent, MealAccordionComponent],
-  templateUrl: './inicio.page.html'
+  templateUrl: './inicio.page.html',
+  styleUrls: ['./inicio.page.scss']
 })
 export class InicioPage implements OnInit {
   week: WeekDay[] = [];
@@ -87,7 +88,14 @@ export class InicioPage implements OnInit {
               }))
             )
           );
-          rxjsForkJoin(observables).subscribe((items: MealItem[]) => this.mealItems[meal] = items);
+          
+          if (observables.length > 0) {
+            forkJoin(observables).subscribe((items: MealItem[]) => {
+              this.mealItems[meal] = items;
+            });
+          } else {
+            this.mealItems[meal] = [];
+          }
         } else {
           this.mealItems[meal] = [];
         }
@@ -124,12 +132,14 @@ export class InicioPage implements OnInit {
   }
 
   addMeal(meal: typeof this.meals[number]) {
-    const dateISO = this.week.find(d => d.active)!.date.toISOString();
-    this.router.navigate(['/search'], { queryParams: { date: dateISO, meal } });
+    const activeDay = this.week.find(d => d.active);
+    if (activeDay) {
+      this.router.navigate(['/tabs/inicio/search'], { 
+        queryParams: { 
+          date: activeDay.date.toISOString(),
+          meal: meal 
+        } 
+      });
+    }
   }
 }
-
-function forkJoin(observables: Observable<{ name: string; calorias: number; proteinas: number; carbohidratos: number; grasas: number; cantidad: number; }>[]) {
-  throw new Error('Function not implemented.');
-}
-

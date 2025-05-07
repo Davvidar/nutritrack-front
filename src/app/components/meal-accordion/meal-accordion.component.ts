@@ -56,7 +56,7 @@ export class MealAccordionComponent implements OnChanges {
     this.expanded = !this.expanded;
   }
 
-  /** Maneja click en “+”: detiene propagación y emite evento */
+  /** Maneja click en "+": detiene propagación y emite evento */
   onAddClick(event: Event) {
     event.stopPropagation();
     // Desenfocamos el botón para que no quede con focus en la página oculta

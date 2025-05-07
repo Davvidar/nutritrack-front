@@ -1,46 +1,46 @@
 <!-- src/app/components/meal-accordion/meal-accordion.component.html -->
 <div class="food-tracker">
-    <div class="food-tracker-header" (click)="toggleExpanded()">
-      <h2>{{ title }}</h2>
-      <span class="toggle-icon" [class.up]="expanded">&#9660;</span>
-      <div class="add-button">
-        <button
-          ion-button
-          fill="clear"
-          (click)="onAddClick($event)"
-          [routerLink]="['/tabs/inicio/search']"
-          [queryParams]="{
-            date: (parentDate | date:'yyyy-MM-ddTHH:mm:ss.SSSZ'),
-            meal: title.toLowerCase()
-          }">
-          +
-        </button>
-      </div>
-    </div>
-    
-    <div class="food-tracker-summary">
-      <span class="calories">{{ totalCalories | number:'1.0-0' }}</span>
-      <span class="protein">{{ totalProtein | number:'1.0-0' }}</span>
-      <span class="carbs">{{ totalCarbs | number:'1.0-0' }}</span>
-      <span class="fat">{{ totalFat | number:'1.0-0' }}</span>
-    </div>
-    
-    <div class="food-tracker-details" [class.open]="expanded">
-      <div class="food-item" *ngFor="let item of items">
-        <div class="food-item-header">
-          <span class="food-item-name">{{ item.name }}</span>
-          <span class="food-item-weight">{{ item.cantidad }}g</span>
-        </div>
-        <div class="food-item-nutrients">
-          <span class="calories">{{ item.calorias | number:'1.0-0' }}</span>
-          <span class="protein">{{ item.proteinas | number:'1.0-0' }}</span>
-          <span class="carbs">{{ item.carbohidratos | number:'1.0-0' }}</span>
-          <span class="fat">{{ item.grasas | number:'1.0-0' }}</span>
-        </div>
-      </div>
-      
-      <div class="empty-state" *ngIf="items.length === 0">
-        <p>No hay alimentos registrados</p>
-      </div>
+  <div class="food-tracker-header" (click)="toggleExpanded()">
+    <h2>{{ title }}</h2>
+    <span class="toggle-icon" [class.up]="expanded">&#9660;</span>
+    <div class="add-button">
+      <button
+        ion-button
+        fill="clear"
+        (click)="onAddClick($event)"
+        [routerLink]="['/tabs/inicio/search']"
+        [queryParams]="{
+          date: (parentDate | date:'yyyy-MM-ddTHH:mm:ss.SSSZ'),
+          meal: title.toLowerCase()
+        }">
+        +
+      </button>
     </div>
   </div>
+  
+  <div class="food-tracker-summary">
+    <span class="calories">{{ totalCalories | number:'1.0-0' }}</span>
+    <span class="protein">{{ totalProtein | number:'1.0-0' }}</span>
+    <span class="carbs">{{ totalCarbs | number:'1.0-0' }}</span>
+    <span class="fat">{{ totalFat | number:'1.0-0' }}</span>
+  </div>
+  
+  <div class="food-tracker-details" [class.open]="expanded">
+    <div class="food-item" *ngFor="let item of items">
+      <div class="food-item-header">
+        <span class="food-item-name">{{ item.name }}</span>
+        <span class="food-item-weight">{{ item.cantidad }}g</span>
+      </div>
+      <div class="food-item-nutrients">
+        <span class="calories">{{ item.calorias | number:'1.0-0' }}</span>
+        <span class="protein">{{ item.proteinas | number:'1.0-0' }}</span>
+        <span class="carbs">{{ item.carbohidratos | number:'1.0-0' }}</span>
+        <span class="fat">{{ item.grasas | number:'1.0-0' }}</span>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="items.length === 0">
+      <p>No hay alimentos registrados</p>
+    </div>
+  </div>
+</div>

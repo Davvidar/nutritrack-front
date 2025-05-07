@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
+import { AuthService } from './auth.service';
 
 export interface Ingredient {
   productId: string;
@@ -29,34 +30,45 @@ export interface Recipe {
   providedIn: 'root'
 })
 export class RecipeService {
-  private baseUrl = environment.API_URL +  +'/recipes'; // Ajusta tu URL
+  private baseUrl = environment.API_URL + '/recipes'; // URL corregida
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService
+  ) {}
 
   /** Obtiene todas las recetas (globales + propias) */
   getAll(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(this.baseUrl);
+    return this.http.get<Recipe[]>(this.baseUrl, {
+      headers: this.authService.getAuthHeaders()
+    });
   }
 
   /** Obtiene receta por ID */
   getById(id: string): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.baseUrl}/${id}`);
+    return this.http.get<Recipe>(`${this.baseUrl}/${id}`, {
+      headers: this.authService.getAuthHeaders()
+    });
   }
 
   /** Crea una nueva receta */
   create(recipe: Partial<Recipe>): Observable<Recipe> {
-    return this.http.post<{ recipe: Recipe }>(this.baseUrl, recipe)
-      .pipe(map(res => res.recipe));
+    return this.http.post<{ recipe: Recipe }>(this.baseUrl, recipe, {
+      headers: this.authService.getAuthHeaders()
+    }).pipe(map(res => res.recipe));
   }
 
   /** Actualiza una receta existente */
   update(id: string, data: Partial<Recipe>): Observable<Recipe> {
-    return this.http.put<{ recipe: Recipe }>(`${this.baseUrl}/${id}`, data)
-      .pipe(map(res => res.recipe));
+    return this.http.put<{ recipe: Recipe }>(`${this.baseUrl}/${id}`, data, {
+      headers: this.authService.getAuthHeaders()
+    }).pipe(map(res => res.recipe));
   }
 
   /** Elimina una receta */
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
+      headers: this.authService.getAuthHeaders()
+    });
   }
 }

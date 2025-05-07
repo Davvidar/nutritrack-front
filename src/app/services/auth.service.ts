@@ -31,14 +31,13 @@ export interface RegisterData {
     password: string;
     peso: number;
     altura: number;
-    sexo: 'masculino' | 'femenino' | 'otro';
+    sexo: 'masculino' | 'femenino';
     edad: number;
     objetivo: 'perder peso' | 'mantenerse' | 'ganar músculo';
     actividad: 'sedentario' | 'ligero' | 'moderado' | 'activo' | 'muy activo';
-  }
+}
 
 @Injectable({ providedIn: 'root' })
-
 export class AuthService {
   private api = environment.API_URL + '/users';
   private tokenKey = 'nutritrack_token';
@@ -54,7 +53,7 @@ export class AuthService {
     );
   }
 
-  register(data: any): Observable<any> {
+  register(data: RegisterData): Observable<any> {
     return this.http.post(`${this.api}/register`, data);
   }
 
@@ -75,10 +74,21 @@ export class AuthService {
 
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return new HttpHeaders({ 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
   }
+
   logout(): Observable<any> {
-    return this.http.post(`${this.api}/logout`, {}, { headers: this.getAuthHeaders() })
-      .pipe(tap(() => localStorage.removeItem(this.tokenKey)));
+    // Limpiar el token del localStorage antes de la petición
+    localStorage.removeItem(this.tokenKey);
+    
+    return this.http.post(`${this.api}/logout`, {});
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    return !!token;
   }
 }

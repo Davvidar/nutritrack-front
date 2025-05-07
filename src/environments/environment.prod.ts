@@ -18,4 +18,16 @@ export const environment = {
     appId: "1:437054249533:web:4fc4b2df574114f7af6854",
     measurementId: "G-4C6H1PB3PZ"
     }
-};
+}; 
+/* 
+const PORT = ':5000';
+const API_URL_BASE = 'http://localhost:5000' + PORT;
+
+export const environment = {
+  production: false,
+  PORT: PORT,
+  API_URL_BASE: API_URL_BASE,
+  API_URL_BASE_BACKEND: API_URL_BASE,
+  API_URL: API_URL_BASE + '/api',
+  lang: 'ES',
+};*/

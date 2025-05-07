@@ -14,21 +14,16 @@ export const routes: Routes = [
   },
   {
     path: 'tabs',
-    //canActivate: [authGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./tabs/tabs.page').then(m => m.TabsPage),
     children: [
       {
         path: 'inicio',
-        loadComponent: () => import('./tabs/inicio/inicio.page').then(m => m.InicioPage),
-        children: [
-          // <-- aquí
-          {
-            path: 'search',
-            loadComponent: () =>
-              import('./tabs/inicio/search/search.page').then(m => m.SearchPage)
-          },
-          { path: '', redirectTo: 'search', pathMatch: 'full' }
-        ]
+        loadComponent: () => import('./tabs/inicio/inicio.page').then(m => m.InicioPage)
+      },
+      {
+        path: 'inicio/search',
+        loadComponent: () => import('./tabs/inicio/search/search.page').then(m => m.SearchPage)
       },
       {
         path: 'perfil',
