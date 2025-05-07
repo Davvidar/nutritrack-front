@@ -6,7 +6,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { ProductService, Product } from '../../../services/product.service';
 import { RecipeService, Recipe } from '../../../services/recipe.service';
-import { DailyLogService, MealItemDTO } from '../../../services/daily-log.service';
 
 @Component({
   selector: 'app-search',
@@ -19,29 +18,20 @@ export class SearchPage implements OnInit {
   searchQuery: string = '';
   segment: 'todos' | 'tuyos' | 'recetas' = 'todos';
 
-  products: Product[] = [
-    { _id: '1', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 },
-    { _id: '2', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 },
-    { _id: '3', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 },
-    { _id: '4', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 },
-    { _id: '5', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 },
-    { _id: '6', nombre: 'Nombre producto', calorias: 600, proteinas: 10, carbohidratos: 70, grasas: 24 }
-  ];
+  products: Product[] = [];
   recipes: Recipe[] = [];
   filteredItems: Array<Product | Recipe> = [];
   
   // Parámetros de la ruta
   dateParam: string = '';
-  mealParam: string = 'Desayuno';
+  mealParam: string = '';
   
-  loading: boolean = false;
+  loading: boolean = true;
   error: string | null = null;
-  selectedPortion: number = 100; // Porción por defecto en gramos
 
   constructor(
     private productService: ProductService,
     private recipeService: RecipeService,
-    private dailyLogService: DailyLogService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -70,11 +60,14 @@ export class SearchPage implements OnInit {
   }
 
   loadData() {
-    this.loading = false;
+    this.loading = true;
     this.error = null;
     
-    // Para esta demo, usamos datos estáticos en lugar de cargar desde el servicio
-    this.filteredItems = this.products;
+    if (this.segment === 'recetas') {
+      this.loadRecipes();
+    } else {
+      this.loadProducts();
+    }
   }
   
   private loadProducts() {
@@ -82,11 +75,18 @@ export class SearchPage implements OnInit {
     this.products = [];
     this.filteredItems = [];
     
-    // Simulamos la carga de datos para la demo
-    setTimeout(() => {
-      this.filteredItems = this.products;
-      this.loading = false;
-    }, 500);
+    this.productService.getAll(this.segment === 'tuyos').subscribe({
+      next: (products) => {
+        this.products = products;
+        this.filteredItems = products;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar productos:', err);
+        this.error = 'No se pudieron cargar los productos';
+        this.loading = false;
+      }
+    });
   }
   
   private loadRecipes() {
@@ -94,11 +94,18 @@ export class SearchPage implements OnInit {
     this.recipes = [];
     this.filteredItems = [];
     
-    // Simulamos la carga de datos para la demo
-    setTimeout(() => {
-      this.filteredItems = [];
-      this.loading = false;
-    }, 500);
+    this.recipeService.getAll().subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+        this.filteredItems = recipes;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar recetas:', err);
+        this.error = 'No se pudieron cargar las recetas';
+        this.loading = false;
+      }
+    });
   }
 
   onSearchChange() {
@@ -107,21 +114,20 @@ export class SearchPage implements OnInit {
 
   onSegmentChange(event: any) {
     this.segment = event.detail.value;
-    if (this.segment === 'todos' || this.segment === 'tuyos') {
-      this.filteredItems = this.products;
-    } else {
-      this.filteredItems = [];
-    }
+    this.loadData();
   }
 
   private applyFilter() {
     const query = this.searchQuery.trim().toLowerCase();
     
     if (this.segment === 'recetas') {
-      this.filteredItems = [];
+      this.filteredItems = this.recipes.filter(r => 
+        r.nombre.toLowerCase().includes(query)
+      );
     } else {
       this.filteredItems = this.products.filter(p =>
-        p.nombre.toLowerCase().includes(query)
+        p.nombre.toLowerCase().includes(query) || 
+        (p.marca && p.marca.toLowerCase().includes(query))
       );
     }
   }
@@ -141,6 +147,19 @@ export class SearchPage implements OnInit {
   }
 
   onSelect(item: Product | Recipe) {
-    console.log('Item seleccionado:', item);
+    // Determinar si es producto o receta basado en la estructura
+    const isProduct = 'carbohidratos' in item;
+    
+    if (isProduct) {
+      this.router.navigate(['/tabs/inicio/product', item._id], {
+        queryParams: {
+          date: this.dateParam,
+          meal: this.mealParam
+        }
+      });
+    } else {
+      // Implementar navegación a detalle de receta cuando esté disponible
+      console.log('Navegar a detalle de receta:', item);
+    }
   }
 }

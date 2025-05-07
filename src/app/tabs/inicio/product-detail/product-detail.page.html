@@ -1,0 +1,129 @@
+<!-- src/app/tabs/inicio/product-detail/product-detail.page.html -->
+<ion-header>
+    <ion-toolbar [color]="'success'">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        <div *ngIf="product">{{ product.nombre }}</div>
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <!-- Spinner de carga -->
+    <div class="loading-container" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  
+    <!-- Mensaje de error -->
+    <div class="error-container" *ngIf="error">
+      <p>{{ error }}</p>
+      <ion-button (click)="loadProduct()">Reintentar</ion-button>
+    </div>
+  
+    <div class="product-detail" *ngIf="product && !loading">
+      <!-- Subtítulo (marca) -->
+      <h2 class="product-subtitle">{{ product.marca || 'Sin marca' }}</h2>
+  
+      <!-- Selector de cantidad -->
+      <div class="cantidad-container">
+        <h3>Cantidad a consumir</h3>
+        <ion-item class="cantidad-input">
+          <ion-input 
+            type="number" 
+            inputmode="numeric" 
+            [(ngModel)]="cantidad" 
+            min="1" 
+            placeholder="100">
+          </ion-input>
+          <div class="cantidad-suffix">g</div>
+        </ion-item>
+      </div>
+  
+      <!-- Información nutricional por cantidad seleccionada -->
+      <div class="nutrition-card">
+        <h3 class="nutrition-title">Información nutricional por 100g o cantidad seleccionada</h3>
+        
+        <!-- Círculo de calorías -->
+        <div class="calories-circle-container">
+          <div class="calories-circle">
+            <div class="calories-value">{{ caloriasTotales | number:'1.0-0' }}</div>
+            <div class="calories-unit">kcal</div>
+          </div>
+  
+          <!-- Macronutrientes principales -->
+          <div class="macros-list">
+            <div class="macro-item protein">
+              <div class="macro-name">Proteínas - {{ proteinasTotales | number:'1.0-0' }}g</div>
+            </div>
+            <div class="macro-item carbs">
+              <div class="macro-name">Carbohidratos - {{ carbohidratosTotales | number:'1.0-0' }}g</div>
+            </div>
+            <div class="macro-item fat">
+              <div class="macro-name">Grasas - {{ grasasTotales | number:'1.0-0' }}g</div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Información detallada nutricional -->
+      <div class="nutrition-details">
+        <h3 class="nutrition-title">Información nutricional cada 100g</h3>
+        
+        <div class="nutrient-row">
+          <div class="nutrient-icon calories-icon">C</div>
+          <div class="nutrient-name">Calorías *</div>
+          <div class="nutrient-value">{{ product.calorias | number:'1.0-0' }} kcal</div>
+        </div>
+        
+        <div class="nutrient-row">
+          <div class="nutrient-icon fat-icon">G</div>
+          <div class="nutrient-name">Grasas *</div>
+          <div class="nutrient-value">{{ product.grasas | number:'1.0-0' }}g</div>
+        </div>
+        
+        <div class="nutrient-row" *ngIf="product.grasasSaturadas !== undefined">
+          <div class="nutrient-icon"></div>
+          <div class="nutrient-name indent">saturadas</div>
+          <div class="nutrient-value">{{ product.grasasSaturadas | number:'1.0-0' }}g</div>
+        </div>
+        
+        <div class="nutrient-row">
+          <div class="nutrient-icon carbs-icon">H</div>
+          <div class="nutrient-name">H. de carbono *</div>
+          <div class="nutrient-value">{{ product.carbohidratos | number:'1.0-0' }}g</div>
+        </div>
+        
+        <div class="nutrient-row" *ngIf="product.azucares !== undefined">
+          <div class="nutrient-icon"></div>
+          <div class="nutrient-name indent">Azúcares</div>
+          <div class="nutrient-value">{{ product.azucares | number:'1.0-0' }}g</div>
+        </div>
+        
+        <div class="nutrient-row">
+          <div class="nutrient-icon protein-icon">P</div>
+          <div class="nutrient-name">Proteínas *</div>
+          <div class="nutrient-value">{{ product.proteinas | number:'1.0-0' }}g</div>
+        </div>
+        
+        <div class="nutrient-row" *ngIf="product.fibra !== undefined">
+          <div class="nutrient-icon"></div>
+          <div class="nutrient-name">Fibra</div>
+          <div class="nutrient-value">{{ product.fibra | number:'1.0-0' }}g</div>
+        </div>
+      </div>
+  
+      <!-- Toggle para más información -->
+      <div class="more-info-toggle" (click)="toggleMoreInfo()">
+        <span>Más información</span>
+        <ion-icon [name]="showMoreInfo ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </div>
+  
+      <!-- Botón Añadir -->
+      <ion-button expand="block" class="add-button" (click)="addToMeal()">
+        Añadir producto
+        <ion-icon name="add-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-content>

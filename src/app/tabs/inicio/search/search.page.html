@@ -49,12 +49,13 @@
   <div class="items-list" *ngIf="!loading && !error">
     <div *ngFor="let item of filteredItems" class="product-card" (click)="onSelect(item)">
       <div class="product-content">
-        <div class="product-name">Nombre producto</div>
+        <div class="product-name">{{ item.nombre }}</div>
+        <div class="product-brand" *ngIf="hasKey(item, 'marca') && item.marca">{{ item.marca }}</div>
         <div class="product-macros">
-          <span class="calories">600 kcal</span>
-          <span class="protein">10g</span>
-          <span class="carbs">70g</span>
-          <span class="fat">24g</span>
+          <span class="calories">{{ item.calorias | number:'1.0-0' }} kcal</span>
+          <span class="protein">{{ item.proteinas | number:'1.0-0' }}g</span>
+          <span class="carbs">{{ item.carbohidratos | number:'1.0-0' }}g</span>
+          <span class="fat">{{ item.grasas | number:'1.0-0' }}g</span>
         </div>
         <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
       </div>

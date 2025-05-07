@@ -14,7 +14,10 @@ export interface Product {
   calorias: number;
   proteinas: number;
   carbohidratos: number;
+  azucares?: number;
   grasas: number;
+  grasasSaturadas?: number;
+  fibra?: number;
   porcion?: number;
   userId?: string | null;
 }
