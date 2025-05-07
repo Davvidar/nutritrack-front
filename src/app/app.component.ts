@@ -8,11 +8,7 @@ register();
   selector: 'app-root',
   standalone: true,
   imports: [IonicModule, RouterModule],
-  // <-- cambia aquí:
-  template: `
-    <ion-app>
-      <ion-router-outlet></ion-router-outlet>
-    </ion-app>
-  `
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {}

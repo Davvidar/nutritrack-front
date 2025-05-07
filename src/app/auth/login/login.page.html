@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="login-content">
 
   <div class="login-header">
-    <img src="assets/logo.png" alt="logo nutriTrack" class="logo" />
+    <img src="../../../assets/logo.png" alt="logo nutriTrack" class="logo" />
     <h1 class="title">nutritrack</h1> <p class="subtitle">Inicia sesión para acceder</p>
   </div>
 
@@ -10,7 +10,7 @@
     <div class="form-field">
       <ion-label class="input-label" position="stacked">Email</ion-label>
       <ion-item fill="outline" shape="round" lines="none" class="input-item">
-        <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+        <ion-icon slot="start" name="mail-outline" ></ion-icon>
         <ion-input
           formControlName="correo"
           type="email"
@@ -24,7 +24,7 @@
     <div class="form-field">
       <ion-label class="input-label" position="stacked">Contraseña</ion-label>
       <ion-item fill="outline" shape="round" lines="none" class="input-item">
-        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+        <ion-icon slot="start" name="lock-closed-outline" ></ion-icon>
         <ion-input
           formControlName="password"
           [type]="passwordType"
@@ -48,7 +48,7 @@
       shape="round"
       [disabled]="loginForm.invalid">
       Iniciar sesión
-      <ion-icon slot="end" name="arrow-forward" aria-hidden="true"></ion-icon>
+      <ion-icon slot="end" name="arrow-forward" ></ion-icon>
     </ion-button>
   </form>
 
@@ -62,7 +62,7 @@
     expand="block"
     shape="round"
     class="google-button">
-    <ion-icon slot="start" name="logo-google" aria-hidden="true"></ion-icon>
+    <ion-icon slot="start" name="logo-google" ></ion-icon>
     Iniciar sesión con Google
   </ion-button>
 
