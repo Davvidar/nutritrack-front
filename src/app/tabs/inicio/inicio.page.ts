@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { addDays, startOfWeek } from 'date-fns';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
+import { ToastController } from '@ionic/angular';
 
 import { WeekSliderComponent, WeekDay } from '../../components/week-slider/week-slider.component';
 import { MetricsSummaryComponent, Macros } from '../../components/metrics-summary/metrics-summary.component';
-import { MealAccordionComponent, MealItem } from '../../components/meal-accordion/meal-accordion.component';
+import { MealAccordionComponent, MealItemInterface } from '../../components/meal-accordion/meal-accordion.component';
 
-import { DailyLogService, DailyLog, SummaryResponse } from '../../services/daily-log.service';
+import { DailyLogService, MealItem, SummaryResponse } from '../../services/daily-log.service';
 import { ProductService, Product } from '../../services/product.service';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { Observable, forkJoin } from 'rxjs';
@@ -27,19 +28,35 @@ export class InicioPage implements OnInit {
   baseMonday: Date = startOfWeek(new Date(), { weekStartsOn: 1 });
   meals = ['desayuno', 'almuerzo', 'comida', 'merienda', 'cena', 'recena'] as const;
 
-  mealItems: Record<typeof this.meals[number], MealItem[]> = {
-    desayuno: [], almuerzo: [], comida: [], merienda: [], cena: [], recena: []
+  selectedDate: Date = new Date(); // O la fecha que estés manejando
+  mealItems: {
+    desayuno: MealItem[];
+    almuerzo: MealItem[];
+    comida: MealItem[];
+    merienda: MealItem[];
+    cena: MealItem[];
+    recena: MealItem[];
+  } = {
+    desayuno: [],
+    almuerzo: [],
+    comida: [],
+    merienda: [],
+    cena: [],
+    recena: []
   };
 
   dailyGoals: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   currentConsumption: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+  loading: boolean = false;
 
   constructor(
     private dailyLogService: DailyLogService,
     private productService: ProductService,
     private recipeService: RecipeService,
+    private toastController: ToastController,
     private authService: AuthService,
     private router: Router
+
   ) {}
 
   ngOnInit() {
@@ -60,6 +77,18 @@ export class InicioPage implements OnInit {
     
   }
 
+  ionViewWillEnter() {
+    // Se ejecuta cada vez que la página está a punto de entrar en la vista.
+    // Ideal para recargar datos.
+    const activeDay = this.week.find(d => d.active);
+    if (activeDay) {
+      console.log('InicioPage: ionViewWillEnter - Recargando datos para:', activeDay.date);
+      this.onDaySelected(activeDay); // Esto ya llama a loadDailyLog y loadSummary
+    }
+  }
+
+  
+
   private buildWeek() {
     this.week = [];
     for (let i = 0; i < 7; i++) {
@@ -75,60 +104,30 @@ export class InicioPage implements OnInit {
   }
 
   private loadDailyLog(date: Date) {
-    this.dailyLogService.getByDate(date).subscribe((log: DailyLog) => {
-      this.meals.forEach(meal => {
-        const itemsDTO = log.comidas[meal] || [];
-        if (itemsDTO.length) {
-          const observables: Observable<MealItem>[] = [];
-          
-          // Filtrar y procesar los items por tipo (producto o receta)
-          itemsDTO.forEach(dto => {
-            if (dto.productId) {
-              // Solo añadir al observable si productId está definido
-              observables.push(
-                this.productService.getById(dto.productId).pipe(
-                  map((p: Product) => ({
-                    name: p.nombre,
-                    calorias: (p.calorias * dto.cantidad) / 100,
-                    proteinas: (p.proteinas * dto.cantidad) / 100,
-                    carbohidratos: (p.carbohidratos * dto.cantidad) / 100,
-                    grasas: (p.grasas * dto.cantidad) / 100,
-                    cantidad: dto.cantidad
-                  }))
-                )
-              );
-            } else if (dto.recipeId) {
-              // Manejar recetas si están disponibles
-              observables.push(
-                this.recipeService.getById(dto.recipeId).pipe(
-                  map((r: Recipe) => {
-                    const proportion = dto.cantidad / r.pesoFinal;
-                    return {
-                      name: r.nombre,
-                      calorias: r.calorias * proportion,
-                      proteinas: r.proteinas * proportion,
-                      carbohidratos: r.carbohidratos * proportion,
-                      grasas: r.grasas * proportion,
-                      cantidad: dto.cantidad
-                    };
-                  })
-                )
-              );
-            }
-          });
-          
-          if (observables.length > 0) {
-            forkJoin(observables).subscribe((items: MealItem[]) => {
-              this.mealItems[meal] = items;
-            });
-          } else {
-            this.mealItems[meal] = [];
-          }
-        } else {
-          this.mealItems[meal] = [];
+    this.dailyLogService.getDailyLogWithDetails(date).subscribe({
+      next: (data: any) => {  // Añade tipado explícito
+        // Asignar datos directamente sin peticiones adicionales
+        if (data && data.comidas) {
+          this.mealItems = data.comidas;
         }
-      });
+      },
+      error: (err: any) => {  // Añade tipado explícito
+        console.error('Error al cargar el registro diario:', err);
+        // Puedes mostrar un mensaje al usuario aquí
+      }
     });
+  }
+  
+  
+  // Método auxiliar para mostrar mensajes de error
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom',
+      color: 'danger'
+    });
+    toast.present();
   }
 
   private loadSummary(date: Date) {
@@ -153,8 +152,9 @@ export class InicioPage implements OnInit {
     });
   }
 
-  loadWeek(dir: 'prev' | 'next') {
-    this.baseMonday = addDays(this.baseMonday, dir === 'next' ? 7 : -7);
+  loadWeek(direction: 'prev' | 'next') {
+    // Aquí actualizas baseMonday según la dirección
+    this.baseMonday = addDays(this.baseMonday, direction === 'next' ? 7 : -7);
     this.buildWeek();
     this.onDaySelected(this.week[0]);
   }

@@ -1,22 +1,18 @@
 // src/app/components/meal-accordion/meal-accordion.component.ts
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { CommonModule, DatePipe } from '@angular/common';
+import { RouterLink, RouterModule } from '@angular/router';
+import { MealItem } from 'src/app/services/daily-log.service';
 
-export interface MealItem {
-  name: string;
-  calorias: number;
-  proteinas: number;
-  carbohidratos: number;
-  grasas: number;
-  cantidad: number;  // en gramos
-}
+
+
+export interface MealItemInterface extends MealItem {}
 
 @Component({
   selector: 'app-meal-accordion',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterModule],
+  imports: [IonicModule, CommonModule, RouterModule, DatePipe],
   templateUrl: './meal-accordion.component.html',
   styleUrls: ['./meal-accordion.component.scss']
 })
@@ -24,20 +20,24 @@ export class MealAccordionComponent implements OnChanges {
   /** Título de la comida (Desayuno, Almuerzo, etc.) */
   @Input() title: string = '';
   /** Lista de ítems de la comida */
-  @Input() items: MealItem[] = [];
-  /** Estado expandido/collapse */
-  @Input() expanded: boolean = false;
+  @Input() items: MealItemInterface[] = [];
+
   /** Fecha seleccionada, pasada desde InicioPage (para el queryParam) */
-  @Input() parentDate!: Date;
+  @Input() parentDate: Date = new Date();
   /** Evento que dispara la acción de añadir un ítem */
   @Output() addItem = new EventEmitter<void>();
 
-  /** Totales calculados */
+
+  expanded: boolean = false;
   totalCalories: number = 0;
   totalProtein: number = 0;
   totalCarbs: number = 0;
-  totalFat: number = 0;
+  totalFat: number = 0
 
+  constructor() {}
+
+  /** Método de ciclo de vida que se ejecuta al inicializar el componente */
+  
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items']) {
       this.calculateTotals();

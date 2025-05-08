@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { IonicModule, GestureController } from '@ionic/angular';
+import { Component, EventEmitter, Input, Output, ViewChild, ElementRef, AfterViewInit, CUSTOM_ELEMENTS_SCHEMA, OnChanges } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { addDays } from 'date-fns';
+import { register } from 'swiper/element/bundle';
+
+// Registrar Swiper
+register();
 
 export interface WeekDay {
   letter: string;
@@ -14,67 +17,141 @@ export interface WeekDay {
   selector: 'app-week-slider',
   standalone: true,
   imports: [IonicModule, CommonModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // Necesario para elementos web personalizados
   templateUrl: './week-slider.component.html',
   styleUrls: ['./week-slider.component.scss']
 })
-export class WeekSliderComponent implements AfterViewInit {
+export class WeekSliderComponent implements AfterViewInit, OnChanges {
   @Input() week: WeekDay[] = [];
   @Output() dayChange = new EventEmitter<WeekDay>();
   @Output() weekChange = new EventEmitter<'next' | 'prev'>();
   
-  @ViewChild('weekSlider') weekSlider!: ElementRef;
+  @ViewChild('swiperElement') swiperElement!: ElementRef;
   
   monthTitle = '';
+  today = new Date();
   
-  constructor(private gestureCtrl: GestureController) {}
+  // Días de la semana en español
+  diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  mesEnEspanol = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+  
+  // Mantener semanas adyacentes
+  prevWeek: WeekDay[] = [];
+  nextWeek: WeekDay[] = [];
+  
+  constructor() {}
   
   ngAfterViewInit() {
-    this.setupGestures();
-  /*   this.updateMonthTitle(); */
+    // Generar semanas adyacentes
+    this.updateAdjacentWeeks();
+    
+    // Configurar Swiper después de que la vista se ha inicializado
+    if (this.swiperElement?.nativeElement) {
+      const swiperEl = this.swiperElement.nativeElement;
+      
+      // Configurar opciones de Swiper
+      Object.assign(swiperEl, {
+        slidesPerView: 1,
+        initialSlide: 1,
+        speed: 300,
+        allowTouchMove: true
+      });
+      
+      // Inicializar Swiper
+      swiperEl.initialize();
+      
+      // Agregar evento para detectar cambio de slide
+      swiperEl.addEventListener('slidechange', (event: any) => {
+        const activeIndex = event.detail[0].activeIndex;
+        
+        if (activeIndex === 0) {
+          // Si se desliza a la izquierda (semana anterior)
+          this.weekChange.emit('prev');
+        } else if (activeIndex === 2) {
+          // Si se desliza a la derecha (semana siguiente)
+          this.weekChange.emit('next');
+        }
+        
+        // Reiniciar al slide central
+        setTimeout(() => {
+          swiperEl.swiper.slideTo(1, 0);
+        }, 50);
+      });
+    }
+    
+    this.updateMonthTitle();
+  }
+  
+  ngOnChanges() {
+    // Actualizar semanas adyacentes cuando cambia la semana principal
+    this.updateAdjacentWeeks();
+  }
+  
+  // Actualizar las semanas previa y siguiente
+  updateAdjacentWeeks() {
+    if (this.week && this.week.length > 0) {
+      this.prevWeek = this.generatePreviousWeek(this.week[0].date);
+      this.nextWeek = this.generateNextWeek(this.week[0].date);
+    }
   }
   
   selectDay(day: WeekDay) {
+    // Solo seleccionar días en la semana actual
+    this.week.forEach(d => d.active = d.date.toDateString() === day.date.toDateString());
     this.dayChange.emit(day);
-  /*   this.updateMonthTitle(); */
+    this.updateMonthTitle();
   }
   
-/*   updateMonthTitle() {
+  updateMonthTitle() {
     const activeDay = this.week.find(d => d.active);
     if (activeDay) {
-      this.monthTitle = format(activeDay.date, 'MMMM yyyy', { locale: es, timeZone: 'UTC',  });
+      // Formatear el mes y año en español
+      const mes = this.mesEnEspanol[activeDay.date.getMonth()];
+      const anio = activeDay.date.getFullYear();
+      this.monthTitle = `${mes} ${anio}`;
     }
-  } */
+  }
   
-  setupGestures() {
-    const element = this.weekSlider.nativeElement;
-    let startX: number;
-    let endX: number;
+  generatePreviousWeek(fecha: Date): WeekDay[] {
+    const result: WeekDay[] = [];
+    const firstDay = new Date(fecha);
     
-    const gesture = this.gestureCtrl.create({
-      el: element,
-      threshold: 15,
-      gestureName: 'week-swipe',
-      onStart: (ev) => {
-        startX = ev.startX;
-      },
-      onMove: (ev) => {
-        endX = ev.currentX;
-      },
-      onEnd: () => {
-        const diff = endX - startX;
-        if (Math.abs(diff) > 100) {
-          if (diff > 0) {
-            // Swipe right - previous week
-            this.weekChange.emit('prev');
-          } else {
-            // Swipe left - next week
-            this.weekChange.emit('next');
-          }
-        /*   this.updateMonthTitle(); */
-        }
-      }
-    });
+    for (let i = 0; i < 7; i++) {
+      const date = addDays(firstDay, -7 + i);
+      result.push({
+        date,
+        // Usar nuestro array de días en español
+        letter: this.diasSemana[date.getDay() === 0 ? 6 : date.getDay() - 1],
+        active: false
+      });
+    }
     
-    gesture.enable();
+    return result;
+  }
+  
+  generateNextWeek(fecha: Date): WeekDay[] {
+    const result: WeekDay[] = [];
+    const firstDay = new Date(fecha);
+    
+    for (let i = 0; i < 7; i++) {
+      const date = addDays(firstDay, 7 + i);
+      result.push({
+        date,
+        // Usar nuestro array de días en español
+        letter: this.diasSemana[date.getDay() === 0 ? 6 : date.getDay() - 1],
+        active: false
+      });
+    }
+    
+    return result;
+  }
+  
+  datesAreOnSameDay(first: Date, second: Date): boolean {
+    return first.getDate() === second.getDate() && 
+           first.getMonth() === second.getMonth() && 
+           first.getFullYear() === second.getFullYear();
   }
 }

@@ -26,7 +26,7 @@ export interface Product {
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = environment.API_URL + '/products'; // URL corregida
+  private baseUrl = environment.API_URL + '/products';
   currentUserId: string | null = null;
 
   constructor(
@@ -114,6 +114,25 @@ export class ProductService {
     if (query) params = params.set('query', query);
     if (mis) params = params.set('mis', 'true');
     if (favoritos) params = params.set('favoritos', 'true');
+    
+    return this.http.get<Product[]>(`${this.baseUrl}/search`, { 
+      headers: this.authService.getAuthHeaders(),
+      params 
+    });
+  }
+  
+  /** 
+   * Método extendido para paginación (simulación en cliente)
+   * Aunque envía parámetros de paginación, el backend actual los ignorará
+   * pero el código está preparado para cuando el backend implemente paginación
+   */
+  searchProductsPaginated(query: string = '', mis: boolean = false, favoritos: boolean = false, page: number = 0, limit: number = 10): Observable<Product[]> {
+    let params = new HttpParams();
+    if (query) params = params.set('query', query);
+    if (mis) params = params.set('mis', 'true');
+    if (favoritos) params = params.set('favoritos', 'true');
+    params = params.set('page', page.toString());
+    params = params.set('limit', limit.toString());
     
     return this.http.get<Product[]>(`${this.baseUrl}/search`, { 
       headers: this.authService.getAuthHeaders(),

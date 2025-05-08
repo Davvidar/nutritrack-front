@@ -23,6 +23,11 @@
       width: 40px;
       color: white;
       
+      &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      
       .day-letter {
         font-size: 0.8rem;
         font-weight: 500;
@@ -42,6 +47,10 @@
       &.active .day-number {
         background-color: #000;
         font-weight: 500;
+      }
+      
+      &.today .day-number {
+        border: 2px solid #fff;
       }
     }
   }

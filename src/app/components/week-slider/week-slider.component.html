@@ -1,12 +1,40 @@
 <div class="week-container">
-  <!-- <div class="month-title">{{ monthTitle }}</div> -->
-  <div class="week-slider" #weekSlider>
-    <div class="day" 
-         *ngFor="let day of week" 
-         [class.active]="day.active"
-         (click)="selectDay(day)">
-      <div class="day-letter">{{ day.letter }}</div>
-      <div class="day-number">{{ day.date | date:'d' }}</div>
-    </div>
-  </div>
+  <div class="month-title">{{ monthTitle }}</div>
+  
+  <swiper-container #swiperElement init="false">
+    <swiper-slide>
+      <div class="week-slider">
+        <div class="day adjacent-week" 
+             *ngFor="let day of prevWeek" 
+             [class.today]="datesAreOnSameDay(day.date, today)">
+          <div class="day-letter">{{ day.letter }}</div>
+          <div class="day-number">{{ day.date | date:'d' }}</div>
+        </div>
+      </div>
+    </swiper-slide>
+    
+    <swiper-slide>
+      <div class="week-slider">
+        <div class="day" 
+             *ngFor="let day of week" 
+             [class.active]="day.active"
+             [class.today]="datesAreOnSameDay(day.date, today)"
+             (click)="selectDay(day)">
+          <div class="day-letter">{{ day.letter }}</div>
+          <div class="day-number">{{ day.date | date:'d' }}</div>
+        </div>
+      </div>
+    </swiper-slide>
+    
+    <swiper-slide>
+      <div class="week-slider">
+        <div class="day adjacent-week" 
+             *ngFor="let day of nextWeek" 
+             [class.today]="datesAreOnSameDay(day.date, today)">
+          <div class="day-letter">{{ day.letter }}</div>
+          <div class="day-number">{{ day.date | date:'d' }}</div>
+        </div>
+      </div>
+    </swiper-slide>
+  </swiper-container>
 </div>

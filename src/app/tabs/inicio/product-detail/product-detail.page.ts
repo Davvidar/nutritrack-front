@@ -1,9 +1,10 @@
 // src/app/tabs/inicio/product-detail/product-detail.page.ts
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { ProductService, Product } from '../../../services/product.service';
 import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
@@ -15,7 +16,7 @@ import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
   templateUrl: './product-detail.page.html',
   styleUrls: ['./product-detail.page.scss']
 })
-export class ProductDetailPage implements OnInit {
+export class ProductDetailPage implements OnInit, OnDestroy {
   product: Product | null = null;
   cantidad: number = 100; // Cantidad por defecto (en gramos)
   
@@ -27,6 +28,9 @@ export class ProductDetailPage implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   showMoreInfo: boolean = false;
+
+  private paramsSubscription: Subscription | undefined;
+  private queryParamsSubscription: Subscription | undefined;
 
   // Propiedades calculadas basadas en la cantidad
   get caloriasTotales(): number {
@@ -62,19 +66,21 @@ export class ProductDetailPage implements OnInit {
     private productService: ProductService,
     private dailyLogService: DailyLogService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private loadingController: LoadingController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
     // Recuperar parámetros de la URL
-    this.route.params.subscribe(params => {
+    this.paramsSubscription = this.route.params.subscribe(params => {
       if (params['id']) {
         this.productId = params['id'];
         this.loadProduct();
       }
     });
     
-    this.route.queryParams.subscribe(params => {
+    this.queryParamsSubscription = this.route.queryParams.subscribe(params => {
       if (params['date']) {
         this.dateParam = params['date'];
       }
@@ -82,6 +88,15 @@ export class ProductDetailPage implements OnInit {
         this.mealParam = params['meal'];
       }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.paramsSubscription) {
+      this.paramsSubscription.unsubscribe();
+    }
+    if (this.queryParamsSubscription) {
+      this.queryParamsSubscription.unsubscribe();
+    }
   }
 
   loadProduct() {
@@ -108,19 +123,33 @@ export class ProductDetailPage implements OnInit {
 
   addToMeal() {
     if (!this.product || !this.dateParam || !this.mealParam) {
-      console.error('Faltan datos para añadir a la comida');
+      let missingDataMessage = 'Faltan datos para añadir:';
+      if (!this.product) missingDataMessage += ' Producto no cargado.';
+      if (!this.dateParam) missingDataMessage += ' Fecha no especificada.';
+      if (!this.mealParam) missingDataMessage += ' Comida no especificada.';
+      console.error(missingDataMessage);
+      this.presentErrorToast(missingDataMessage);
       return;
     }
-
+    if (typeof this.cantidad !== 'number' || this.cantidad <= 0) {
+      this.presentErrorToast('Por favor, introduce una cantidad válida (mayor que 0).');
+      return;
+    }
+  
+    // Mostrar un loading indicator
+    this.presentLoading();
+  
     // Primero, obtener el registro diario actual
     this.dailyLogService.getByDate(new Date(this.dateParam)).subscribe({
       next: (dailyLog: DailyLog) => {
+        console.log('Registro diario obtenido:', dailyLog);
+        
         // Crear un nuevo item para añadir
         const newItem = {
           productId: this.productId,
           cantidad: this.cantidad
         };
-
+  
         // Si el registro no tiene comidas inicializadas
         if (!dailyLog.comidas) {
           dailyLog.comidas = {
@@ -132,7 +161,7 @@ export class ProductDetailPage implements OnInit {
             recena: []
           };
         }
-
+  
         // Añadir el item a la comida correspondiente
         const mealKey = this.mealParam.toLowerCase() as keyof typeof dailyLog.comidas;
         if (!dailyLog.comidas[mealKey]) {
@@ -140,25 +169,79 @@ export class ProductDetailPage implements OnInit {
         }
         
         dailyLog.comidas[mealKey].push(newItem);
+  
+        // Es posible que necesitemos asegurarnos de que la fecha esté en formato ISO string
+        if (typeof dailyLog.fecha === 'object' && dailyLog.fecha instanceof Date) {
+          dailyLog.fecha = dailyLog.fecha.toISOString();
+        }
 
+  
+        console.log('DailyLog a guardar:', JSON.stringify(dailyLog));
+  
         // Guardar el registro actualizado
         this.dailyLogService.save(dailyLog).subscribe({
-          next: () => {
-            console.log('Producto añadido correctamente');
+          next: (response) => {
+            console.log('Producto añadido correctamente:', response);
+            this.dismissLoading();
+            this.presentToast('Producto añadido correctamente');
             // Navegar de vuelta a la página de inicio
             this.router.navigate(['/tabs/inicio']);
           },
           error: (err) => {
             console.error('Error al guardar el registro diario:', err);
-            // Mostrar mensaje de error
+            if (err.error && err.error.errors && Array.isArray(err.error.errors)) {
+                console.error('Detalles del error del backend:', err.error.errors);
+                // Podrías incluso mostrar el primer mensaje de error al usuario si es apropiado
+                // this.errorMessage = err.error.errors[0].msg || 'Error desconocido del servidor.';
+              } else if (err.error) {
+                console.error('Cuerpo del error del backend:', err.error);
+              }
+            this.dismissLoading();
+            this.presentErrorToast('Error al guardar los cambios');
           }
         });
       },
       error: (err) => {
         console.error('Error al obtener el registro diario:', err);
-        // Mostrar mensaje de error
+        this.dismissLoading();
+        this.presentErrorToast('Error al obtener registro diario');
       }
     });
+  }
+  async presentLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Guardando...',
+      spinner: 'circular'
+    });
+    await loading.present();
+  }
+  
+  async dismissLoading() {
+    await this.loadingController.dismiss();
+  }
+  
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: 'success'
+    });
+    await toast.present();
+  }
+  
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom',
+      color: 'danger',
+      buttons: [{
+        text: 'OK',
+        role: 'cancel'
+      }]
+    });
+    await toast.present();
   }
 
   // Función para mostrar/ocultar más información

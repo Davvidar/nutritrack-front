@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { MealItem } from '../components/meal-accordion/meal-accordion.component';
+import { MealItemInterface } from '../components/meal-accordion/meal-accordion.component';
 import { environment } from '../../environments/environment';
 
 export interface Meal {
@@ -11,7 +11,7 @@ export interface Meal {
   userId?: string;
   fecha: string;  // formato YYYY-MM-DD
   tipo: string;   // 'desayuno', 'almuerzo', 'cena', 'snacks'
-  items: MealItem[];
+  items: MealItemInterface[];
 }
 
 @Injectable({

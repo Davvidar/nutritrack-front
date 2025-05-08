@@ -1,4 +1,4 @@
-<!-- Versión corregida de search.page.html -->
+<!-- src/app/tabs/inicio/search/search.page.html -->
 <ion-header>
   <ion-toolbar color="success">
     <ion-title>{{ mealParam | titlecase }}</ion-title>
@@ -14,6 +14,16 @@
 </ion-header>
 
 <ion-content>
+  <!-- Pull-to-refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="circles"
+      refreshingText="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <!-- Barra de búsqueda -->
   <div class="search-bar-container">
     <div class="search-bar">
@@ -23,6 +33,7 @@
         placeholder="Buscar"
         mode="md"
         animated="true"
+        debounce="300"
         class="product-search">
       </ion-searchbar>
       <ion-button fill="clear" class="filter-button">
@@ -46,6 +57,11 @@
     </ion-segment>
   </div>
 
+  <!-- Contador de resultados -->
+  <div class="results-count" *ngIf="filteredItems.length > 0">
+    {{ getResultsMessage() }}
+  </div>
+
   <!-- Lista de productos/recetas -->
   <div class="items-list" *ngIf="!loading && !error">
     <ion-card class="product-card" *ngFor="let item of filteredItems" (click)="onSelect(item)">
@@ -53,7 +69,8 @@
         <div class="product-name">{{ item.nombre }}</div>
         <div class="product-brand" *ngIf="isProduct(item) && item.marca">
           {{ item.marca }}
-        </div>        <div class="product-macros">
+        </div>
+        <div class="product-macros">
           <span class="calories">{{ item.calorias | number:'1.0-0' }} kcal</span>
           <span class="protein">{{ item.proteinas | number:'1.0-0' }}g</span>
           <span class="carbs">{{ item.carbohidratos | number:'1.0-0' }}g</span>
@@ -64,20 +81,43 @@
     </ion-card>
 
     <!-- Mensaje si no hay resultados -->
-    <div class="no-results" *ngIf="filteredItems.length === 0">
-      <p>No se encontraron resultados</p>
-      <ion-button fill="outline" (click)="goToCreateProduct()">Crear nuevo producto</ion-button>
+    <div class="no-results" *ngIf="filteredItems.length === 0 && !loadingSearch">
+      <ion-icon name="search-outline" class="no-results-icon"></ion-icon>
+      <h3>No se encontraron resultados</h3>
+      <p>Intenta con otros términos de búsqueda o crea un nuevo elemento</p>
+      <ion-button expand="block" fill="outline" (click)="goToCreateProduct()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear nuevo producto
+      </ion-button>
     </div>
   </div>
 
-  <!-- Spinner de carga -->
-  <div class="loading-container" *ngIf="loading">
+  <!-- Spinner de carga para búsqueda inicial -->
+  <div class="loading-container" *ngIf="loadingSearch && filteredItems.length === 0">
     <ion-spinner name="crescent"></ion-spinner>
+    <p>Buscando...</p>
   </div>
 
   <!-- Mensaje de error -->
   <div class="error-container" *ngIf="error">
+    <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+    <h3>¡Ups! Algo salió mal</h3>
     <p>{{ error }}</p>
-    <ion-button (click)="loadData()">Reintentar</ion-button>
+    <ion-button expand="block" (click)="loadData(true)">Reintentar</ion-button>
   </div>
+
+  <!-- Infinite Scroll para cargar más resultados -->
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="onIonInfinite($event)" *ngIf="hasMoreItems">
+    <ion-infinite-scroll-content
+      loadingSpinner="circular"
+      loadingText="Cargando más resultados...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Floating Action Button para crear nuevo producto -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="success" (click)="goToCreateProduct()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

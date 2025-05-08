@@ -30,7 +30,7 @@ export interface Recipe {
   providedIn: 'root'
 })
 export class RecipeService {
-  private baseUrl = environment.API_URL + '/recipes'; // URL corregida
+  private baseUrl = environment.API_URL + '/recipes';
 
   constructor(
     private http: HttpClient, 
@@ -70,5 +70,22 @@ export class RecipeService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()
     });
+  }
+  
+  /** 
+   * Busca recetas por nombre o ingredientes 
+   * (método preparado para cuando el backend lo implemente)
+   */
+  search(query: string = ''): Observable<Recipe[]> {
+    return this.getAll().pipe(
+      map(recipes => {
+        if (!query) return recipes;
+        
+        const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return recipes.filter(recipe => 
+          recipe.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedQuery)
+        );
+      })
+    );
   }
 }

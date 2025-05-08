@@ -7,10 +7,10 @@
 <ion-content>
   <!-- Week Slider Component -->
   <app-week-slider 
-    [week]="week"
-    (dayChange)="onDaySelected($event)"
-    (weekChange)="loadWeek($event)">
-  </app-week-slider>
+  [week]="week"
+  (dayChange)="onDaySelected($event)"
+  (weekChange)="loadWeek($event)">
+</app-week-slider>
   
   <!-- Metrics Summary Component -->
   <app-metrics-summary
@@ -24,6 +24,7 @@
     <app-meal-accordion 
       title="Desayuno" 
       [items]="mealItems.desayuno"
+      [parentDate]="selectedDate"
       (addItem)="addMeal('desayuno')">
     </app-meal-accordion>
     
@@ -31,6 +32,7 @@
     <app-meal-accordion 
       title="Almuerzo" 
       [items]="mealItems.almuerzo"
+      [parentDate]="selectedDate"
       (addItem)="addMeal('almuerzo')">
     </app-meal-accordion>
     
@@ -38,6 +40,7 @@
     <app-meal-accordion 
       title="Comida" 
       [items]="mealItems.comida"
+      [parentDate]="selectedDate"
       (addItem)="addMeal('comida')">
     </app-meal-accordion>
     
@@ -45,6 +48,7 @@
     <app-meal-accordion 
       title="Merienda" 
       [items]="mealItems.merienda"
+      [parentDate]="selectedDate"
       (addItem)="addMeal('merienda')">
     </app-meal-accordion>
     
@@ -52,7 +56,15 @@
     <app-meal-accordion 
       title="Cena" 
       [items]="mealItems.cena"
+      [parentDate]="selectedDate"
       (addItem)="addMeal('cena')">
+    </app-meal-accordion>
+    <!-- Recena -->
+    <app-meal-accordion 
+      title="Recena" 
+      [items]="mealItems.recena"
+      [parentDate]="selectedDate"
+      (addItem)="addMeal('recena')">
     </app-meal-accordion>
   </div>
 </ion-content>
