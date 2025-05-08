@@ -1,4 +1,4 @@
-// src/app/services/daily-log.service.ts
+// src/app/services/daily-log.service.ts (corregido)
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,7 +6,8 @@ import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment.prod';
 
 export interface MealItemDTO {
-  productId: string;
+  productId?: string;
+  recipeId?: string;
   cantidad: number; // en gramos
 }
 
@@ -20,13 +21,18 @@ export interface MealItem {
 }
 
 export interface DailyLog {
-  _id: string;
+  _id?: string;
+  userId?: string;
   fecha: string; // ISO string
   pesoDelDia?: number;
-  comidas: Record<
-    'desayuno' | 'almuerzo' | 'comida' | 'merienda' | 'cena' | 'recena',
-    MealItemDTO[]
-  >;
+  comidas: {
+    desayuno: MealItemDTO[];
+    almuerzo: MealItemDTO[];
+    comida: MealItemDTO[];
+    merienda: MealItemDTO[];
+    cena: MealItemDTO[];
+    recena: MealItemDTO[];
+  };
 }
 
 export interface SummaryResponse {
@@ -52,7 +58,7 @@ export interface SummaryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class DailyLogService {
-  private readonly API = environment.API_URL + '/dailyLogs'; // URL corregida
+  private readonly API = environment.API_URL + '/dailylogs'; // URL corregida
 
   constructor(
     private http: HttpClient,
@@ -88,6 +94,24 @@ export class DailyLogService {
    * - Si no, hará POST /api/dailyLogs
    */
   save(log: Partial<DailyLog>): Observable<DailyLog> {
+    // Aseguramos que la fecha esté en formato ISO
+    if (log.fecha && typeof log.fecha === 'object') {
+      log.fecha = (log.fecha as Date).toISOString();
+    }
+
+    // Aseguramos que todas las comidas existan como arrays vacíos si no están definidas
+    if (log.comidas) {
+      const comidas = log.comidas as any;
+      if (!comidas.desayuno) comidas.desayuno = [];
+      if (!comidas.almuerzo) comidas.almuerzo = [];
+      if (!comidas.comida) comidas.comida = [];
+      if (!comidas.merienda) comidas.merienda = [];
+      if (!comidas.cena) comidas.cena = [];
+      if (!comidas.recena) comidas.recena = [];
+    }
+
+    console.log('Guardando registro diario:', JSON.stringify(log));
+
     if (log._id) {
       return this.http.put<DailyLog>(
         `${this.API}/${log._id}`,

@@ -17,11 +17,49 @@ log.txt
 /.versions
 /coverage
 
+# Compiled source
+*.class
+
+
 # Ionic
 /.ionic
 /www
 /platforms
 /plugins
+
+# Capacitor
+/android
+/ios
+
+# Angular
+.angular/cache
+.angular.json
+
+# Firebase
+/firebase-debug.log*
+/.firebase/
+
+# Entornos
+/src/environments/environment.ts
+/src/environments/environment.prod.ts
+
+# Herramientas de desarrollo
+/.eslintcache
+/.prettiercache
+/.husky/_/*
+
+# CI/CD
+/.github/workflows/*.log
+
+# Logs y depuración
+/debug.log
+/error.log
+
+# Herramientas específicas
+/cypress/screenshots
+/cypress/videos
+/junit.xml
+/coverage/
 
 # Compiled output
 /dist
@@ -60,7 +98,6 @@ yarn-error.log
 /.nx
 /.nx/cache
 /connect.lock
-/coverage
 /libpeerconnection.log
 testem.log
 /typings

@@ -36,6 +36,10 @@ export class SearchPage implements OnInit {
     private route: ActivatedRoute
   ) {}
   
+  isProduct(item: any): item is Product {
+    return 'marca' in item;
+  }
+
   hasKey(obj: any, key: string): boolean {
     return obj && obj.hasOwnProperty(key);
   }
@@ -75,8 +79,12 @@ export class SearchPage implements OnInit {
     this.products = [];
     this.filteredItems = [];
     
-    this.productService.getAll(this.segment === 'tuyos').subscribe({
+    const isMisProducts = this.segment === 'tuyos';
+    console.log('Cargando productos con filtro mis=', isMisProducts);
+    
+    this.productService.searchProducts(this.searchQuery, isMisProducts).subscribe({
       next: (products) => {
+        console.log(`Recibidos ${products.length} productos`);
         this.products = products;
         this.filteredItems = products;
         this.loading = false;
@@ -109,27 +117,13 @@ export class SearchPage implements OnInit {
   }
 
   onSearchChange() {
-    this.applyFilter();
+    // Al cambiar la búsqueda, recargamos los datos con el filtro actualizado
+    this.loadData();
   }
 
   onSegmentChange(event: any) {
     this.segment = event.detail.value;
     this.loadData();
-  }
-
-  private applyFilter() {
-    const query = this.searchQuery.trim().toLowerCase();
-    
-    if (this.segment === 'recetas') {
-      this.filteredItems = this.recipes.filter(r => 
-        r.nombre.toLowerCase().includes(query)
-      );
-    } else {
-      this.filteredItems = this.products.filter(p =>
-        p.nombre.toLowerCase().includes(query) || 
-        (p.marca && p.marca.toLowerCase().includes(query))
-      );
-    }
   }
 
   onScanBarcode() {
@@ -147,6 +141,8 @@ export class SearchPage implements OnInit {
   }
 
   onSelect(item: Product | Recipe) {
+    console.log('Seleccionado item:', item);
+    
     // Determinar si es producto o receta basado en la estructura
     const isProduct = 'carbohidratos' in item;
     

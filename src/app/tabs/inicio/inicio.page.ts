@@ -13,6 +13,7 @@ import { DailyLogService, DailyLog, SummaryResponse } from '../../services/daily
 import { ProductService, Product } from '../../services/product.service';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { Observable, forkJoin } from 'rxjs';
+import { Recipe, RecipeService } from 'src/app/services/recipe.service';
 
 @Component({
   selector: 'app-inicio',
@@ -36,6 +37,7 @@ export class InicioPage implements OnInit {
   constructor(
     private dailyLogService: DailyLogService,
     private productService: ProductService,
+    private recipeService: RecipeService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -55,6 +57,7 @@ export class InicioPage implements OnInit {
       // Tras cargar objetivos, cargar día y métricas
       this.onDaySelected(today);
     });
+    
   }
 
   private buildWeek() {
@@ -76,18 +79,43 @@ export class InicioPage implements OnInit {
       this.meals.forEach(meal => {
         const itemsDTO = log.comidas[meal] || [];
         if (itemsDTO.length) {
-          const observables = itemsDTO.map(dto =>
-            this.productService.getById(dto.productId).pipe(
-              map((p: Product) => ({
-                name: p.nombre,
-                calorias: (p.calorias * dto.cantidad) / 100,
-                proteinas: (p.proteinas * dto.cantidad) / 100,
-                carbohidratos: (p.carbohidratos * dto.cantidad) / 100,
-                grasas: (p.grasas * dto.cantidad) / 100,
-                cantidad: dto.cantidad
-              }))
-            )
-          );
+          const observables: Observable<MealItem>[] = [];
+          
+          // Filtrar y procesar los items por tipo (producto o receta)
+          itemsDTO.forEach(dto => {
+            if (dto.productId) {
+              // Solo añadir al observable si productId está definido
+              observables.push(
+                this.productService.getById(dto.productId).pipe(
+                  map((p: Product) => ({
+                    name: p.nombre,
+                    calorias: (p.calorias * dto.cantidad) / 100,
+                    proteinas: (p.proteinas * dto.cantidad) / 100,
+                    carbohidratos: (p.carbohidratos * dto.cantidad) / 100,
+                    grasas: (p.grasas * dto.cantidad) / 100,
+                    cantidad: dto.cantidad
+                  }))
+                )
+              );
+            } else if (dto.recipeId) {
+              // Manejar recetas si están disponibles
+              observables.push(
+                this.recipeService.getById(dto.recipeId).pipe(
+                  map((r: Recipe) => {
+                    const proportion = dto.cantidad / r.pesoFinal;
+                    return {
+                      name: r.nombre,
+                      calorias: r.calorias * proportion,
+                      proteinas: r.proteinas * proportion,
+                      carbohidratos: r.carbohidratos * proportion,
+                      grasas: r.grasas * proportion,
+                      cantidad: dto.cantidad
+                    };
+                  })
+                )
+              );
+            }
+          });
           
           if (observables.length > 0) {
             forkJoin(observables).subscribe((items: MealItem[]) => {

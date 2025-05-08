@@ -1,13 +1,268 @@
+ion-spinner {
+  display: block;
+  margin: auto; // Centrar spinner si se usa fuera de ion-content padding
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
-  
-  ion-spinner {
-    display: block;
-    margin: 2rem auto;
+.error {
+  color: var(--ion-color-danger);
+  text-align: center;
+  padding: 1rem;
+  background-color: rgba(var(--ion-color-danger-rgb), 0.1);
+  border-radius: var(--ion-border-radius, 8px);
+  margin-top: 1rem; // Ajustar si está dentro de .ion-padding
+}
+
+.profile-header {
+  ion-toolbar {
+    --background: var(--ion-color-success, #558B2F); // Color verde principal
+    --color: var(--ion-color-success-contrast, #ffffff); // Texto blanco
+    padding-bottom: 30px; // Espacio para el solapamiento visual y bordes redondeados
+    border-radius: 0 0 25px 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-title {
+    padding: 10px 0;
+    text-align: left;
+    font-size: 1em; // Tamaño base para el título de la app
+
+    div {
+      line-height: 1.3;
+    }
+    .profile-name {
+      font-size: 1.6em;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    .profile-objective {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+  }
+  .header-icon-button ion-icon {
+    font-size: 1.6rem; // Iconos de la cabecera
+  }
+}
+
+.profile-content {
+  --background: #f4f4f8; // Fondo gris muy claro para el contenido general
+  // El solapamiento se maneja con margen negativo en la primera tarjeta
+}
+
+.summary-card,
+.weight-card,
+.details-list {
+  background: var(--ion-card-background, var(--ion-color-light, #ffffff));
+  color: var(--ion-text-color, var(--ion-color-dark, #222222));
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card {
+  margin-top: -20px; // Solapamiento con la cabecera
+  margin-left: 0; // El padding de ion-content se encarga
+  margin-right: 0; // El padding de ion-content se encarga
+  margin-bottom: 20px;
+
+  ion-card-content {
+    padding: 16px; // Padding interno de la tarjeta
+  }
+
+  .calories-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; // Ajustar según preferencia (space-around)
+    margin-bottom: 25px;
+    width: 100%;
+  }
+
+  .calories-text {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25%; // Darle un tamaño base
+    
+    .value {
+      font-size: 1.3em; // Ajustar según necesidad
+      font-weight: bold;
+      color: var(--ion-color-dark-shade);
+    }
+    .label {
+      font-size: 0.75em;
+      color: var(--ion-color-medium-shade);
+      margin-top: 2px;
+    }
   }
   
-  .error {
-    color: red;
-    text-align: center;
-    margin-top: 2rem;
+  .calories-consumed-text {
+    align-items: flex-start;
+    text-align: left;
   }
-  
+
+  .calories-remaining-text {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .calories-circle-container {
+    flex-shrink: 0;
+    padding: 0 5px; // Menor padding lateral
+  }
+
+  .calories-circle {
+    position: relative;
+    width: 90px;  // Círculo más pequeño
+    height: 90px; // Círculo más pequeño
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 70px;  // Interior más pequeño
+      height: 70px; // Interior más pequeño
+      background: var(--ion-card-background, var(--ion-color-light, #ffffff)); 
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .calories-value {
+      position: relative;
+      z-index: 2;
+      font-weight: bold;
+      color: var(--ion-color-dark-shade);
+      font-size: 1.3em; // Ajustar para el nuevo tamaño
+      text-align: center;
+      line-height: 1;
+      
+      .calories-unit {
+        display: block; // Kcal debajo del número
+        font-size: 0.6em;
+        font-weight: normal;
+        margin-left: 0; // No necesita margen si está debajo
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .macros-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+
+    .macro-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 30%;
+
+      .macro-label {
+        font-size: 1em;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        ion-icon {
+          margin-right: 5px;
+          font-size: 0.8em;
+        }
+        .p-color { color: var(--ion-color-primary); }
+        .h-color { color: var(--ion-color-warning); }
+        .g-color { color: var(--ion-color-tertiary); }
+      }
+      
+      .macro-progress {
+        width: 100%;
+        text-align: center; // Centrar texto debajo de la barra
+        ion-progress-bar {
+          height: 8px;
+          border-radius: 4px;
+          margin-bottom: 4px;
+          --background: #e0e0e0; // Fondo de la barra de progreso
+        }
+        .macro-detail-text {
+          font-size: 0.7em;
+          color: var(--ion-color-medium-shade);
+        }
+      }
+    }
+  }
+}
+
+.section-title {
+  font-size: 1.15em;
+  font-weight: 500;
+  color: var(--ion-color-dark-shade, #333);
+  margin-top: 25px;
+  margin-bottom: 15px;
+  // padding-left: 5px; // No es necesario si .ion-padding se encarga
+}
+
+.weight-grid {
+  padding: 0; // Quitar padding de ion-grid si no es necesario
+}
+
+.weight-card {
+  margin: 0 4px; // Pequeño margen entre tarjetas de peso
+  ion-card-content {
+    padding: 12px 8px; // Padding interno más ajustado
+  }
+  .hexagon-shape {
+    width: 45px; // Más pequeño para caber mejor
+    height: 45px;
+    margin: 0 auto 8px auto;
+    border-radius: 8px; // Cuadrado redondeado como fallback simple
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .orange-hexagon { background-color: #E65100; } // Naranja oscuro
+  .yellow-hexagon { background-color: #FFA000; } // Naranja claro/ambar
+  .purple-hexagon { background-color: #7B1FA2; } // Púrpura
+
+  .weight-label {
+    font-size: 0.8em;
+    color: var(--ion-color-medium-shade);
+    margin-bottom: 4px;
+  }
+  .weight-value {
+    font-size: 1.15em;
+    font-weight: 500;
+  }
+}
+
+.view-more-button {
+  // ion-margin-top ya está en el HTML
+  --border-radius: 10px;
+  height: 48px;
+  font-weight: 500;
+  text-transform: none; // Si no quieres mayúsculas
+}
+
+.details-list {
+  margin-top: 10px;
+  background: var(--ion-card-background, var(--ion-color-light, #ffffff));
+  ion-item {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    --min-height: 48px;
+    --background: transparent; // Heredar de la lista
+    ion-label {
+      color: var(--ion-color-dark-tint);
+      font-weight: normal; // O 500 si prefieres
+      font-size: 0.9em;
+    }
+    ion-text {
+      color: var(--ion-color-medium-shade);
+      font-size: 0.9em;
+    }
+  }
+}
+

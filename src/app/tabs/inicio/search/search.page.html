@@ -1,3 +1,4 @@
+<!-- Versión corregida de search.page.html -->
 <ion-header>
   <ion-toolbar color="success">
     <ion-title>{{ mealParam | titlecase }}</ion-title>
@@ -47,19 +48,20 @@
 
   <!-- Lista de productos/recetas -->
   <div class="items-list" *ngIf="!loading && !error">
-    <div *ngFor="let item of filteredItems" class="product-card" (click)="onSelect(item)">
-      <div class="product-content">
+    <ion-card class="product-card" *ngFor="let item of filteredItems" (click)="onSelect(item)">
+      <ion-card-content>
         <div class="product-name">{{ item.nombre }}</div>
-        <div class="product-brand" *ngIf="hasKey(item, 'marca') && item.marca">{{ item.marca }}</div>
-        <div class="product-macros">
+        <div class="product-brand" *ngIf="isProduct(item) && item.marca">
+          {{ item.marca }}
+        </div>        <div class="product-macros">
           <span class="calories">{{ item.calorias | number:'1.0-0' }} kcal</span>
           <span class="protein">{{ item.proteinas | number:'1.0-0' }}g</span>
           <span class="carbs">{{ item.carbohidratos | number:'1.0-0' }}g</span>
           <span class="fat">{{ item.grasas | number:'1.0-0' }}g</span>
         </div>
         <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
-      </div>
-    </div>
+      </ion-card-content>
+    </ion-card>
 
     <!-- Mensaje si no hay resultados -->
     <div class="no-results" *ngIf="filteredItems.length === 0">

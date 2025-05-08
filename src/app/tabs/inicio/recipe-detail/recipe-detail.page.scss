@@ -1,7 +1,5 @@
-// src/app/tabs/inicio/product-detail/product-detail.page.scss
-
 :host {
-    --product-bg-color: #fff;
+    --recipe-bg-color: #fff;
     --macro-protein-color: #5046c8; // Morado azulado
     --macro-carbs-color: #ff8c42;   // Naranja
     --macro-fat-color: #d4ca3a;     // Amarillo
@@ -39,12 +37,12 @@
     }
   }
   
-  .product-detail {
+  .recipe-detail {
     padding: 16px;
-    background-color: var(--product-bg-color);
+    background-color: var(--recipe-bg-color);
   }
   
-  .product-subtitle {
+  .recipe-subtitle {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 500;
@@ -76,7 +74,6 @@
         --padding-start: 8px;
         font-size: 1.1rem;
         font-weight: 500;
-        color:black
       }
       
       .cantidad-suffix {
@@ -255,20 +252,63 @@
     }
   }
   
-  // Toggle de más información
-  .more-info-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 0;
-    color: var(--text-light);
-    font-weight: 500;
+  // Tarjeta de ingredientes
+  .ingredients-card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
     margin-bottom: 24px;
-    cursor: pointer;
     
-    ion-icon {
-      font-size: 1.2rem;
+    .ingredients-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      
+      .ingredients-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 0;
+      }
+      
+      ion-icon {
+        font-size: 1.2rem;
+        color: var(--text-light);
+      }
+    }
+    
+    .ingredients-list {
+      margin-top: 16px;
+      
+      .ingredient-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .ingredient-name {
+          font-size: 0.9rem;
+          color: var(--text-color);
+        }
+        
+        .ingredient-quantity {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: var(--text-color);
+        }
+      }
+      
+      .no-ingredients {
+        text-align: center;
+        padding: 16px 0;
+        color: var(--text-light);
+      }
     }
   }
   

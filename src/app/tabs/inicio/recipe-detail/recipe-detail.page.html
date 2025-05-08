@@ -1,11 +1,10 @@
-<!-- src/app/tabs/inicio/product-detail/product-detail.page.html -->
 <ion-header>
     <ion-toolbar [color]="'success'">
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
       </ion-buttons>
       <ion-title>
-        <div *ngIf="product">{{ product.nombre }}</div>
+        <div *ngIf="recipe">{{ recipe.nombre }}</div>
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -19,12 +18,12 @@
     <!-- Mensaje de error -->
     <div class="error-container" *ngIf="error">
       <p>{{ error }}</p>
-      <ion-button (click)="loadProduct()">Reintentar</ion-button>
+      <ion-button (click)="loadRecipe()">Reintentar</ion-button>
     </div>
   
-    <div class="product-detail" *ngIf="product && !loading">
-      <!-- Subtítulo (marca) -->
-      <h2 class="product-subtitle">{{ product.marca || '' }}</h2>
+    <div class="recipe-detail" *ngIf="recipe && !loading">
+      <!-- Subtítulo (peso final) -->
+      <h2 class="recipe-subtitle">Peso final: {{ recipe.pesoFinal }}g</h2>
   
       <!-- Selector de cantidad -->
       <div class="cantidad-container">
@@ -43,7 +42,7 @@
   
       <!-- Información nutricional por cantidad seleccionada -->
       <div class="nutrition-card">
-        <h3 class="nutrition-title">Información por cantidad seleccionada</h3>
+        <h3 class="nutrition-title">Información nutricional para {{ cantidad }}g</h3>
         
         <!-- Círculo de calorías -->
         <div class="calories-circle-container">
@@ -69,60 +68,73 @@
   
       <!-- Información detallada nutricional -->
       <div class="nutrition-details">
-        <h3 class="nutrition-title">Información nutricional cada 100g</h3>
+        <h3 class="nutrition-title">Información nutricional completa</h3>
         
         <div class="nutrient-row">
           <div class="nutrient-icon calories-icon">C</div>
-          <div class="nutrient-name">Calorías *</div>
-          <div class="nutrient-value">{{ product.calorias | number:'1.0-0' }} kcal</div>
+          <div class="nutrient-name">Calorías</div>
+          <div class="nutrient-value">{{ recipe.calorias | number:'1.0-0' }} kcal</div>
         </div>
         
         <div class="nutrient-row">
           <div class="nutrient-icon fat-icon">G</div>
-          <div class="nutrient-name">Grasas *</div>
-          <div class="nutrient-value">{{ product.grasas | number:'1.0-0' }}g</div>
+          <div class="nutrient-name">Grasas</div>
+          <div class="nutrient-value">{{ recipe.grasas | number:'1.0-0' }}g</div>
         </div>
         
-        <div class="nutrient-row" *ngIf="product.grasasSaturadas !== undefined">
+        <div class="nutrient-row" *ngIf="recipe.grasasSaturadas !== undefined">
           <div class="nutrient-icon"></div>
           <div class="nutrient-name indent">saturadas</div>
-          <div class="nutrient-value">{{ product.grasasSaturadas | number:'1.0-0' }}g</div>
+          <div class="nutrient-value">{{ recipe.grasasSaturadas | number:'1.0-0' }}g</div>
         </div>
         
         <div class="nutrient-row">
           <div class="nutrient-icon carbs-icon">H</div>
-          <div class="nutrient-name">H. de carbono *</div>
-          <div class="nutrient-value">{{ product.carbohidratos | number:'1.0-0' }}g</div>
+          <div class="nutrient-name">H. de carbono</div>
+          <div class="nutrient-value">{{ recipe.carbohidratos | number:'1.0-0' }}g</div>
         </div>
         
-        <div class="nutrient-row" *ngIf="product.azucares !== undefined">
+        <div class="nutrient-row" *ngIf="recipe.azucares !== undefined">
           <div class="nutrient-icon"></div>
           <div class="nutrient-name indent">Azúcares</div>
-          <div class="nutrient-value">{{ product.azucares | number:'1.0-0' }}g</div>
+          <div class="nutrient-value">{{ recipe.azucares | number:'1.0-0' }}g</div>
         </div>
         
         <div class="nutrient-row">
           <div class="nutrient-icon protein-icon">P</div>
-          <div class="nutrient-name">Proteínas *</div>
-          <div class="nutrient-value">{{ product.proteinas | number:'1.0-0' }}g</div>
+          <div class="nutrient-name">Proteínas</div>
+          <div class="nutrient-value">{{ recipe.proteinas | number:'1.0-0' }}g</div>
         </div>
         
-        <div class="nutrient-row" *ngIf="product.fibra !== undefined">
+        <div class="nutrient-row" *ngIf="recipe.fibra !== undefined">
           <div class="nutrient-icon"></div>
           <div class="nutrient-name">Fibra</div>
-          <div class="nutrient-value">{{ product.fibra | number:'1.0-0' }}g</div>
+          <div class="nutrient-value">{{ recipe.fibra | number:'1.0-0' }}g</div>
         </div>
       </div>
   
-      <!-- Toggle para más información -->
-      <div class="more-info-toggle" (click)="toggleMoreInfo()">
-        <span>Más información</span>
-        <ion-icon [name]="showMoreInfo ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      <!-- Ingredientes de la receta (plegables) -->
+      <div class="ingredients-card">
+        <div class="ingredients-header" (click)="toggleIngredients()">
+          <h3 class="ingredients-title">Ingredientes</h3>
+          <ion-icon [name]="showIngredients ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+        
+        <div class="ingredients-list" *ngIf="showIngredients">
+          <div class="ingredient-item" *ngFor="let ingredient of ingredients">
+            <div class="ingredient-name">{{ ingredient.name }}</div>
+            <div class="ingredient-quantity">{{ ingredient.cantidad }}g</div>
+          </div>
+          
+          <div class="no-ingredients" *ngIf="ingredients.length === 0">
+            <p>No hay ingredientes disponibles para mostrar</p>
+          </div>
+        </div>
       </div>
   
       <!-- Botón Añadir -->
       <ion-button expand="block" class="add-button" (click)="addToMeal()">
-        Añadir producto
+        Añadir receta
         <ion-icon name="add-outline" slot="end"></ion-icon>
       </ion-button>
     </div>
