@@ -1,0 +1,69 @@
+<div class="nutrition-summary">
+    <ion-card class="summary-card">
+      <ion-card-content>
+        <!-- El contenido se muestra directamente. Si nutritionData es null, los getters devolverán 0 y progress será 0. -->
+          <div class="calories-area">
+            <div class="calories-text calories-consumed-text">
+              <span class="value">{{ getConsumedCalories() | number:'1.0-0' }}</span>
+              <span class="label">consumidas</span>
+            </div>
+
+            <div class="calories-circle-container">
+              <div class="calories-circle" 
+                   [style.background]="'conic-gradient(var(--ion-color-warning) 0% ' + caloriesProgress + '%, #e9ecef ' + caloriesProgress + '% 100%)'">
+                <div class="calories-value">
+                  {{ getTargetCalories() | number:'1.0-0' }}
+                  <span class="calories-unit">kcal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="calories-text calories-remaining-text">
+              <span class="value">{{ getRemainingCalories() | number:'1.0-0' }}</span>
+              <span class="label">restantes</span>
+            </div>
+          </div>
+
+          <div class="macros-summary">
+            <div class="macro-item">
+              <div class="macro-label">
+                <ion-icon name="ellipse" class="p-color"></ion-icon> P
+              </div>
+              <div class="macro-values">
+                 {{ getConsumedProtein() | number:'1.0-0' }} / {{ getTargetProtein() | number:'1.0-0' }} g
+              </div>
+              <ion-progress-bar
+                [value]="proteinProgress / 100"
+                class="protein-progress-bar">
+              </ion-progress-bar>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label">
+                <ion-icon name="ellipse" class="h-color"></ion-icon> H
+              </div>
+              <div class="macro-values">
+                {{ getConsumedCarbs() | number:'1.0-0' }} / {{ getTargetCarbs() | number:'1.0-0' }} g
+              </div>
+              <ion-progress-bar
+                [value]="carbsProgress / 100"
+                class="carbs-progress-bar ">
+              </ion-progress-bar>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label">
+                <ion-icon name="ellipse" class="g-color"></ion-icon> G
+              </div>
+              <div class="macro-values">
+                 {{ getConsumedFat() | number:'1.0-0' }} / {{ getTargetFat() | number:'1.0-0' }} g
+              </div>
+              <ion-progress-bar
+                [value]="fatProgress / 100"
+                class="fat-progress-bar">
+              </ion-progress-bar>
+            </div>
+          </div>
+      </ion-card-content>
+    </ion-card>
+  </div>

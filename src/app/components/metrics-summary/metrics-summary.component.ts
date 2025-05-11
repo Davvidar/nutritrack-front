@@ -21,6 +21,7 @@ export class MetricsSummaryComponent implements OnChanges {
   @Input() dailyGoals: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   @Input() currentConsumption: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
+  
   // Para las barras de progreso
   caloriesProgress: number = 0;
   proteinProgress: number = 0;

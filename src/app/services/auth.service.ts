@@ -23,6 +23,7 @@ export interface UserProfile {
     carbohidratos: number;
     grasas: number;
   };
+
   // Campos opcionales/extendidos
   consumoActual?: {
     calorias?: number;
@@ -33,6 +34,7 @@ export interface UserProfile {
   pesoAnterior?: number;
   pesoHoy?: number;
 }
+
 
 export interface RegisterData {
   nombre: string;
@@ -137,7 +139,15 @@ export class AuthService {
 
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
-    return new HttpHeaders({ 
+    if (!token) {
+      console.warn('No hay token disponible para autenticación');
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+    
+    console.log('Token disponible:', token ? 'Sí' : 'No');
+    return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });

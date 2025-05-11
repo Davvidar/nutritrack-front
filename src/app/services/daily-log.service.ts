@@ -1,11 +1,11 @@
 // src/app/services/daily-log.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, of, forkJoin } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { Observable, of, forkJoin, throwError } from 'rxjs';
+import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { throwError } from 'rxjs';
-import { ProductService, Product } from './product.service'; // Importar ProductService y Product
+import { ProductService, Product } from './product.service';
+import { NutritionUpdateService } from './nutrition-update.service';
 import { environment } from 'src/environments/environment.prod';
 
 export interface MealItemDTO {
@@ -28,7 +28,7 @@ export interface MealItem {
 export interface DailyLog {
   _id?: string;
   userId?: string;
-  fecha: string | Date ; // ISO string
+  fecha: string | Date; // ISO string o Date
   pesoDelDia?: number | null;
   comidas: {
     desayuno: MealItemDTO[];
@@ -41,6 +41,7 @@ export interface DailyLog {
 }
 
 export interface SummaryResponse {
+  message?: string;
   consumido: {
     calorias: number;
     proteinas: number;
@@ -68,11 +69,12 @@ export class DailyLogService {
   constructor(
     private http: HttpClient,
     private auth: AuthService,
-    private productService: ProductService // Inyectar ProductService
+    private productService: ProductService,
+    private nutritionUpdateService: NutritionUpdateService
   ) {}
   
   /**
-   * Obtiene el DailyLog completo para la fecha indicada.
+   * Obtiene el DailyLog completo para la fecha indicada con detalles de productos/recetas.
    * Si no existe, la API debería devolver un objeto con todas las comidas vacías.
    */
   getDailyLogWithDetails(date: Date): Observable<any> {
@@ -96,7 +98,6 @@ export class DailyLogService {
         }).pipe(
           map(resolvedComidas => {
             return {
-              // dailyLog, // Puedes incluir el dailyLog original si lo necesitas en la UI
               comidas: resolvedComidas // Este objeto contiene los MealItem[] con detalles completos
             };
           })
@@ -105,6 +106,11 @@ export class DailyLogService {
     );
   }
 
+  /**
+   * Transforma los DTO de los items de comida en objetos completos con información nutricional.
+   * @param itemDTOs Array de DTOs de items de comida con IDs de productos/recetas
+   * @returns Observable que emite array de MealItems con información nutricional
+   */
   private transformMealItems(itemDTOs: MealItemDTO[]): Observable<MealItem[]> {
     if (!itemDTOs || itemDTOs.length === 0) {
       return of([]);
@@ -113,7 +119,7 @@ export class DailyLogService {
     const itemObservables: Observable<MealItem>[] = itemDTOs.map(dto => {
       if (dto.productId) {
         return this.productService.getById(dto.productId).pipe(
-          map((product: Product | null) => { // ProductService podría devolver null si no se encuentra
+          map((product: Product | null) => {
             if (!product) {
               return {
                 name: `Producto ID ${dto.productId} no encontrado`,
@@ -152,20 +158,32 @@ export class DailyLogService {
     return forkJoin(itemObservables);
   }
   
+  /**
+   * Obtiene el DailyLog para una fecha específica.
+   * @param fecha Fecha para obtener el registro
+   * @returns Observable que emite el DailyLog para esa fecha
+   */
   getByDate(fecha: Date): Observable<DailyLog> {
-    const params = new HttpParams().set('fecha', fecha.toISOString());
+    // Formatear fecha como YYYY-MM-DD
+    const fechaFormatted = this.formatDateForBackend(fecha);
+    
+    const params = new HttpParams().set('fecha', fechaFormatted);
+    
+    console.log('DailyLogService - Solicitando log para fecha:', fechaFormatted);
     
     return this.http.get<DailyLog>(
       `${this.API}/por-fecha`,
       { headers: this.auth.getAuthHeaders(), params }
     ).pipe(
+      tap(response => {
+        console.log('DailyLogService - Respuesta del log diario:', response);
+      }),
       catchError((error: HttpErrorResponse) => {
         console.error('Error obteniendo DailyLog:', error);
         // Devolver un objeto vacío en caso de error (ej. 404 Not Found)
-        // Es importante incluir el userId si se va a usar este objeto para crear uno nuevo.
-        const currentUserId = this.auth.getCurrentUserId(); // Asumiendo que este método existe
+        const currentUserId = this.auth.getCurrentUserId();
         const emptyDailyLog: DailyLog = {
-          userId: currentUserId || undefined, // Añadir userId si está disponible
+          userId: currentUserId || undefined,
           fecha: fecha.toISOString(),
           pesoDelDia: null,
           comidas: {
@@ -183,15 +201,25 @@ export class DailyLogService {
   }
 
   /**
-   * Obtiene únicamente el resumen de consumido vs objetivo (calorías + macros).
+   * Obtiene el resumen nutricional para una fecha específica.
+   * @param fecha Fecha para obtener el resumen
+   * @returns Observable que emite el resumen nutricional
    */
   getSummary(fecha: Date): Observable<SummaryResponse> {
-    const params = new HttpParams().set('fecha', fecha.toISOString());
+    // Formatear fecha como YYYY-MM-DD
+    const fechaFormatted = this.formatDateForBackend(fecha);
+    
+    const params = new HttpParams().set('fecha', fechaFormatted);
+    
+    console.log('DailyLogService - Solicitando resumen para fecha:', fechaFormatted);
     
     return this.http.get<SummaryResponse>(
       `${this.API}/resumen`,
       { headers: this.auth.getAuthHeaders(), params }
     ).pipe(
+      tap(response => {
+        console.log('DailyLogService - Respuesta de resumen nutricional:', response);
+      }),
       catchError(error => {
         console.error('Error obteniendo resumen:', error);
         // Devolver un objeto vacío en caso de error
@@ -211,7 +239,7 @@ export class DailyLogService {
    * - Si no, hará POST /api/dailyLogs
    */
   save(log: Partial<DailyLog>): Observable<DailyLog> {
-    const currentUserId = this.auth.getCurrentUserId(); // Asumiendo que este método existe
+    const currentUserId = this.auth.getCurrentUserId();
     if (!currentUserId) {
       console.error('User ID no disponible. No se puede guardar el DailyLog.');
       return throwError(() => new Error('Usuario no autenticado o ID no disponible.'));
@@ -221,20 +249,27 @@ export class DailyLogService {
     const logToSave: Partial<DailyLog> = { ...log };
     
     if (!logToSave.userId) logToSave.userId = currentUserId;
-  
-    // Aseguramos que la fecha esté en formato ISO
-    if (logToSave.fecha && typeof logToSave.fecha === 'object') {
-      logToSave.fecha = (logToSave.fecha as Date).toISOString();
+    
+    // Formatear la fecha como YYYY-MM-DD si existe
+    if (logToSave.fecha) {
+      // Convertir a objeto Date si es string
+      const fechaObj = typeof logToSave.fecha === 'string' 
+        ? new Date(logToSave.fecha) 
+        : logToSave.fecha as Date;
+      
+      // Convertir a formato YYYY-MM-DD
+      logToSave.fecha = this.formatDateForBackend(fechaObj);
+      
+      console.log('DailyLogService - Fecha formateada para guardar:', logToSave.fecha);
     }
-
-    // Si pesoDelDia es null, y el validador del backend es .optional().isFloat({ gt: 0 }),
-    // es mejor no enviar el campo para que .optional() aplique.
-    // El error del backend indica explícitamente "value: null" para pesoDelDia.
+  
+    // Si pesoDelDia es null y el validador del backend es .optional().isFloat({ gt: 0 }),
+    // es mejor no enviar el campo
     if (logToSave.hasOwnProperty('pesoDelDia') && logToSave.pesoDelDia === null) {
       delete logToSave.pesoDelDia;
     }
   
-    // Aseguramos que todas las comidas existan como arrays vacíos si no están definidas
+    // Asegurar que todas las comidas existan como arrays vacíos
     if (logToSave.comidas) {
       const comidas = logToSave.comidas as any;
       if (!comidas.desayuno) comidas.desayuno = [];
@@ -245,34 +280,54 @@ export class DailyLogService {
       if (!comidas.recena) comidas.recena = [];
     }
   
-    console.log('Guardando registro diario:', JSON.stringify(logToSave));
+    console.log('DailyLogService - Guardando registro diario:', JSON.stringify(logToSave));
   
+    // Variable para almacenar la fecha original para notificaciones
+    const originalDateObj = typeof log.fecha === 'string' 
+      ? new Date(log.fecha) 
+      : log.fecha as Date;
+
     if (logToSave._id) {
       return this.http.put<DailyLog>(
         `${this.API}/${logToSave._id}`,
         logToSave,
         { headers: this.auth.getAuthHeaders() }
+      ).pipe(
+        tap(() => {
+          // Notificar actualización
+          this.nutritionUpdateService.notifyNutritionUpdated(originalDateObj);
+        })
       );
     }
+    
     return this.http.post<DailyLog>(
       this.API,
       logToSave,
       { headers: this.auth.getAuthHeaders() }
+    ).pipe(
+      tap(() => {
+        // Notificar actualización
+        this.nutritionUpdateService.notifyNutritionUpdated(originalDateObj);
+      })
     );
   }
 
   /**
-   * Actualiza solo el peso del día
+   * Actualiza solo el peso del día para una fecha específica.
+   * @param date Fecha para la que actualizar el peso
+   * @param peso Nuevo valor de peso
+   * @returns Observable que emite el DailyLog actualizado
    */
   updateWeight(date: Date, peso: number): Observable<DailyLog> {
     return this.getByDate(date).pipe(
-      switchMap(dailyLog => { // dailyLog aquí ya debería tener userId si getByDate lo maneja
+      switchMap(dailyLog => {
         const currentUserId = this.auth.getCurrentUserId();
         if (!dailyLog.userId && currentUserId) {
-          dailyLog.userId = currentUserId; // Asegurar userId si no vino de getByDate
+          dailyLog.userId = currentUserId;
         } else if (!dailyLog.userId && !currentUserId) {
           return throwError(() => new Error('User ID no disponible para actualizar peso.'));
         }
+        
         const updatedLog: Partial<DailyLog> = { ...dailyLog, pesoDelDia: peso };
         return this.save(updatedLog);
       }),
@@ -280,9 +335,13 @@ export class DailyLogService {
         console.error('Error actualizando peso:', error);
         const currentUserId = this.auth.getCurrentUserId();
         if (!currentUserId) return throwError(() => new Error('User ID no disponible para crear nuevo log de peso.'));
+        
+        // Formatear fecha como YYYY-MM-DD
+        const fechaFormatted = this.formatDateForBackend(date);
+        
         // Crear un nuevo registro sólo con el peso
         const newLog: Partial<DailyLog> = {
-          fecha: date.toISOString(),
+          fecha: fechaFormatted,
           pesoDelDia: peso,
           comidas: {
             desayuno: [],
@@ -292,7 +351,7 @@ export class DailyLogService {
             cena: [],
             recena: []
           },
-          userId: currentUserId // Asegurar userId al crear nuevo
+          userId: currentUserId
         };
         return this.save(newLog);
       })
@@ -300,9 +359,8 @@ export class DailyLogService {
   }
   
   /**
-   * Obtiene el historial de pesos
-   * Este método asume que existe un endpoint para historial de pesos
-   * Si no existe, debería implementarse en el backend
+   * Obtiene el historial de pesos.
+   * @returns Observable que emite un array de pesos con sus fechas
    */
   getWeightHistory(): Observable<{fecha: string, peso: number}[]> {
     return this.http.get<{fecha: string, peso: number}[]>(
@@ -314,5 +372,22 @@ export class DailyLogService {
         return of([]);
       })
     );
+  }
+
+  /**
+   * Método auxiliar para formatear fechas como YYYY-MM-DD.
+   * @param date Fecha a formatear
+   * @returns String en formato YYYY-MM-DD
+   */
+  private formatDateForBackend(date: Date): string {
+    // Asegurar que es Date
+    const d = new Date(date);
+    
+    // Formatear como YYYY-MM-DD
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
   }
 }

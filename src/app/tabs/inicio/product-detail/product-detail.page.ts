@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 
 import { ProductService, Product } from '../../../services/product.service';
 import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
+import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
+
 
 @Component({
   selector: 'app-product-detail',
@@ -68,7 +70,8 @@ export class ProductDetailPage implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private loadingController: LoadingController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private nutritionUpdateService: NutritionUpdateService //
   ) {}
 
   ngOnInit() {
@@ -180,13 +183,18 @@ export class ProductDetailPage implements OnInit, OnDestroy {
   
         // Guardar el registro actualizado
         this.dailyLogService.save(dailyLog).subscribe({
-          next: (response) => {
-            console.log('Producto añadido correctamente:', response);
-            this.dismissLoading();
-            this.presentToast('Producto añadido correctamente');
-            // Navegar de vuelta a la página de inicio
-            this.router.navigate(['/tabs/inicio']);
-          },
+            next: (response) => {
+              console.log('Producto añadido correctamente:', response);
+              this.dismissLoading();
+              this.presentToast('Producto añadido correctamente');
+              
+              // Notificar la actualización directamente (redundante, pero asegura la actualización)
+              const dateObj = new Date(this.dateParam);
+              this.nutritionUpdateService.notifyNutritionUpdated(dateObj);
+              
+              // Navegar de vuelta a la página de inicio
+              this.router.navigate(['/tabs/inicio']);
+            },
           error: (err) => {
             console.error('Error al guardar el registro diario:', err);
             if (err.error && err.error.errors && Array.isArray(err.error.errors)) {

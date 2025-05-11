@@ -1,0 +1,173 @@
+// src/app/components/nutrition-summary/nutrition-summary.component.scss
+.nutrition-summary {
+    width: 100%;
+  }
+  
+  .summary-card {
+    margin: 0;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .loading-container, .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    text-align: center;
+    
+    ion-spinner {
+      margin-bottom: 12px;
+    }
+    
+    ion-icon {
+      font-size: 32px;
+      color: var(--ion-color-danger);
+      margin-bottom: 12px;
+    }
+  }
+  
+  .calories-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    width: 100%;
+  }
+  
+  .calories-text {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25%;
+    
+    .value {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: var(--ion-color-dark-shade);
+    }
+    .label {
+      font-size: 0.75em;
+      color: var(--ion-color-medium-shade);
+      margin-top: 2px;
+    }
+  }
+  
+  .calories-consumed-text {
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  .calories-remaining-text {
+    align-items: flex-end;
+    text-align: right;
+  }
+  
+  .calories-circle-container {
+    flex-shrink: 0;
+    padding: 0 5px;
+  }
+  
+  .calories-circle {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    &::before {
+      content: '';
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      background: var(--ion-card-background, var(--ion-color-light, #ffffff)); 
+      border-radius: 50%;
+      z-index: 1;
+    }
+  
+    .calories-value {
+      position: relative;
+      z-index: 2;
+      font-weight: bold;
+      color: var(--ion-color-dark-shade);
+      font-size: 1.3em;
+      text-align: center;
+      line-height: 1;
+      
+      .calories-unit {
+        display: block;
+        font-size: 0.6em;
+        font-weight: normal;
+        margin-top: 2px;
+      }
+    }
+  }
+  
+  .macros-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  
+    .macro-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 30%;
+  
+      .macro-label {
+        font-size: 1em;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        ion-icon {
+          margin-right: 5px;
+          font-size: 0.8em;
+        }
+        .p-color { color: blue }
+        .h-color { color: rgb(247, 132, 0); }
+        .g-color { color: gold }
+      }
+      
+      
+      .macro-progress {
+        width: 100%;
+        text-align: center;
+        ion-progress-bar {
+          height: 8px;
+          border-radius: 4px;
+          margin-bottom: 4px;
+          --background: #e0e0e0;
+        }
+        
+       
+      }
+    }
+    ion-progress-bar {
+        height: 10px !important;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 8px 0;
+        
+        --background: rgba(255, 255, 255, 0.1); // Fondo gris claro para la parte vacía
+        
+        &::part(progress) {
+          transition: transform 0.3s ease-out;
+        }
+        
+        &.protein-progress-bar {
+          --progress-background: blue;
+        }
+        
+        &.carbs-progress-bar {
+          --progress-background: rgb(247, 132, 0);
+        }
+        
+        &.fat-progress-bar {
+          --progress-background: gold;
+        }
+      }
+  }

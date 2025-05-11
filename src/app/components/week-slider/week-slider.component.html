@@ -7,7 +7,7 @@
         <div class="day adjacent-week" 
              *ngFor="let day of prevWeek" 
              [class.today]="datesAreOnSameDay(day.date, today)">
-          <div class="day-letter">{{ day.letter }}</div>
+          <div class="day-letter" >{{ day.letter }}</div>
           <div class="day-number">{{ day.date | date:'d' }}</div>
         </div>
       </div>

@@ -1,22 +1,22 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="success">
-    <ion-title class="ion-text-center">nutritrack</ion-title>
+<ion-header class="nutri-header">
+  <ion-toolbar class="nutri-header">
+    <img src="../../../assets/Nutritrack_letras.png" alt="logo nutriTrack" class="nutri-header" />
   </ion-toolbar>
-</ion-header>
-
-<ion-content>
-  <!-- Week Slider Component -->
-  <app-week-slider 
-  [week]="week"
-  (dayChange)="onDaySelected($event)"
-  (weekChange)="loadWeek($event)">
-</app-week-slider>
   
-  <!-- Metrics Summary Component -->
-  <app-metrics-summary
-    [dailyGoals]="dailyGoals"
-    [currentConsumption]="currentConsumption">
-  </app-metrics-summary>
+</ion-header>
+<!-- Week Slider Component -->
+<app-week-slider 
+[week]="week"
+(dayChange)="onDaySelected($event)"
+(weekChange)="loadWeek($event)">
+</app-week-slider>
+
+<!-- Metrics Summary Component -->
+<app-metrics-summary
+[dailyGoals]="dailyGoals"
+[currentConsumption]="currentConsumption">
+</app-metrics-summary>
+<ion-content>
   
   <!-- Meals Section -->
   <div class="meals-container">

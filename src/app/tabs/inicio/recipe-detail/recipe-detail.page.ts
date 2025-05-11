@@ -8,6 +8,9 @@ import { ProductService, Product } from '../../../services/product.service';
 import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
+import { ToastController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-recipe-detail',
@@ -60,7 +63,10 @@ export class RecipeDetailPage implements OnInit {
     private productService: ProductService,
     private dailyLogService: DailyLogService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastController: ToastController,
+    private nutritionUpdateService: NutritionUpdateService
+
   ) {}
 
   ngOnInit() {
@@ -155,15 +161,18 @@ export class RecipeDetailPage implements OnInit {
 
         // Guardar el registro actualizado
         this.dailyLogService.save(dailyLog).subscribe({
-          next: () => {
-            console.log('Receta añadida correctamente');
-            // Navegar de vuelta a la página de inicio
-            this.router.navigate(['/tabs/inicio']);
-          },
-          error: (err) => {
-            console.error('Error al guardar el registro diario:', err);
-            // Mostrar mensaje de error
-          }
+            next: (response) => {
+              console.log('Producto añadido correctamente:', response);
+              // Remove the call to dismissLoading as it is not defined
+          //    this.presentToast('Producto añadido correctamente');
+              
+              // Notificar la actualización directamente (redundante, pero asegura la actualización)
+              const dateObj = new Date(this.dateParam);
+              this.nutritionUpdateService.notifyNutritionUpdated(dateObj);
+              
+              // Navegar de vuelta a la página de inicio
+              this.router.navigate(['/tabs/inicio']);
+            },
         });
       },
       error: (err) => {

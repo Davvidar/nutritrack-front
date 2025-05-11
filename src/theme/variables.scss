@@ -2,6 +2,7 @@
 // http://ionicframework.com/docs/theming/
 // src/theme/variables.scss
 
+
   
   ion-item.input-item {
     --border-color: var(--nutri-border-color);
@@ -36,6 +37,31 @@
     }
   }
 
+  
+ion-header.profile-header {
+  // Asegura que no haya borde si ion-no-border no es suficiente por alguna razón.
+  &.ion-no-border {
+    ion-toolbar {
+
+    }
+  }
+
+  ion-toolbar {
+    // Establece el color de fondo del toolbar.
+    --background: var(--ion-color-primary);
+
+    // Establece el color del texto y los iconos para que contrasten con el fondo.
+    color: var(--ion-color-primary-contrast);
+
+    ion-title {
+      color: var(--ion-color-primary-contrast); // Asegura que el título también tome el color.
+      div { // Para los divs dentro del ion-title
+        color: var(--ion-color-primary-contrast);
+      }
+    }
+  }
+}
+
 :root {
     /* …otras variables… */
   
@@ -45,7 +71,7 @@
     --ion-color-primary-contrast-rgb: 255,255,255;
     --ion-color-primary-shade:       #4a7a33;
     --ion-color-primary-tint:        #6b9a4d;
-  
+
     /* …resto del tema… */
   }
   
