@@ -6,11 +6,14 @@ import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, arrowForward } from 'ionicons/icons';
 import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-
 import { environment } from './environments/environment';
-
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
+import { AuthInterceptor } from './app/interceptors/auth.interceptor';
+import { TokenRefreshInterceptor } from './app/interceptors/token-refresh.interceptor';
+
 
 if (environment.production) {
   enableProdMode();
@@ -28,6 +31,16 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideHttpClient(),
     importProvidersFrom(IonicModule.forRoot()),
-    provideRouter(routes)
+    provideRouter(routes),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenRefreshInterceptor,
+      multi: true
+    }
   ]
 }).catch(err => console.error(err));

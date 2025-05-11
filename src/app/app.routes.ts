@@ -1,11 +1,17 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { alreadyAuthGuard } from './guards/already-auth.guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage) },
+  { 
+    path: '', 
+    loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage),
+    canActivate: [alreadyAuthGuard] // Aplicar el guard a la ruta raíz
+  },
   {
     path: 'auth',
+    canActivate: [alreadyAuthGuard], // Aplicar el guard al módulo de autenticación
     children: [
       { path: 'login',    loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage) },
       { path: 'register', loadComponent: () => import('./auth/register/register.page').then(m => m.RegisterPage) },
@@ -29,7 +35,6 @@ export const routes: Routes = [
         path: 'inicio/product/:id',
         loadComponent: () => import('./tabs/inicio/product-detail/product-detail.page').then(m => m.ProductDetailPage)
       },
-
       {
         path: 'perfil',
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)

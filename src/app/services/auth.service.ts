@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
 import { Router } from '@angular/router';
 
@@ -54,6 +54,7 @@ export class AuthService {
   private api = environment.API_URL + '/users';
   private tokenKey = 'nutritrack_token';
   private userKey = 'nutritrack_user';
+  private tokenExpiryKey = 'nutritrack_token_expiry';
   
   // Estado de autenticación observable
   private authState = new BehaviorSubject<boolean>(false);
@@ -63,6 +64,7 @@ export class AuthService {
   public authStatus$ = this.authState.asObservable();
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  
   constructor(
     private http: HttpClient,
     private router: Router
@@ -73,13 +75,30 @@ export class AuthService {
   // Verificar estado de autenticación al iniciar
   private checkAuth() {
     const token = this.getToken();
-    const userData = this.getUserData();
     
-    if (token) {
+    if (token && !this.isTokenExpired()) {
+      // Token válido, actualizar estado y cargar datos de usuario
       this.authState.next(true);
+      
+      // Intentar cargar datos de usuario desde localStorage
+      const userData = this.getUserData();
       if (userData) {
         this.currentUserSubject.next(userData);
+      } else {
+        // Si no hay datos en localStorage, intentar obtener del perfil
+        this.getProfile().subscribe({
+          next: (user) => {
+            this.currentUserSubject.next(user);
+          },
+          error: () => {
+            // Si hay error al cargar el perfil, limpiar y desconectar
+            this.clearAuthData();
+          }
+        });
       }
+    } else if (token && this.isTokenExpired()) {
+      // Token expirado, limpiar todo
+      this.clearAuthData();
     }
   }
 
@@ -91,6 +110,7 @@ export class AuthService {
       tap(res => {
         this.saveToken(res.token);
         this.saveUserData(res.user);
+        this.saveTokenExpiry(res.token); // Guardar la fecha de expiración del token
         this.authState.next(true);
         this.currentUserSubject.next(res.user);
       })
@@ -119,6 +139,30 @@ export class AuthService {
       })
     );
   }
+
+  private saveTokenExpiry(token: string) {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return;
+      
+      const payload = JSON.parse(atob(parts[1]));
+      if (payload.exp) {
+        localStorage.setItem(this.tokenExpiryKey, payload.exp.toString());
+      }
+    } catch (error) {
+      console.error('Error guardando expiración del token:', error);
+    }
+  }
+  
+  private clearAuthData() {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.tokenExpiryKey);
+    this.authState.next(false);
+    this.currentUserSubject.next(null);
+  }
+
+  
 
   saveToken(token: string) {
     localStorage.setItem(this.tokenKey, token);
@@ -186,21 +230,29 @@ export class AuthService {
   
   // Verificar si el token ha caducado
   isTokenExpired(): boolean {
-    const token = this.getToken();
-    if (!token) return true;
-    
-    try {
-      const parts = token.split('.');
-      if (parts.length !== 3) return true;
+    const expiryString = localStorage.getItem(this.tokenExpiryKey);
+    if (!expiryString) {
+      // Si no tenemos fecha de expiración, verificamos directamente del token
+      const token = this.getToken();
+      if (!token) return true;
       
-      const payload = JSON.parse(atob(parts[1]));
-      const now = Math.floor(Date.now() / 1000);
-      
-      return payload.exp && payload.exp < now;
-    } catch (error) {
-      console.error('Error verificando expiración del token:', error);
-      return true;
+      try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return true;
+        
+        const payload = JSON.parse(atob(parts[1]));
+        const now = Math.floor(Date.now() / 1000);
+        
+        return payload.exp && payload.exp < now;
+      } catch (error) {
+        console.error('Error verificando expiración del token:', error);
+        return true;
+      }
     }
+    
+    const expiry = parseInt(expiryString, 10);
+    const now = Math.floor(Date.now() / 1000);
+    return expiry < now;
   }
   getCurrentUserId(): string | null {
     const userData = this.getUserData();
