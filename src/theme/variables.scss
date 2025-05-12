@@ -74,4 +74,468 @@ ion-header.profile-header {
 
     /* …resto del tema… */
   }
+  /* src/global.scss - Añadir al final del archivo existente */
+
+/* Estilos para el scanner de código de barras */
+body.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
+  --ion-background-color-rgb: 0,0,0;
+}
+
+body.scanner-active {
+  /* Ocultar otros elementos mientras escanea */
+  ion-content {
+    --background: transparent;
+  }
   
+  ion-app {
+    background: transparent;
+  }
+}
+
+/* Estilo adicional para el botón de escaneo en los campos de código de barras */
+.barcode-item {
+  position: relative;
+  
+  ion-input {
+    padding-right: 50px; // Espacio para el botón
+  }
+  
+  ion-button[slot="end"] {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* Animación para el scanner */
+/* src/global.scss - Añadir al final del archivo existente */
+
+/* Estilos para el scanner de código de barras */
+body.scanner-active {
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  background: transparent !important;
+}
+
+body.scanner-active ion-app {
+  background: transparent !important;
+}
+
+body.scanner-active ion-content {
+  --background: transparent !important;
+  background: transparent !important;
+}
+
+body.scanner-active ion-page {
+  display: none !important;
+}
+/* src/global.scss - Añadir al final del archivo existente */
+
+/* Estilos para el scanner de código de barras */
+body.scanner-active {
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ocultar todos los elementos de la UI cuando el scanner está activo */
+body.scanner-active {
+  ion-app {
+    background: transparent !important;
+  }
+  
+  ion-page {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  
+  ion-content {
+    --background: transparent !important;
+    background: transparent !important;
+    opacity: 0 !important;
+  }
+  
+  ion-content.scanner-hidden {
+    display: none !important;
+  }
+  
+  ion-header {
+    display: none !important;
+  }
+  
+  ion-toolbar {
+    display: none !important;
+  }
+  
+  ion-tab-bar {
+    display: none !important;
+  }
+  
+  ion-tabs {
+    background: transparent !important;
+  }
+  
+  .tabs-inner {
+    display: none !important;
+  }
+  
+  ion-router-outlet {
+    background: transparent !important;
+  }
+  
+  app-week-slider,
+  app-metrics-summary,
+  app-meal-accordion,
+  .meals-container {
+    display: none !important;
+  }
+  
+  /* Asegurar que cualquier spinner o loading también se oculte */
+  ion-spinner,
+  .loading-overlay {
+    display: none !important;
+  }
+}
+
+/* UI del escáner */
+.scanner-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999999;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  padding-top: 40px; /* Espacio para la barra de estado */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.scanner-title {
+  color: white;
+  font-size: 1.2rem;
+  flex: 1;
+  text-align: center;
+  margin-right: 48px; // Para compensar el botón de cerrar
+}
+
+.close-scanner {
+  --color: white;
+}
+
+.scanner-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
+}
+
+.scanner-frame {
+  width: 280px;
+  height: 280px;
+  position: relative;
+  
+  /* Esquinas del marco */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    border-top: 3px solid #6ab04c;
+    border-left: 3px solid #6ab04c;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border-bottom: 3px solid #6ab04c;
+    border-right: 3px solid #6ab04c;
+  }
+}
+
+/* Esquinas adicionales */
+/* src/global.scss - Añadir al final del archivo existente */
+
+/* Estilos para el scanner de código de barras */
+body.scanner-active {
+  --background: transparent !important;
+  --ion-background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ocultar todos los elementos de la UI cuando el scanner está activo */
+body.scanner-active {
+  ion-app {
+    background: transparent !important;
+  }
+  
+  ion-page {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  
+  ion-content {
+    --background: transparent !important;
+    background: transparent !important;
+    opacity: 0 !important;
+  }
+  
+  ion-content.scanner-hidden {
+    display: none !important;
+  }
+  
+  ion-header {
+    display: none !important;
+  }
+  
+  ion-toolbar {
+    display: none !important;
+  }
+  
+  ion-tab-bar {
+    display: none !important;
+  }
+  
+  ion-tabs {
+    background: transparent !important;
+  }
+  
+  .tabs-inner {
+    display: none !important;
+  }
+  
+  ion-router-outlet {
+    background: transparent !important;
+  }
+  
+  app-week-slider,
+  app-metrics-summary,
+  app-meal-accordion,
+  .meals-container {
+    display: none !important;
+  }
+  
+  /* Asegurar que cualquier spinner o loading también se oculte */
+  ion-spinner,
+  .loading-overlay {
+    display: none !important;
+  }
+}
+
+/* UI del escáner */
+.scanner-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999999;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  padding-top: 40px; /* Espacio para la barra de estado */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.scanner-title {
+  color: white;
+  font-size: 1.2rem;
+  flex: 1;
+  text-align: center;
+  margin-right: 48px; // Para compensar el botón de cerrar
+}
+
+.close-scanner {
+  --color: white;
+}
+
+.scanner-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
+}
+
+.scanner-frame {
+  width: 280px;
+  height: 280px;
+  position: relative;
+  
+  /* Esquinas del marco */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    border-top: 3px solid #6ab04c;
+    border-left: 3px solid #6ab04c;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border-bottom: 3px solid #6ab04c;
+    border-right: 3px solid #6ab04c;
+  }
+}
+
+/* Esquinas adicionales */
+.scanner-frame::before,
+.scanner-frame::after,
+.scanner-ui::before,
+.scanner-ui::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 3px solid #6ab04c;
+}
+
+.scanner-frame::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.scanner-frame::after {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+.scanner-ui::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  border: none;
+}
+
+.scanner-ui::before::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  border-top: 3px solid #6ab04c;
+  border-right: 3px solid #6ab04c;
+}
+
+.scanner-ui::before::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  border-bottom: 3px solid #6ab04c;
+  border-left: 3px solid #6ab04c;
+}
+
+.scanner-line {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background-color: #6ab04c;
+  animation: scan 2s linear infinite;
+  box-shadow: 0 0 10px #6ab04c;
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: calc(100% - 2px);
+  }
+}
+
+.scanner-instructions {
+  color: white;
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+/* Estilo adicional para el botón de escaneo en los campos de código de barras */
+.barcode-item {
+  position: relative;
+  
+  ion-input {
+    padding-right: 50px; // Espacio para el botón
+  }
+  
+  ion-button[slot="end"] {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* Estilos para el botón de escaneo */
+.scan-button-custom,
+ion-button[slot="end"] ion-icon[name="barcode-outline"] {
+  color: var(--nutri-primary-green, #6ab04c);
+  font-size: 1.4rem;
+}

@@ -37,7 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'inicio/product/:id/edit',
-        loadComponent: () => import('./tabs/inicio/product-edit/product-edit.page').then(m => m.ProductEditPage)
+        loadComponent: () => import('./tabs/inicio/edit-product/product-edit.page').then(m => m.ProductEditPage)
       },
       {
         path: 'inicio/create-product',

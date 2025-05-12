@@ -303,10 +303,10 @@ ion-header{
 }
 ion-header.profile-header {
   // Asegura que no haya borde si ion-no-border no es suficiente por alguna razón.
-  height: 50px;
   &.ion-no-border {
     ion-toolbar {
       --border-width: 0;
+      
     }
   }
 

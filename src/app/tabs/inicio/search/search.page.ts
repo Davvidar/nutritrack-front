@@ -1,12 +1,14 @@
 // src/app/tabs/inicio/search/search.page.ts
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
+import { IonicModule, LoadingController, ToastController, Platform, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 import { ProductService, Product } from '../../../services/product.service';
 import { RecipeService, Recipe } from '../../../services/recipe.service';
+import { BarcodeScannerService } from '../../../services/barcode-scanner.service';
 
 @Component({
   selector: 'app-search',
@@ -47,7 +49,10 @@ export class SearchPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private loadingController: LoadingController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private platform: Platform,
+    private alertController: AlertController,
+    private barcodeScannerService: BarcodeScannerService
   ) {}
   
   ngOnInit() {
@@ -68,6 +73,156 @@ export class SearchPage implements OnInit {
   ionViewWillEnter() {
     this.loadData(true);
   }
+
+  ionViewWillLeave() {
+    // Asegurarse de que el escáner se detiene cuando salimos de la página
+    this.barcodeScannerService.stopScan();
+  }
+
+  // Preparar el escáner de código de barras
+  async prepareScanner() {
+    try {
+      // Verificar permisos de cámara
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      
+      if (status.granted) {
+        console.log('Permisos de cámara concedidos');
+      } else if (status.denied) {
+        // Si está denegado, intentar solicitar permiso
+        const newStatus = await BarcodeScanner.checkPermission({ force: true });
+        if (!newStatus.granted) {
+          this.presentErrorToast('Se requiere permiso de cámara para escanear códigos de barras');
+        }
+      }
+    } catch (err) {
+      console.error('Error al preparar escáner:', err);
+    }
+  }
+
+  // Implementación mejorada del escáner de código de barras
+  async onScanBarcode() {
+    try {
+      // Verificar si estamos en una plataforma nativa
+      if (!this.platform.is('capacitor')) {
+        await this.presentToast('El escáner solo funciona en dispositivos móviles');
+        return;
+      }
+
+      // Usar el servicio para escanear
+      const barcode = await this.barcodeScannerService.startScan();
+      
+      if (barcode) {
+        console.log('Código escaneado:', barcode);
+        await this.handleBarcodeResult(barcode);
+      } else {
+        console.log('Escaneo cancelado o sin resultado');
+      }
+    } catch (err) {
+      console.error('Error durante el escaneo:', err);
+      this.presentErrorToast('Error al escanear el código de barras');
+    }
+  }
+
+  // Verificar permisos de cámara
+  async checkPermission(): Promise<boolean> {
+    try {
+      const status = await BarcodeScanner.checkPermission({ force: true });
+
+      if (status.granted) {
+        return true;
+      }
+
+      if (status.denied) {
+        await this.presentErrorToast('Por favor, habilita el permiso de cámara en la configuración de la app');
+        return false;
+      }
+
+      if (status.neverAsked) {
+        const newStatus = await BarcodeScanner.checkPermission({ force: true });
+        if (newStatus.granted) {
+          return true;
+        }
+      }
+
+      if (status.restricted || status.unknown) {
+        return false;
+      }
+
+      return false;
+    } catch (err) {
+      console.error('Error verificando permisos:', err);
+      return false;
+    }
+  }
+
+  // Manejar el resultado del escaneo
+  async handleBarcodeResult(barcode: string) {
+    const loading = await this.presentLoading();
+
+    try {
+      // Buscar producto por código de barras
+      this.productService.getByBarcode(barcode).subscribe({
+        next: (product) => {
+          loading.dismiss();
+          // Si se encuentra el producto, navegar a su página de detalle
+          this.router.navigate(['/tabs/inicio/product', product._id], {
+            queryParams: {
+              date: this.dateParam,
+              meal: this.mealParam
+            }
+          });
+          this.presentToast('Producto encontrado');
+        },
+        error: (err) => {
+          loading.dismiss();
+          if (err.status === 404) {
+            // Si no se encuentra, ofrecer crear un nuevo producto
+           /*  this.presentNotFoundAlert(barcode); */
+           this.router.navigate(['/tabs/inicio/create-product'], {
+            queryParams: {
+              date: this.dateParam,
+              meal: this.mealParam,
+              barcode: barcode // Pasar el código como parámetro
+            }
+          });
+          } else {
+            this.presentErrorToast('Error al buscar el producto');
+          }
+        }
+      });
+    } catch (err) {
+      loading.dismiss();
+      console.error('Error procesando código de barras:', err);
+      this.presentErrorToast('Error al procesar el código de barras');
+    }
+  }
+
+  // Alerta cuando no se encuentra el producto
+  async presentNotFoundAlert(barcode: string) {
+    const alert = await this.alertController.create({
+      header: 'Producto no encontrado',
+      message: `No se encontró ningún producto con el código ${barcode}. ¿Deseas crear uno nuevo?`,
+      buttons: [
+       
+        {
+          text: 'Ok',
+          handler: () => {
+            this.router.navigate(['/tabs/inicio/create-product'], {
+              queryParams: {
+                date: this.dateParam,
+                meal: this.mealParam,
+                barcode: barcode // Pasar el código como parámetro
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ... resto de métodos existentes ...
 
   // Versión optimizada de loadData con paginación
   loadData(reset: boolean = false) {
@@ -170,13 +325,6 @@ export class SearchPage implements OnInit {
     this.loadData(true);
   }
 
-  onScanBarcode() {
-    // Aquí se implementaría la funcionalidad del escáner de códigos de barras
-    console.log('Función de escanear código de barras');
-    // En el futuro, integrar con un plugin como BarcodeScanner
-    this.presentToast('Funcionalidad de escáner en desarrollo');
-  }
-
   goToCreateProduct() {
     this.router.navigate(['/tabs/inicio/create-product'], { 
       queryParams: { 
@@ -258,6 +406,7 @@ export class SearchPage implements OnInit {
       duration: 10000 // Timeout por si algo falla
     });
     await loading.present();
+    return loading;
   }
   
   // Ocultar loading spinner
@@ -304,6 +453,7 @@ export class SearchPage implements OnInit {
     
     return `Mostrando ${this.filteredItems.length} de ${this.totalItems} resultados`;
   }
+  
   openFilterOptions(): void {
     // Implement the logic for opening filter options
     console.log('Filter options opened');
