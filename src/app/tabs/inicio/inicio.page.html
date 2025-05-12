@@ -17,15 +17,19 @@
 [currentConsumption]="currentConsumption">
 </app-metrics-summary>
 <ion-content>
-  
+
+  <ion-spinner *ngIf="loading" class="global-spinner"></ion-spinner>
+<!--   <div class="loading-overlay" *ngIf="loading"></div>   -->
   <!-- Meals Section -->
   <div class="meals-container">
     <!-- Desayuno -->
     <app-meal-accordion 
-      title="Desayuno" 
-      [items]="mealItems.desayuno"
-      [parentDate]="selectedDate"
-      (addItem)="addMeal('desayuno')">
+    title="Desayuno" 
+    [items]="mealItems.desayuno"
+    [parentDate]="selectedDate"
+    (addItem)="addMeal('desayuno')"
+    (itemClick)="onMealItemClick($event, 'desayuno')"
+    (removeItem)="onRemoveMealItem($event, 'desayuno')">
     </app-meal-accordion>
     
     <!-- Almuerzo -->
@@ -33,7 +37,9 @@
       title="Almuerzo" 
       [items]="mealItems.almuerzo"
       [parentDate]="selectedDate"
-      (addItem)="addMeal('almuerzo')">
+      (addItem)="addMeal('almuerzo')"
+      (itemClick)="onMealItemClick($event, 'almuerzo')"
+      (removeItem)="onRemoveMealItem($event, 'almuerzo')">   
     </app-meal-accordion>
     
     <!-- Comida -->
@@ -41,7 +47,9 @@
       title="Comida" 
       [items]="mealItems.comida"
       [parentDate]="selectedDate"
-      (addItem)="addMeal('comida')">
+      (addItem)="addMeal('comida')"
+      (itemClick)="onMealItemClick($event, 'comida')"
+      (removeItem)="onRemoveMealItem($event, 'comida')">
     </app-meal-accordion>
     
     <!-- Merienda -->
@@ -49,7 +57,9 @@
       title="Merienda" 
       [items]="mealItems.merienda"
       [parentDate]="selectedDate"
-      (addItem)="addMeal('merienda')">
+      (addItem)="addMeal('merienda')"
+      (itemClick)="onMealItemClick($event, 'merienda')"
+      (removeItem)="onRemoveMealItem($event, 'merienda')">
     </app-meal-accordion>
     
     <!-- Cena -->
@@ -57,14 +67,18 @@
       title="Cena" 
       [items]="mealItems.cena"
       [parentDate]="selectedDate"
-      (addItem)="addMeal('cena')">
+      (addItem)="addMeal('cena')"
+      (itemClick)="onMealItemClick($event, 'cena')"
+      (removeItem)="onRemoveMealItem($event, 'cena')">
     </app-meal-accordion>
     <!-- Recena -->
     <app-meal-accordion 
       title="Recena" 
       [items]="mealItems.recena"
       [parentDate]="selectedDate"
-      (addItem)="addMeal('recena')">
+      (addItem)="addMeal('recena')"
+      (itemClick)="onMealItemClick($event, 'recena')"
+      (removeItem)="onRemoveMealItem($event, 'recena')">
     </app-meal-accordion>
   </div>
 </ion-content>

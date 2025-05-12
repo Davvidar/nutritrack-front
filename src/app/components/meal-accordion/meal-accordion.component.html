@@ -26,10 +26,19 @@
   </div>
   
   <div class="food-tracker-details" [class.open]="expanded">
-    <div class="food-item" *ngFor="let item of items">
+    <div class="food-item" *ngFor="let item of items" (click)="onItemClick(item, $event)">
       <div class="food-item-header">
-        <span class="food-item-name">{{ item.name }}</span>
-        <span class="food-item-weight">{{ item.cantidad }}g</span>
+        <div class="food-item-info">
+          <span class="food-item-name">{{ item.name }}</span>
+          <span class="food-item-weight">{{ item.cantidad }}g</span>
+        </div>
+        <div class="food-item-actions">
+          <ion-icon 
+            name="trash-outline" 
+            class="remove-icon" 
+            (click)="onRemoveClick(item, $event)">
+          </ion-icon>
+        </div>
       </div>
       <div class="food-item-nutrients">
         <span class="calories">{{ item.calorias | number:'1.0-0' }}</span>

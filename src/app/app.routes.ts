@@ -36,6 +36,15 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/inicio/product-detail/product-detail.page').then(m => m.ProductDetailPage)
       },
       {
+        path: 'inicio/product/:id/edit',
+        loadComponent: () => import('./tabs/inicio/product-edit/product-edit.page').then(m => m.ProductEditPage)
+      },
+      {
+        path: 'inicio/create-product',
+        loadComponent: () => import('./tabs/inicio/create-product/create-product.page').then(m => m.CreateProductPage)
+      },
+
+      {
         path: 'perfil',
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },

@@ -42,7 +42,7 @@ ion-header.profile-header {
   // Asegura que no haya borde si ion-no-border no es suficiente por alguna razón.
   &.ion-no-border {
     ion-toolbar {
-
+      --border-width: 0;
     }
   }
 

@@ -18,6 +18,7 @@ export interface Product {
   grasas: number;
   grasasSaturadas?: number;
   fibra?: number;
+  sal?: number;
   porcion?: number;
   userId?: string | null;
 }

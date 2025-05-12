@@ -1,6 +1,7 @@
 <!-- src/app/tabs/perfil/perfil.page.html -->
-<ion-header class="profile-header ion-no-border">
-  <ion-toolbar class="ion-header"> <ion-title>
+<ion-header class="profile-header">
+  <ion-toolbar class="nutri-header">
+    <ion-title>
       <div>nutritrack</div>
       <div class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</div>
       <div class="profile-objective">Objetivo: {{ profile?.objetivo }}</div>
@@ -19,7 +20,8 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="profile-content"> <ng-container *ngIf="loading">
+<ion-content class="profile-content">
+  <ng-container *ngIf="loading">
     <ion-spinner name="crescent"></ion-spinner>
   </ng-container>
 
@@ -30,15 +32,31 @@
   </ng-container>
 
   <ng-container *ngIf="profile">
-    <div class="ion-padding"> 
-      <!-- Componente de nutrición -->
-      <app-nutrition-summary 
-    [nutritionData]="nutritionSummaryData"
-    [date]="today"> </app-nutrition-summary>
+    <div class="ion-padding">
+      <!-- Componente de nutrición con estrategia de recreación -->
+      <div *ngIf="showNutritionSummary">
+        <app-nutrition-summary 
+          [nutritionData]="nutritionSummaryData"
+          [date]="today">
+        </app-nutrition-summary>
+      </div>
+      
+      <!-- Spinner mientras se recrea el componente -->
+      <div *ngIf="!showNutritionSummary" class="nutrition-loading">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+
+      <!-- Botón para refrescar manualmente (opcional) -->
+      <ion-button 
+        *ngIf="nutritionSummaryData?.consumido?.calorias === 0"
+        fill="clear" 
+        size="small" 
+        (click)="refreshData()" 
+        class="refresh-button">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Recargar datos
+      </ion-button>
   
-  <ion-card class="summary-card" *ngIf="nutritionSummaryData"> </ion-card>
-
-
       <h2 class="section-title">Progresión del peso</h2>
       <ion-grid class="weight-grid">
         <ion-row>
@@ -76,56 +94,12 @@
       <ion-card class="weight-history-card">
         <ion-card-content>
           <ion-list class="weight-history-list">
-           <!--  <ion-item *ngFor="let item of profile.pesoHistorico" class="weight-history-item">
-              <ion-label class="weight-history-label">
-                {{ item.fecha | date: 'dd/MM/yyyy' }}: {{ item.peso.toFixed(1) }}Kg
-              </ion-label>
-              <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-            </ion-item> -->
+            <!-- Contenido del histórico... -->
           </ion-list>
         </ion-card-content>
       </ion-card>
         
-        <h2 class="section-title">Histórico de medidas</h2>
-        <ion-card class="measure-history-card">
-          <ion-card-content>
-            <ion-list class="measure-history-list">
-              <!-- <ion-item *ngFor="let item of profile.medidasHistorico" class="measure-history-item">
-                <ion-label class="measure-history-label">
-                  {{ item.fecha | date: 'dd/MM/yyyy' }}: Cintura: {{ item.cintura.toFixed(1) }}cm, Cadera: {{ item.cadera.toFixed(1) }}cm
-                </ion-label>
-                <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-              </ion-item> -->
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-        
-        <h2 class="section-title">Histórico de actividad</h2>
-        <ion-card class="activity-history-card">
-          <ion-card-content>
-            <ion-list class="activity-history-list">
-              <!-- <ion-item *ngFor="let item of profile.actividadHistorico" class="activity-history-item">
-                <ion-label class="activity-history-label">
-                  {{ item.fecha | date: 'dd/MM/yyyy' }}: Pasos: {{ item.pasos.toFixed(0) }}, Calorías: {{ item.calorias.toFixed(0) }}
-                </ion-label>
-                <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-              </ion-item> -->
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-      <h2 class="section-title">Histórico de calorías</h2>
-      <ion-card class="calories-history-card">
-        <ion-card-content>
-          <ion-list class="calories-history-list">
-           <!--  <ion-item *ngFor="let item of profile.caloriasHistorico" class="calories-history-item">
-              <ion-label class="calories-history-label">
-                {{ item.fecha | date: 'dd/MM/yyyy' }}: Calorías consumidas: {{ item.caloriasConsumidas.toFixed(0) }}, Calorías quemadas: {{ item.caloriasQuemadas.toFixed(0) }}
-              </ion-label>
-              <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-            </ion-item> -->
-          </ion-list>
-        </ion-card-content>
-      </ion-card> 
+      <!-- Resto del contenido de la página que ya tenías... -->
     </div> 
   </ng-container>
 </ion-content>

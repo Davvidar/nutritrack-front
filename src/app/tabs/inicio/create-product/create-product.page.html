@@ -1,0 +1,118 @@
+<ion-header class="custom-header-curved">
+    <ion-toolbar> <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/inicio/search" color="light"></ion-back-button>
+      </ion-buttons>
+      <ion-title>Nuevo producto</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content [fullscreen]="true" class="create-product-content">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div class="form-fields-container">
+        <ion-item lines="none" class="transparent-item first-item">
+          <ion-label position="stacked">Nombre*</ion-label>
+          <ion-input formControlName="nombre" type="text" placeholder="Ej: Manzana Fuji"></ion-input>
+          <ion-note slot="error" *ngIf="productForm.get('nombre')?.touched && productForm.get('nombre')?.errors?.['required']">
+            El nombre es obligatorio
+          </ion-note>
+        </ion-item>
+  
+        <ion-item lines="none" class="transparent-item">
+          <ion-label position="stacked">Marca</ion-label>
+          <ion-input formControlName="marca" type="text" placeholder="Ej: Golden"></ion-input>
+        </ion-item>
+  
+        <ion-item lines="none" class="transparent-item barcode-item-custom">
+          <ion-label position="stacked">Código de barras</ion-label>
+          <ion-input formControlName="codigoBarras" type="text" placeholder="Escanear o introducir"></ion-input>
+          <ion-button slot="end" fill="clear" (click)="onScanBarcode()" class="scan-button-custom">
+            <ion-icon name="barcode-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+  
+        <div class="section-title-custom">
+          Información nutricional cada 100g
+        </div>
+  
+        <div class="nutrition-card">
+          <ion-item lines="none" class="nutrient-item-custom">
+            <div class="nutrient-icon-custom calories-icon-bg">
+              <ion-icon name="flame-outline"></ion-icon>
+            </div>
+            <ion-label>Calorías *</ion-label>
+            <ion-input formControlName="calorias" type="number" placeholder="Kcal" inputmode="decimal"></ion-input>
+            <ion-note slot="error" *ngIf="productForm.get('calorias')?.touched && productForm.get('calorias')?.errors?.['required']">
+              Obligatorio
+            </ion-note>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom">
+            <div class="nutrient-icon-custom fat-icon-bg">
+              <span class="macro-letter">G</span>
+            </div>
+            <ion-label>Grasas *</ion-label>
+            <ion-input formControlName="grasas" type="number" placeholder="g" inputmode="decimal"></ion-input>
+            <ion-note slot="error" *ngIf="productForm.get('grasas')?.touched && productForm.get('grasas')?.errors?.['required']">
+              Obligatorio
+            </ion-note>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom indented-item">
+            <ion-label>saturadas</ion-label>
+            <ion-input formControlName="grasasSaturadas" type="number" placeholder="g" inputmode="decimal"></ion-input>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom">
+            <div class="nutrient-icon-custom carbs-icon-bg">
+              <span class="macro-letter">H</span>
+            </div>
+            <ion-label>Carbohidratos*</ion-label>
+            <ion-input formControlName="carbohidratos" type="number" placeholder="g" inputmode="decimal"></ion-input>
+            <ion-note slot="error" *ngIf="productForm.get('carbohidratos')?.touched && productForm.get('carbohidratos')?.errors?.['required']">
+              Obligatorio
+            </ion-note>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom indented-item">
+            <ion-label>Azúcares</ion-label>
+            <ion-input formControlName="azucares" type="number" placeholder="g" inputmode="decimal"></ion-input>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom">
+            <div class="nutrient-icon-custom protein-icon-bg">
+              <span class="macro-letter">P</span>
+            </div>
+            <ion-label>Proteínas *</ion-label>
+            <ion-input formControlName="proteinas" type="number" placeholder="g" inputmode="decimal"></ion-input>
+            <ion-note slot="error" *ngIf="productForm.get('proteinas')?.touched && productForm.get('proteinas')?.errors?.['required']">
+              Obligatorio
+            </ion-note>
+          </ion-item>
+  
+          <ion-item lines="none" class="nutrient-item-custom">
+            <ion-label class="label-no-icon">Fibra</ion-label>
+            <ion-input formControlName="fibra" type="number" placeholder="g" inputmode="decimal"></ion-input>
+          </ion-item>
+        </div>
+  
+        <div class="more-info-toggle-custom" (click)="toggleMoreInfo()" role="button" [attr.aria-expanded]="showMore">
+          <span>Más información</span>
+          <ion-icon [name]="showMore ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+  
+        <div *ngIf="showMore" class="more-info-content">
+          <ion-item lines="none" class="transparent-item">
+            <ion-label position="stacked">Porción sugerida (g)</ion-label>
+            <ion-input formControlName="porcion" type="number" placeholder="Ej: 150" inputmode="decimal"></ion-input>
+          </ion-item>
+        </div>
+      </div> <ion-button
+        expand="block"
+        type="submit"
+        class="create-button-custom"
+        [disabled]="productForm.invalid">
+        Crear producto
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </form>
+  </ion-content>

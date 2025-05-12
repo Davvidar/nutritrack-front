@@ -1,110 +1,270 @@
-// Añadir al archivo src/app/tabs/inicio/search/search.page.scss
+// src/app/tabs/inicio/search/search.page.scss
 
-// Estilo para el contador de resultados
-.results-count {
-  padding: 8px 16px;
-  color: white;
-  font-size: 0.9rem;
-  text-align: center;
+// --- Variables de Color (consistentes con tus otros diseños) ---
+:host {
+  --nutri-primary-green: #6ab04c;
+  --nutri-text-light: #ffffff;
+  --nutri-text-dark: #333333;
+  --nutri-text-medium: #555555;
+  --nutri-text-placeholder: #999999;
+  --nutri-background-page: #f4f5f7;
+  --nutri-card-background: #ffffff;
+  --nutri-segment-indicator: var(--nutri-primary-green);
+
+  // Colores de macros (tomados de tu imagen Listado_productos.png)
+  --macro-kcal-color: #8a63d2;    // Morado/Azul para Kcal
+  --macro-protein-color: #8a63d2; // Mismo color para Proteína (según imagen)
+  --macro-carbs-color: #ff8c42;   // Naranja para Carbohidratos
+  --macro-fat-color: #5046c8;     // Azul oscuro/Púrpura para Grasas
 }
 
-// Estilos para mensajes de no resultados
-.no-results {
+// --- Header Personalizado ---
+ion-header.custom-search-header {
+  background: var(--nutri-primary-green);
+  color: var(--nutri-text-light);
+  box-shadow: none;
+  // El padding-bottom se maneja con el contenido interno para la curva
+  padding-bottom: 70px; // Espacio para la curva + segmentos
+
+  &::after { display: none; } // Quitar línea de header
+
+  ion-toolbar {
+    --background: transparent;
+    --color: var(--nutri-text-light);
+    --border-width: 0 !important;
+  }
+
+  ion-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+// Contenido dentro del header (Searchbar y Segmentos)
+.header-search-segments {
+  background: var(--nutri-primary-green); // Para la parte superior
+  padding: 0 16px 0px 16px; // Padding lateral
+  position: relative; // Para que el z-index funcione
+  z-index: 10; // Encima del ::before de ion-content
+}
+
+.search-bar-wrapper {
+  padding-top: 5px;
+  padding-bottom: 15px;
+}
+
+.search-bar-field {
+  display: flex;
+  align-items: center;
+  background-color: var(--nutri-card-background);
+  border-radius: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 48px;
+
+  .product-searchbar {
+    --background: transparent;
+    --placeholder-color: var(--nutri-text-placeholder);
+    --icon-color: var(--nutri-primary-green);
+    --clear-button-color: var(--nutri-text-medium);
+    --color: var(--nutri-text-dark);
+    font-size: 0.95rem;
+    flex: 1;
+    --padding-start: 16px;
+    --box-shadow: none !important; // Quitar sombra de searchbar
+  }
+
+  .filter-button-search {
+    --color: var(--nutri-primary-green);
+    font-size: 1.4rem;
+    margin: 0 8px 0 4px;
+    height: 100%;
+  }
+}
+
+.segments-wrapper-outer {
+  background-color: var(--nutri-background-page); // Fondo claro para segmentos
+  border-radius: 20px 20px 0 0; // Redondeo superior
+  padding: 10px 10px 0px 10px;
+  margin: 0 -16px; // Extender a los bordes del .header-search-segments
+  position: relative;
+  margin-top: -20px; // Solapar para el efecto de curva con el verde
+  box-shadow: 0 -5px 10px rgba(0,0,0,0.05); // Sombra sutil superior
+}
+
+ion-segment {
+  --background: transparent; // Hereda de .segments-wrapper-outer
+
+  ion-segment-button {
+    --indicator-color: var(--nutri-segment-indicator);
+    --indicator-height: 3px;
+    --color: var(--nutri-text-medium);
+    --color-checked: var(--nutri-primary-green);
+    min-height: 44px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: none;
+
+    &::part(indicator) {
+      bottom: 0px;
+    }
+  }
+}
+
+
+// --- Contenido Principal de la Página ---
+ion-content.search-page-content {
+  --background: var(--nutri-background-page);
+  position: relative;
+
+  // Efecto de curva verde del header
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; // Pega arriba del ion-content
+    left: 0;
+    right: 0;
+    height: 80px; // Altura de la parte visible de la curva
+    background: var(--nutri-primary-green);
+    border-radius: 0 0 30px 30px;
+    z-index: 0; // Detrás de todo
+  }
+}
+
+// Estilo para el contador de resultados
+.results-count-display {
+  padding: 8px 16px 0px 16px; // Ajustar padding
+  color: var(--nutri-text-medium); // Color para fondo claro
+  font-size: 0.85rem;
+  text-align: left; // O como prefieras
+  position: relative; // Encima del ::before
+  z-index: 1;
+  margin-top: 10px; // Espacio desde el header
+}
+
+// Lista de Items
+.items-display-list {
+  padding: 0 16px 16px 16px; // Padding para la lista
+  position: relative;
+  z-index: 1;
+  margin-top: 5px; // Ajusta el espacio desde el contador/header
+}
+
+.custom-product-card {
+  background: var(--nutri-card-background);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  display: block; // Para que el (click) funcione bien
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .card-main-content {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center; // Alinear verticalmente
+
+    .info-section {
+      flex-grow: 1; // Ocupa el espacio disponible
+    }
+
+    .product-name-display {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--nutri-text-dark);
+      margin-bottom: 6px;
+    }
+    .product-brand-display {
+      font-size: 0.8rem;
+      color: var(--nutri-text-medium);
+      margin-bottom: 8px;
+    }
+
+    .product-macros-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px; // Espacio entre macros
+
+      .macro-value {
+        font-size: 0.85rem;
+        font-weight: 500;
+        // Aplicar colores específicos
+        &.calories { color: var(--macro-kcal-color); }
+        &.protein  { color: var(--macro-protein-color); }
+        &.carbs    { color: var(--macro-carbs-color); }
+        &.fat      { color: var(--macro-fat-color); }
+      }
+    }
+
+    .chevron-icon-display {
+      color: #c0c0c0;
+      font-size: 1.3rem;
+      margin-left: 10px; // Separación
+      flex-shrink: 0; // Evitar que se encoja
+    }
+  }
+}
+
+// --- Mensajes de Estado (Loading, Error, No Results) sobre fondo claro ---
+.status-message-display {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  color: white;
   text-align: center;
   padding: 20px;
-  
-  .no-results-icon {
+  position: relative;
+  z-index: 1;
+  margin-top: 10px; // Espacio desde el header
+  color: var(--nutri-text-medium); // Color para texto en fondo claro
+
+  .status-icon {
     font-size: 48px;
     margin-bottom: 16px;
-    opacity: 0.7;
+    opacity: 0.6;
   }
-  
+  .error-icon { color: var(--ion-color-danger); opacity: 1;}
+
   h3 {
     margin: 0 0 8px 0;
     font-size: 1.2rem;
     font-weight: 600;
+    color: var(--nutri-text-dark);
   }
-  
+
   p {
     margin: 0 0 16px 0;
     font-size: 0.9rem;
-    opacity: 0.8;
-    max-width: 250px;
+    max-width: 280px; // Ajustar ancho máximo
   }
-  
-  ion-button {
-    --background: white;
-    --color: #6ab04c;
+
+  ion-button.action-button { // Para botones de "Crear" o "Reintentar"
+    --color: var(--nutri-primary-green);
+    --border-color: var(--nutri-primary-green);
+    font-weight: 500;
     margin-top: 8px;
+    &.error-button {
+      --color: var(--ion-color-danger);
+      --border-color: var(--ion-color-danger);
+    }
   }
 }
 
-// Estilos para mensaje de error
-.error-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 250px;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  
-  .error-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    color: #ffcc00;
-  }
-  
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  
-  p {
-    margin: 0 0 16px 0;
-    font-size: 0.9rem;
-    opacity: 0.8;
-    max-width: 250px;
-  }
-  
-  ion-button {
-    --background: white;
-    --color: #6ab04c;
-    margin-top: 8px;
-  }
-}
-
-// Mejora visual para las tarjetas de productos
-.product-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  }
-}
-
-// Animación para el spinner
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.loading-container {
+.loading-display {
   ion-spinner {
-    animation: spin 1s linear infinite;
+    --color: var(--nutri-primary-green);
+    width: 40px;
+    height: 40px;
   }
-  
-  p {
-    margin-top: 12px;
-    font-size: 0.9rem;
-  }
+  p { margin-top: 12px; font-size: 0.9rem; }
+}
+
+// Asegurar que ion-content no tenga padding superior automático que interfiera
+:host ion-content.search-page-content {
+  --padding-top: 0 !important;
 }

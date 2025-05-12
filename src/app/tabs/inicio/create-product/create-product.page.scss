@@ -1,0 +1,259 @@
+// --- Variables de Color (Ajusta si es necesario) ---
+:host {
+    --nutri-primary-green: #6ab04c; // Verde principal de la imagen
+    --nutri-background-page: #f4f5f8; // Fondo de la página (gris muy claro)
+    --nutri-card-background: #ffffff;
+    --nutri-text-light: #ffffff;
+    --nutri-text-dark: #333333;
+    --nutri-text-medium: #666666;
+    --nutri-text-placeholder: #b0b0b0; // Placeholder más claro
+    --nutri-input-border: #e0e0e0; // Borde sutil para inputs
+  
+    // Colores de iconos de macros
+    --macro-calories-bg: #8c63d0; // Morado
+    --macro-protein-bg: #5046c8;  // Azul/Púrpura oscuro
+    --macro-carbs-bg: #ff8c42;    // Naranja
+    --macro-fat-bg: #d4ca3a;      // Amarillo
+  }
+  
+  // --- Estilo General ---
+  ion-content.create-product-content {
+    --background: var(--nutri-background-page);
+    position: relative;
+  
+    &::before { // Pseudo-elemento para la curva verde del header
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px; // Altura de la parte verde visible bajo el toolbar
+      background: var(--nutri-primary-green);
+      border-radius: 0 0 28px 28px; // Curva inferior
+      z-index: 0;
+    }
+  }
+  
+  // --- Header Curvado ---
+  ion-header.custom-header-curved {
+    background: var(--nutri-primary-green);
+    color: var(--nutri-text-light);
+    box-shadow: none;
+    &::after { // Quitar línea inferior del header de Ionic
+        display: none;
+    }
+    
+    ion-toolbar {
+        --border: none; // Quitar borde
+      --background: transparent;
+      --color: var(--nutri-text-light);
+    }
+  
+    ion-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  }
+  
+  // Contenedor de los campos del formulario que van sobre el fondo blanco principal
+  .form-fields-container {
+    position: relative;
+    z-index: 1;
+    background-color: var(--nutri-card-background); // Fondo blanco
+    margin: 15px; // Margen alrededor
+    border-radius: 16px; // Bordes redondeados para todo el bloque de campos
+    padding: 1px 0; // Para que el box-shadow interno no se corte
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  // --- Estilos para ion-item ---
+  ion-item.transparent-item {
+    --background: transparent; // Hacer el item transparente
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 60px; // Un poco más de altura
+    --border-color: var(--nutri-input-border); // Color de línea si se usa 'lines="full"'
+  
+    &.first-item { // Para el primer item si tiene borde superior redondeado
+      // border-top-left-radius: 16px;
+      // border-top-right-radius: 16px;
+    }
+  
+    ion-label[position="stacked"] {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--nutri-text-medium);
+      margin-bottom: 2px; // Menos espacio
+      transform: none; // Evitar que se mueva mucho
+      padding-left: 2px;
+    }
+  
+    ion-input {
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      --placeholder-color: var(--nutri-text-placeholder);
+      font-size: 1rem;
+      color: var(--nutri-text-dark);
+      border: 1px solid var(--nutri-input-border);
+      border-radius: 8px;
+      padding-left: 12px !important; // Forzar padding interno
+      padding-right: 12px !important;
+      margin-top: 4px; // Espacio desde el label
+    }
+  
+    ion-note[slot="error"] {
+      padding-left: 2px;
+      font-size: 0.75rem;
+    }
+  }
+  
+  
+  // --- Código de Barras ---
+  ion-item.barcode-item-custom {
+    position: relative; // Para posicionar el botón de scan
+    ion-input {
+      padding-right: 50px !important; // Espacio para el botón
+    }
+  }
+  
+  .scan-button-custom {
+    position: absolute;
+    right: 8px; // Posición a la derecha
+    top: 58%; // Ajustar verticalmente (considera altura del input + label)
+    transform: translateY(-50%);
+    --color: var(--nutri-primary-green); // Color del icono
+    font-size: 1.6rem; // Tamaño del icono
+    --padding-start: 6px;
+    --padding-end: 6px;
+    height: 38px; // Para que no sea muy grande
+    margin: 0;
+  }
+  
+  // --- Título de Sección ---
+  .section-title-custom {
+    padding: 20px 16px 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--nutri-text-medium);
+  }
+  
+  // --- Tarjeta de Información Nutricional ---
+  .nutrition-card {
+    background-color: var(--nutri-card-background); // Ya viene del form-fields-container, opcional aquí
+    // border-radius: 12px; // La tarjeta principal ya tiene el borde
+    // margin: 0 16px 16px 16px; // Ajustar márgenes si se saca del .form-fields-container
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  ion-item.nutrient-item-custom {
+    --background: transparent;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 55px; // Altura para cada fila de nutriente
+    --inner-border-width: 0; // Quitar líneas internas por defecto si no se necesita
+    --border-width: 0 0 1px 0; // Borde solo abajo
+    --border-color: #f0f0f0; // Color del borde
+  
+    &:last-child {
+      --border-width: 0; // Sin borde para el último item
+    }
+  
+    .nutrient-icon-custom {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      color: var(--nutri-text-light); // Color del icono/letra dentro del círculo
+  
+      ion-icon {
+        font-size: 1rem;
+      }
+      .macro-letter {
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+    }
+  
+    // Fondos de los iconos circulares
+    & .calories-icon-bg { background-color: var(--macro-calories-bg); }
+    & .protein-icon-bg  { background-color: var(--macro-protein-bg); }
+    & .carbs-icon-bg    { background-color: var(--macro-carbs-bg); }
+    & .fat-icon-bg      { background-color: var(--macro-fat-bg); }
+  
+  
+    ion-label {
+      font-size: 0.95rem;
+      color: var(--nutri-text-dark);
+    }
+  
+    // Para Fibra que no tiene icono
+    .label-no-icon {
+      margin-left: calc(28px + 12px); // Simular indentación del icono (ancho icono + margen)
+    }
+  
+    ion-input {
+      text-align: right;
+      max-width: 80px; // Ancho del input para el valor
+      --placeholder-color: var(--nutri-text-placeholder);
+      font-size: 0.95rem;
+      color: var(--nutri-text-dark);
+      border: 1px solid var(--nutri-input-border);
+      border-radius: 8px;
+      --padding-start: 10px !important;
+      --padding-end: 10px !important;
+      --padding-top: 6px !important;
+      --padding-bottom: 6px !important;
+    }
+  
+    &.indented-item {
+      ion-label {
+        padding-left: calc(28px + 12px); // Indentación para "saturadas", "azúcares"
+      }
+    }
+  }
+  
+  // --- Toggle "Más información" ---
+  .more-info-toggle-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 16px 0;
+    color: var(--nutri-text-medium);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-top: 1px solid #f0f0f0; // Línea superior
+    margin: 0 16px; // Para que la línea no ocupe todo el ancho del form-fields-container
+  
+    ion-icon {
+      font-size: 1rem;
+    }
+  }
+  .more-info-content { // Contenedor de los campos extra
+    padding-bottom: 10px; // Espacio si hay campos
+    ion-item.transparent-item {
+      // Reutilizar estilos de los items de arriba
+    }
+  }
+  
+  // --- Botón "Crear producto" ---
+  .create-button-custom {
+    margin: 20px 16px 25px 16px; // Margen arriba y abajo
+    --background: var(--nutri-primary-green);
+    --background-activated: #548f41; // Un poco más oscuro al pulsar
+    --color: var(--nutri-text-light);
+    --border-radius: 12px; // Bordes redondeados
+    height: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: none; // Sin mayúsculas
+  
+    ion-icon {
+      font-size: 1.3rem;
+    }
+  }

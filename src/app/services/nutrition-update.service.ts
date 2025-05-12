@@ -1,37 +1,34 @@
+// src/app/services/nutrition-update.service.ts
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { throttleTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
 export class NutritionUpdateService implements OnDestroy {
-    // Usar Subject en lugar de BehaviorSubject
-    private nutritionUpdatedSource = new Subject<string>();
+    // Usar BehaviorSubject para que los nuevos suscriptores reciban el último valor
+    private nutritionUpdatedSource = new BehaviorSubject<string>(this.formatDateToYYYYMMDD(new Date()));
 
     // Aplicar operadores para controlar el flujo de eventos
     nutritionUpdated$ = this.nutritionUpdatedSource.pipe(
-        // Convertir fecha a string YYYY-MM-DD para comparar más fácilmente
         distinctUntilChanged(), // Solo emitir si es diferente al último valor
-        throttleTime(1000)     // Limitar a una actualización por segundo
+        throttleTime(500)     // Limitar a una actualización cada 500ms
     );
 
-    private lastUpdateTime: number = 0;
     private isDisposed: boolean = false;
 
     constructor() {
-        console.log('NutritionUpdateService: Inicializado con protección mejorada');
+        console.log('NutritionUpdateService: Inicializado y listo para emitir actualizaciones');
     }
 
     notifyNutritionUpdated(date: Date): void {
         if (this.isDisposed) return;
 
-        const now = Date.now();
         try {
-            const dateStr = this.formatDateToYYYYMMDD(date); // Usa este método
+            const dateStr = this.formatDateToYYYYMMDD(date);
             console.log('NutritionUpdateService: Notificando actualización para:', dateStr);
-            this.lastUpdateTime = Date.now();
-            this.nutritionUpdatedSource.next(dateStr); // Emite YYYY-MM-DD
+            this.nutritionUpdatedSource.next(dateStr);
         } catch (err) {
             console.error('NutritionUpdateService: Error al emitir actualización:', err);
         }
@@ -66,5 +63,4 @@ export class NutritionUpdateService implements OnDestroy {
             console.error('NutritionUpdateService: Error al limpiar recursos:', err);
         }
     }
-
 }

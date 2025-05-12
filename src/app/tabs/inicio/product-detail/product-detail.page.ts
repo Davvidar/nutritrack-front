@@ -1,6 +1,6 @@
 // src/app/tabs/inicio/product-detail/product-detail.page.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
+import { IonicModule, LoadingController, ToastController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 import { ProductService, Product } from '../../../services/product.service';
 import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
-
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -30,6 +30,10 @@ export class ProductDetailPage implements OnInit, OnDestroy {
   loading: boolean = true;
   error: string | null = null;
   showMoreInfo: boolean = false;
+  
+  // Propiedad para verificar si el usuario es el propietario
+  isOwner: boolean = false;
+  currentUserId: string | null = null;
 
   private paramsSubscription: Subscription | undefined;
   private queryParamsSubscription: Subscription | undefined;
@@ -51,19 +55,6 @@ export class ProductDetailPage implements OnInit, OnDestroy {
     return this.product ? (this.product.grasas * this.cantidad) / 100 : 0;
   }
 
-  // Opcional: cálculos para otros nutrientes si están disponibles
-/*   get azucaresTotales(): number | null {
-    return this.product && this.product.azucares ? (this.product.azucares * this.cantidad) / 100 : null;
-  }
-
-  get grasasSaturadasTotales(): number | null {
-    return this.product && this.product.grasasSaturadas ? (this.product.grasasSaturadas * this.cantidad) / 100 : null;
-  }
-
-  get fibraTotales(): number | null {
-    return this.product && this.product.fibra ? (this.product.fibra * this.cantidad) / 100 : null;
-  } */
-
   constructor(
     private productService: ProductService,
     private dailyLogService: DailyLogService,
@@ -71,8 +62,13 @@ export class ProductDetailPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private loadingController: LoadingController,
     private toastController: ToastController,
-    private nutritionUpdateService: NutritionUpdateService //
-  ) {}
+    private alertController: AlertController,
+    private nutritionUpdateService: NutritionUpdateService,
+    private authService: AuthService
+  ) {
+    // Obtener el ID del usuario actual
+    this.currentUserId = this.authService.getCurrentUserId();
+  }
 
   ngOnInit() {
     // Recuperar parámetros de la URL
@@ -110,6 +106,9 @@ export class ProductDetailPage implements OnInit, OnDestroy {
       next: (product) => {
         this.product = product;
         this.loading = false;
+        
+        // Verificar si el usuario es el propietario del producto
+        this.isOwner = product.userId === this.currentUserId;
         
         // Si el producto tiene una porción sugerida, usarla como cantidad por defecto
         if (product.porcion) {
@@ -199,8 +198,6 @@ export class ProductDetailPage implements OnInit, OnDestroy {
             console.error('Error al guardar el registro diario:', err);
             if (err.error && err.error.errors && Array.isArray(err.error.errors)) {
                 console.error('Detalles del error del backend:', err.error.errors);
-                // Podrías incluso mostrar el primer mensaje de error al usuario si es apropiado
-                // this.errorMessage = err.error.errors[0].msg || 'Error desconocido del servidor.';
               } else if (err.error) {
                 console.error('Cuerpo del error del backend:', err.error);
               }
@@ -216,9 +213,67 @@ export class ProductDetailPage implements OnInit, OnDestroy {
       }
     });
   }
+
+  // Función para editar el producto
+  editProduct() {
+    this.router.navigate(['/tabs/inicio/product', this.productId, 'edit'], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+
+  // Función para eliminar el producto
+  async deleteProduct() {
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Eliminar',
+          cssClass: 'danger',
+          handler: () => {
+            this.confirmDelete();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private confirmDelete() {
+    this.presentLoading();
+
+    this.productService.delete(this.productId).subscribe({
+      next: () => {
+        this.dismissLoading();
+        this.presentToast('Producto eliminado correctamente');
+        // Navegar de vuelta a la búsqueda o al inicio
+        this.router.navigate(['/tabs/inicio/search'], {
+          queryParams: {
+            date: this.dateParam,
+            meal: this.mealParam
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al eliminar producto:', err);
+        this.dismissLoading();
+        this.presentErrorToast('Error al eliminar el producto');
+      }
+    });
+  }
+
   async presentLoading() {
     const loading = await this.loadingController.create({
-      message: 'Guardando...',
+      message: 'Cargando...',
       spinner: 'circular'
     });
     await loading.present();
@@ -259,7 +314,6 @@ export class ProductDetailPage implements OnInit, OnDestroy {
 
   // Función para volver a la página anterior
   goBack() {
-    // this.location.back();
     this.router.navigate(['/tabs/inicio/search'], { 
       queryParams: { 
         date: this.dateParam,

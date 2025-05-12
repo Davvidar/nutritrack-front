@@ -21,7 +21,7 @@ import { NutritionData, NutritionSummaryComponent } from 'src/app/components/nut
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [IonicModule, CommonModule, WeekSliderComponent, MetricsSummaryComponent, MealAccordionComponent, NutritionSummaryComponent],
+  imports: [IonicModule, CommonModule, WeekSliderComponent, MetricsSummaryComponent, MealAccordionComponent],
   templateUrl: './inicio.page.html',
   styleUrls: ['./inicio.page.scss']
 })
@@ -39,18 +39,18 @@ export class InicioPage implements OnInit, OnDestroy {
     cena: MealItem[];
     recena: MealItem[];
   } = {
-    desayuno: [],
-    almuerzo: [],
-    comida: [],
-    merienda: [],
-    cena: [],
-    recena: []
-  };
+      desayuno: [],
+      almuerzo: [],
+      comida: [],
+      merienda: [],
+      cena: [],
+      recena: []
+    };
 
   dailyGoals: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   currentConsumption: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   loading: boolean = false;
- nutritionSummaryData: NutritionData | null = null;
+  nutritionSummaryData: NutritionData | null = null;
   nutritionSubscription?: Subscription;
 
 
@@ -63,7 +63,7 @@ export class InicioPage implements OnInit, OnDestroy {
     private router: Router,
     private nutritionUpdateService: NutritionUpdateService
 
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.buildWeek();
@@ -82,29 +82,29 @@ export class InicioPage implements OnInit, OnDestroy {
     });
 
     this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
-    .subscribe({
-      next: (dateStr: string) => {
-        try {
-          console.log('InicioPage: Actualizando por cambio en:', dateStr);
-          
-          // Convertir string a objeto Date
-          const date = new Date(dateStr);
-          
-          // Verificar si la fecha corresponde a la fecha actualmente seleccionada
-          const activeDay = this.week.find(d => d.active);
-          if (activeDay && this.datesAreOnSameDay(activeDay.date, date)) {
-            console.log('InicioPage: Recargando datos para fecha actual:', dateStr);
-            this.loadSummary(activeDay.date);
-            this.loadDailyLog(activeDay.date);
+      .subscribe({
+        next: (dateStr: string) => {
+          try {
+            console.log('InicioPage: Actualizando por cambio en:', dateStr);
+
+            // Convertir string a objeto Date
+            const date = new Date(dateStr);
+
+            // Verificar si la fecha corresponde a la fecha actualmente seleccionada
+            const activeDay = this.week.find(d => d.active);
+            if (activeDay && this.datesAreOnSameDay(activeDay.date, date)) {
+              console.log('InicioPage: Recargando datos para fecha actual:', dateStr);
+              this.loadSummary(activeDay.date);
+              this.loadDailyLog(activeDay.date);
+            }
+          } catch (err) {
+            console.error('InicioPage: Error al procesar actualización:', err);
           }
-        } catch (err) {
-          console.error('InicioPage: Error al procesar actualización:', err);
+        },
+        error: (err) => {
+          console.error('InicioPage: Error en suscripción a actualizaciones:', err);
         }
-      },
-      error: (err) => {
-        console.error('InicioPage: Error en suscripción a actualizaciones:', err);
-      }
-    });
+      });
 
   }
   ngOnDestroy() {
@@ -114,7 +114,7 @@ export class InicioPage implements OnInit, OnDestroy {
     // Si tienes otras suscripciones, también aquí
   }
 
-  
+
   ionViewWillEnter() {
     // Se ejecuta cada vez que la página está a punto de entrar en la vista.
     // Ideal para recargar datos.
@@ -125,7 +125,7 @@ export class InicioPage implements OnInit, OnDestroy {
     }
   }
 
-  
+
 
   private buildWeek() {
     this.week = [];
@@ -142,21 +142,40 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   private loadDailyLog(date: Date) {
+    // Opcional: activar loading aquí también
+    this.loading = true;
+    
     this.dailyLogService.getDailyLogWithDetails(date).subscribe({
-      next: (data: any) => {  // Añade tipado explícito
-        // Asignar datos directamente sin peticiones adicionales
+      next: (data: any) => {
+        console.log('Datos de comidas actualizados:', data);
+        
+        // Asignar datos directamente
         if (data && data.comidas) {
           this.mealItems = data.comidas;
+        } else {
+          // Restablecer a valores por defecto si no hay datos
+          this.mealItems = {
+            desayuno: [],
+            almuerzo: [],
+            comida: [],
+            merienda: [],
+            cena: [],
+            recena: []
+          };
         }
+        
+        // Desactivar loading
+        this.loading = false;
       },
-      error: (err: any) => {  // Añade tipado explícito
+      error: (err: any) => {
         console.error('Error al cargar el registro diario:', err);
-        // Puedes mostrar un mensaje al usuario aquí
+        this.presentErrorToast('Error al cargar datos del día');
+        this.loading = false;
       }
     });
   }
-  
-  
+
+
   // Método auxiliar para mostrar mensajes de error
   async presentErrorToast(message: string) {
     const toast = await this.toastController.create({
@@ -169,56 +188,70 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   private loadSummary(date: Date) {
-    this.dailyLogService.getSummary(date).subscribe((res: SummaryResponse) => {
-      if (res) { // Comprobar que res no sea null
-        this.currentConsumption = {
-          calories: res.consumido?.calorias || 0,
-          protein: res.consumido?.proteinas || 0,
-          carbs: res.consumido?.carbohidratos || 0,
-          fat: res.consumido?.grasas || 0
-        };
-
-        // Actualiza objetivos solo si vienen en la respuesta y son válidos
-        if (res.objetivo) {
+    // Establecer loading si no está ya activo
+    if (!this.loading) this.loading = true;
+    
+    this.dailyLogService.getSummary(date).subscribe({
+      next: (res: SummaryResponse) => {
+        console.log('Datos de resumen nutricional recibidos:', res);
+        
+        if (res) {
+          // Crear un objeto completamente nuevo para la actualización
+          this.currentConsumption = {
+            calories: res.consumido?.calorias || 0,
+            protein: res.consumido?.proteinas || 0,
+            carbs: res.consumido?.carbohidratos || 0,
+            fat: res.consumido?.grasas || 0
+          };
+  
+          if (res.objetivo) {
             this.dailyGoals = {
-                calories: res.objetivo.calorias || 0,
-                protein: res.objetivo.proteinas || 0,
-                carbs: res.objetivo.carbohidratos || 0,
-                fat: res.objetivo.grasas || 0
+              calories: res.objetivo.calorias || 0,
+              protein: res.objetivo.proteinas || 0,
+              carbs: res.objetivo.carbohidratos || 0,
+              fat: res.objetivo.grasas || 0
             };
-        }
-
-        // Construir el objeto NutritionData para el componente hijo
-        this.nutritionSummaryData = {
-          consumido: {
-            calorias: this.currentConsumption.calories,
-            proteinas: this.currentConsumption.protein,
-            carbohidratos: this.currentConsumption.carbs,
-            grasas: this.currentConsumption.fat
-          },
-          objetivo: {
-            calorias: this.dailyGoals.calories,
-            proteinas: this.dailyGoals.protein,
-            carbohidratos: this.dailyGoals.carbs,
-            grasas: this.dailyGoals.fat
-          },
-          // La API de resumen ya debería devolver la diferencia, si no, calcúlala aquí
-          diferencia: { // Asumiendo que tu API devuelve esto o lo calculas
-            calorias: (this.dailyGoals.calories || 0) - (this.currentConsumption.calories || 0),
-            proteinas: (this.dailyGoals.protein || 0) - (this.currentConsumption.protein || 0),
-            carbohidratos: (this.dailyGoals.carbs || 0) - (this.currentConsumption.carbs || 0),
-            grasas: (this.dailyGoals.fat || 0) - (this.currentConsumption.fat || 0),
           }
-        };
-
-      } else {
-        // Manejar el caso donde res es null o indefinido, quizás reseteando los datos
+  
+          // Crear un objeto completamente nuevo para forzar la detección de cambios
+          this.nutritionSummaryData = {
+            consumido: {
+              calorias: this.currentConsumption.calories,
+              proteinas: this.currentConsumption.protein,
+              carbohidratos: this.currentConsumption.carbs,
+              grasas: this.currentConsumption.fat
+            },
+            objetivo: {
+              calorias: this.dailyGoals.calories,
+              proteinas: this.dailyGoals.protein,
+              carbohidratos: this.dailyGoals.carbs,
+              grasas: this.dailyGoals.fat
+            },
+            diferencia: {
+              calorias: (this.dailyGoals.calories || 0) - (this.currentConsumption.calories || 0),
+              proteinas: (this.dailyGoals.protein || 0) - (this.currentConsumption.protein || 0),
+              carbohidratos: (this.dailyGoals.carbs || 0) - (this.currentConsumption.carbs || 0),
+              grasas: (this.dailyGoals.fat || 0) - (this.currentConsumption.fat || 0),
+            }
+          };
+          
+          console.log('Nuevos datos de nutritionSummaryData:', this.nutritionSummaryData);
+        } else {
+          // Resetear completamente si no hay datos
+          this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+          this.nutritionSummaryData = null;
+        }
+        
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar resumen nutricional:', err);
+        this.nutritionSummaryData = null;
         this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-        this.nutritionSummaryData = null; // O un objeto con valores por defecto
+        this.loading = false;
       }
     });
   }
-
 
   loadWeek(direction: 'prev' | 'next') {
     // Aquí actualizas baseMonday según la dirección
@@ -230,17 +263,130 @@ export class InicioPage implements OnInit, OnDestroy {
   addMeal(meal: typeof this.meals[number]) {
     const activeDay = this.week.find(d => d.active);
     if (activeDay) {
-      this.router.navigate(['/tabs/inicio/search'], { 
-        queryParams: { 
+      this.router.navigate(['/tabs/inicio/search'], {
+        queryParams: {
           date: activeDay.date.toISOString(),
-          meal: meal 
-        } 
+          meal: meal
+        }
       });
     }
   }
   private datesAreOnSameDay(first: Date, second: Date): boolean {
     return first.getFullYear() === second.getFullYear() &&
-           first.getMonth() === second.getMonth() &&
-           first.getDate() === second.getDate();
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate();
   }
+
+  onMealItemClick(itemm: MealItem, mealType: string): void {
+    console.log('Item clicked:', itemm, 'in meal:', mealType);
+
+    if (itemm.productId) {
+      // Si es un producto, navegar a la página de detalle del producto
+      this.router.navigate(['/tabs/inicio/product', itemm.productId], {
+        queryParams: {
+          date: this.selectedDate.toISOString(),
+          meal: mealType,
+          editMode: 'true',
+          currentQuantity: itemm.cantidad
+        }
+      });
+    } else if (itemm.recipeId) {
+      // Si es una receta, navegar a la página de detalle de la receta
+      this.router.navigate(['/tabs/inicio/recipe', itemm.recipeId], {
+        queryParams: {
+          date: this.selectedDate.toISOString(),
+          meal: mealType,
+          editMode: 'true',
+          currentQuantity: itemm.cantidad
+        }
+      });
+    }
+  }
+
+  onRemoveMealItem(item: MealItem, mealType: string) {
+    // Confirmar eliminación
+    if (!confirm(`¿Quieres eliminar ${item.name} de tu ${mealType}?`)) {
+      return;
+    }
+    
+    this.loading = true;
+    
+    const activeDay = this.week.find(d => d.active);
+    if (!activeDay) {
+      this.loading = false;
+      return;
+    }
+    
+    // Verificar si es el último elemento de la comida
+    const mealKey = mealType.toLowerCase() as keyof typeof this.mealItems;
+    const isLastItem = this.mealItems[mealKey]?.length === 1;
+    
+    // Usar el servicio dailyLogService para eliminar el item
+    this.dailyLogService.removeItemFromMeal(
+      activeDay.date,
+      mealType,
+      item.productId || item.recipeId || '',
+      !!item.recipeId
+    ).subscribe({
+      next: () => {
+        console.log('Item eliminado correctamente');
+        
+        // Caso especial: Si era el último elemento, hacemos una recarga completa
+        if (isLastItem) {
+          console.log('Era el último elemento - haciendo recarga completa');
+          
+          // 1. Resetear completamente los datos
+          this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+          
+          // 2. Forzar la recreación completa del objeto nutritionSummaryData
+          this.nutritionSummaryData = {
+            consumido: { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
+            objetivo: { 
+              calorias: this.dailyGoals.calories, 
+              proteinas: this.dailyGoals.protein,
+              carbohidratos: this.dailyGoals.carbs,
+              grasas: this.dailyGoals.fat
+            },
+            diferencia: {
+              calorias: this.dailyGoals.calories,
+              proteinas: this.dailyGoals.protein,
+              carbohidratos: this.dailyGoals.carbs,
+              grasas: this.dailyGoals.fat
+            }
+          };
+          
+          // 3. Actualizar la estructura de comidas
+          this.mealItems[mealKey] = [];
+        }
+        
+        // 4. Recargar datos con un pequeño delay para asegurar que el objeto anterior
+        // ya ha sido renderizado y el cambio será detectado
+        setTimeout(() => {
+          // Forzar recargas completas
+          this.loadDailyLog(activeDay.date);
+          this.loadSummary(activeDay.date);
+          this.loading = false;
+        }, 50);
+        
+        this.presentSuccessToast(`${item.name} eliminado de ${mealType}`);
+      },
+      error: (err) => {
+        console.error('Error al eliminar item:', err);
+        this.presentErrorToast('No se pudo eliminar el elemento');
+        this.loading = false;
+      }
+    });
+  }
+  
+  // Añadir este método para mostrar mensajes de éxito
+  async presentSuccessToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 1500,
+      position: 'bottom',
+      color: 'success'
+    });
+    toast.present();
+  }
+  
 }

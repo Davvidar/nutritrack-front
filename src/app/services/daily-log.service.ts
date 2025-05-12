@@ -220,9 +220,17 @@ export class DailyLogService {
       tap(response => {
         console.log('DailyLogService - Respuesta de resumen nutricional:', response);
       }),
+      map(response => {
+        // Asegurarse de que siempre devuelva un objeto completo incluso si está vacío
+        return {
+          consumido: response?.consumido || { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
+          objetivo: response?.objetivo || { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
+          diferencia: response?.diferencia || { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 }
+        };
+      }),
       catchError(error => {
         console.error('Error obteniendo resumen:', error);
-        // Devolver un objeto vacío en caso de error
+        // Devolver un objeto vacío pero completo en caso de error
         const emptySummary: SummaryResponse = {
           consumido: { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
           objetivo: { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
@@ -389,5 +397,38 @@ export class DailyLogService {
     const day = String(d.getDate()).padStart(2, '0');
     
     return `${year}-${month}-${day}`;
+  }
+  removeItemFromMeal(
+    date: Date,
+    mealType: string,
+    itemId: string,
+    isRecipe: boolean = false
+  ): Observable<DailyLog> {
+    return this.getByDate(date).pipe(
+      switchMap(dailyLog => {
+        // Obtener la lista de items para el tipo de comida
+        const mealKey = mealType.toLowerCase() as keyof typeof dailyLog.comidas;
+        const items = dailyLog.comidas[mealKey] || [];
+        
+        // Encontrar y eliminar el item
+        const itemIndex = items.findIndex(item => 
+          isRecipe ? item.recipeId === itemId : item.productId === itemId
+        );
+        
+        if (itemIndex === -1) {
+          return throwError(() => new Error(`Item ${itemId} no encontrado en ${mealType}`));
+        }
+        
+        // Eliminar el item
+        items.splice(itemIndex, 1);
+        
+        // Guardar el dailyLog actualizado
+        return this.save(dailyLog);
+      }),
+      tap(() => {
+        // Notificar que se ha actualizado la información nutricional
+        this.nutritionUpdateService.notifyNutritionUpdated(date);
+      })
+    );
   }
 }

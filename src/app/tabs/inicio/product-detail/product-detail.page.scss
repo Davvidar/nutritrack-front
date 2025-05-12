@@ -288,3 +288,24 @@
       font-size: 1.2rem;
     }
   }
+  .ownership-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    
+    ion-chip {
+      ion-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+  
+  // Sección de más información
+  .more-info-section {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }

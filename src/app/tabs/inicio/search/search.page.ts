@@ -304,4 +304,8 @@ export class SearchPage implements OnInit {
     
     return `Mostrando ${this.filteredItems.length} de ${this.totalItems} resultados`;
   }
+  openFilterOptions(): void {
+    // Implement the logic for opening filter options
+    console.log('Filter options opened');
+  }
 }
