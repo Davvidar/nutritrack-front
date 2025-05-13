@@ -1,16 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, LoadingController, ToastController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RecipeService, Recipe, Ingredient } from '../../../services/recipe.service';
+import { RecipeService, Recipe } from '../../../services/recipe.service';
 import { ProductService, Product } from '../../../services/product.service';
 import { DailyLogService, DailyLog } from '../../../services/daily-log.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
-import { ToastController } from '@ionic/angular';
+import { AuthService } from '../../../services/auth.service';
 
+interface EnrichedIngredient {
+  productId: string;
+  cantidad: number;
+  product?: Product;
+}
 
 @Component({
   selector: 'app-recipe-detail',
@@ -21,7 +26,7 @@ import { ToastController } from '@ionic/angular';
 })
 export class RecipeDetailPage implements OnInit {
   recipe: Recipe | null = null;
-  ingredients: { name: string; cantidad: number }[] = [];
+  enrichedIngredients: EnrichedIngredient[] = [];
   cantidad: number = 100; // Cantidad por defecto (en gramos)
   
   // Parámetros de la ruta
@@ -29,33 +34,36 @@ export class RecipeDetailPage implements OnInit {
   dateParam: string = '';
   mealParam: string = '';
   
+  // Control de estados
   loading: boolean = true;
   error: string | null = null;
   showIngredients: boolean = false;
+  isOwner: boolean = false;
+  currentUserId: string | null = null;
 
   // Propiedades calculadas basadas en la cantidad
   get caloriasTotales(): number {
     if (!this.recipe) return 0;
     const proportion = this.cantidad / this.recipe.pesoFinal;
-    return this.recipe.calorias * proportion;
+    return Math.round(this.recipe.calorias * proportion);
   }
 
   get proteinasTotales(): number {
     if (!this.recipe) return 0;
     const proportion = this.cantidad / this.recipe.pesoFinal;
-    return this.recipe.proteinas * proportion;
+    return Math.round(this.recipe.proteinas * proportion);
   }
 
   get carbohidratosTotales(): number {
     if (!this.recipe) return 0;
     const proportion = this.cantidad / this.recipe.pesoFinal;
-    return this.recipe.carbohidratos * proportion;
+    return Math.round(this.recipe.carbohidratos * proportion);
   }
 
   get grasasTotales(): number {
     if (!this.recipe) return 0;
     const proportion = this.cantidad / this.recipe.pesoFinal;
-    return this.recipe.grasas * proportion;
+    return Math.round(this.recipe.grasas * proportion);
   }
 
   constructor(
@@ -65,9 +73,13 @@ export class RecipeDetailPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private toastController: ToastController,
-    private nutritionUpdateService: NutritionUpdateService
-
-  ) {}
+    private loadingController: LoadingController,
+    private alertController: AlertController,
+    private nutritionUpdateService: NutritionUpdateService,
+    private authService: AuthService
+  ) {
+    this.currentUserId = this.authService.getCurrentUserId();
+  }
 
   ngOnInit() {
     // Recuperar parámetros de la URL
@@ -97,23 +109,34 @@ export class RecipeDetailPage implements OnInit {
         this.recipe = recipe;
         this.cantidad = Math.round(recipe.pesoFinal / 2); // Por defecto, mitad del peso final
         
-        // Cargar los nombres de los productos para los ingredientes
+        // Verificar si el usuario es el propietario
+        this.isOwner = recipe.userId === this.currentUserId;
+        
+        // Cargar los detalles de los productos para los ingredientes
         if (recipe.ingredientes && recipe.ingredientes.length > 0) {
-          const productObservables = recipe.ingredientes.map(ingredient => 
-            this.productService.getById(ingredient.productId).pipe(
+          const productObservables = recipe.ingredientes.map(ingredient => {
+            // Extraer el ID del producto correctamente
+            const productId = typeof ingredient.productId === 'object' 
+              ? (ingredient.productId as any)._id || ingredient.productId.toString()
+              : ingredient.productId;
+            
+            console.log('Cargando producto con ID:', productId);
+            
+            return this.productService.getById(productId).pipe(
               map(product => ({
-                name: product.nombre,
-                cantidad: ingredient.cantidad
+                productId: productId,
+                cantidad: ingredient.cantidad,
+                product: product
               }))
-            )
-          );
+            );
+          });
           return forkJoin(productObservables);
         }
         return of([]);
       })
     ).subscribe({
-      next: (ingredientDetails) => {
-        this.ingredients = ingredientDetails;
+      next: (enrichedIngredients) => {
+        this.enrichedIngredients = enrichedIngredients;
         this.loading = false;
       },
       error: (err) => {
@@ -124,11 +147,15 @@ export class RecipeDetailPage implements OnInit {
     });
   }
 
+  // El resto del código permanece igual...
   addToMeal() {
     if (!this.recipe || !this.dateParam || !this.mealParam) {
       console.error('Faltan datos para añadir a la comida');
       return;
     }
+
+    // Mostrar loading
+    this.presentLoading('Añadiendo receta...');
 
     // Primero, obtener el registro diario actual
     this.dailyLogService.getByDate(new Date(this.dateParam)).subscribe({
@@ -161,23 +188,84 @@ export class RecipeDetailPage implements OnInit {
 
         // Guardar el registro actualizado
         this.dailyLogService.save(dailyLog).subscribe({
-            next: (response) => {
-              console.log('Producto añadido correctamente:', response);
-              // Remove the call to dismissLoading as it is not defined
-          //    this.presentToast('Producto añadido correctamente');
-              
-              // Notificar la actualización directamente (redundante, pero asegura la actualización)
-              const dateObj = new Date(this.dateParam);
-              this.nutritionUpdateService.notifyNutritionUpdated(dateObj);
-              
-              // Navegar de vuelta a la página de inicio
-              this.router.navigate(['/tabs/inicio']);
-            },
+          next: (response) => {
+            console.log('Receta añadida correctamente:', response);
+            this.dismissLoading();
+            this.presentToast('Receta añadida correctamente');
+            
+            // Notificar la actualización de nutrición
+            const dateObj = new Date(this.dateParam);
+            this.nutritionUpdateService.notifyNutritionUpdated(dateObj);
+            
+            // Navegar de vuelta a la página de inicio
+            this.router.navigate(['/tabs/inicio']);
+          },
+          error: (err) => {
+            console.error('Error al guardar:', err);
+            this.dismissLoading();
+            this.presentErrorToast('Error al añadir la receta');
+          }
         });
       },
       error: (err) => {
         console.error('Error al obtener el registro diario:', err);
-        // Mostrar mensaje de error
+        this.dismissLoading();
+        this.presentErrorToast('Error al obtener el registro diario');
+      }
+    });
+  }
+
+  editRecipe() {
+    this.router.navigate(['/tabs/inicio/recipe', this.recipeId, 'edit'], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+
+  async deleteRecipe() {
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que deseas eliminar esta receta? Esta acción no se puede deshacer.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Eliminar',
+          cssClass: 'danger',
+          handler: () => {
+            this.confirmDelete();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private confirmDelete() {
+    this.presentLoading('Eliminando receta...');
+
+    this.recipeService.delete(this.recipeId).subscribe({
+      next: () => {
+        this.dismissLoading();
+        this.presentToast('Receta eliminada correctamente');
+        // Navegar de vuelta a la búsqueda o al inicio
+        this.router.navigate(['/tabs/inicio/search'], {
+          queryParams: {
+            date: this.dateParam,
+            meal: this.mealParam
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al eliminar receta:', err);
+        this.dismissLoading();
+        this.presentErrorToast('Error al eliminar la receta');
       }
     });
   }
@@ -195,5 +283,42 @@ export class RecipeDetailPage implements OnInit {
         meal: this.mealParam 
       } 
     });
+  }
+
+  // Utilidades
+  async presentLoading(message: string = 'Cargando...') {
+    const loading = await this.loadingController.create({
+      message,
+      spinner: 'circular'
+    });
+    await loading.present();
+  }
+
+  async dismissLoading() {
+    await this.loadingController.dismiss();
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: 'success'
+    });
+    await toast.present();
+  }
+
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom',
+      color: 'danger',
+      buttons: [{
+        text: 'OK',
+        role: 'cancel'
+      }]
+    });
+    await toast.present();
   }
 }

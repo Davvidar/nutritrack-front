@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment.prod';
 import { AuthService } from './auth.service';
 
 export interface Ingredient {
-  productId: string;
+  productId: string | any;
   cantidad: number;
 }
 

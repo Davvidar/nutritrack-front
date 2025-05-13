@@ -1,0 +1,281 @@
+// Variables de color
+:host {
+    --nutri-primary-green: #6ab04c;
+    --nutri-background-page: #f4f5f8;
+    --nutri-card-background: #ffffff;
+    --nutri-text-light: #ffffff;
+    --nutri-text-dark: #333333;
+    --nutri-text-medium: #666666;
+    --nutri-text-placeholder: #b0b0b0;
+    --nutri-input-border: #e0e0e0;
+    
+    // Colores de macros
+    --macro-calories-bg: #8c63d0;
+    --macro-protein-bg: #5046c8;
+    --macro-carbs-bg: #ff8c42;
+    --macro-fat-bg: #d4ca3a;
+  }
+  
+  // Estilos generales
+  ion-content.create-recipe-content {
+    --background: var(--nutri-background-page);
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--nutri-primary-green);
+      border-radius: 0 0 28px 28px;
+      z-index: 0;
+    }
+  }
+  
+  // Header curvado
+  ion-header.custom-header-curved {
+    background: var(--nutri-primary-green);
+    color: var(--nutri-text-light);
+    box-shadow: none;
+    
+    &::after {
+      display: none;
+    }
+    
+    ion-toolbar {
+      --border: none;
+      --background: transparent;
+      --color: var(--nutri-text-light);
+    }
+    
+    ion-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  }
+  
+  // Contenedor de campos
+  .form-fields-container {
+    position: relative;
+    z-index: 1;
+    background-color: var(--nutri-card-background);
+    margin: 15px;
+    border-radius: 16px;
+    padding: 1px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  // Items del formulario
+  ion-item.transparent-item {
+    --background: transparent;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 60px;
+    --border-color: var(--nutri-input-border);
+    
+    ion-label[position="stacked"] {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--nutri-text-medium);
+      margin-bottom: 2px;
+      transform: none;
+      padding-left: 2px;
+    }
+    
+    ion-input {
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      --placeholder-color: var(--nutri-text-placeholder);
+      font-size: 1rem;
+      color: var(--nutri-text-dark);
+      border: 1px solid var(--nutri-input-border);
+      border-radius: 8px;
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      margin-top: 4px;
+    }
+    
+    ion-note[slot="helper"] {
+      font-size: 0.75rem;
+      color: var(--nutri-text-medium);
+      margin-top: 4px;
+    }
+    
+    ion-note[slot="error"] {
+      font-size: 0.75rem;
+      color: var(--ion-color-danger);
+      margin-top: 4px;
+    }
+  }
+  
+  // Sección de ingredientes
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px 10px 16px;
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--nutri-text-dark);
+      margin: 0;
+    }
+    
+    ion-button {
+      --color: var(--nutri-primary-green);
+      font-size: 0.9rem;
+    }
+  }
+  
+  // Contenedor de ingredientes
+  .ingredients-container {
+    padding: 0 16px 16px 16px;
+  }
+  
+  // Tarjeta de ingrediente
+  .ingredient-card {
+    background: var(--nutri-card-background);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    
+    .ingredient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      
+      .ingredient-info {
+        h4 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--nutri-text-dark);
+          margin: 0 0 4px 0;
+        }
+        
+        p {
+          font-size: 0.85rem;
+          color: var(--nutri-text-medium);
+          margin: 0;
+        }
+      }
+    }
+    
+    .ingredient-quantity {
+      ion-item {
+        --background: #f7f7f7;
+        --border-radius: 8px;
+        --padding-start: 12px;
+        --padding-end: 12px;
+        
+        ion-label {
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: var(--nutri-text-medium);
+        }
+        
+        ion-input {
+          --padding-start: 0;
+          font-size: 1rem;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  // Estado sin ingredientes
+  .no-ingredients {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--nutri-text-medium);
+    
+    ion-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0 0 16px 0;
+      font-size: 1rem;
+    }
+    
+    ion-button {
+      --background: var(--nutri-primary-green);
+      --color: white;
+      --border-radius: 12px;
+    }
+  }
+  
+  // Resumen nutricional
+  .nutrition-summary-card {
+    background: var(--nutri-card-background);
+    border-radius: 16px;
+    margin: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--nutri-text-dark);
+      margin: 0 0 16px 0;
+    }
+    
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .nutrition-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .nutrition-label {
+        font-size: 0.9rem;
+        color: var(--nutri-text-medium);
+      }
+      
+      .nutrition-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--nutri-text-dark);
+      }
+    }
+    
+    .nutrition-note {
+      font-size: 0.75rem;
+      color: var(--nutri-text-medium);
+      font-style: italic;
+    }
+  }
+  
+  // Botón de guardar
+  .save-button {
+    margin: 20px 16px 25px 16px;
+    --background: var(--nutri-primary-green);
+    --background-activated: #548f41;
+    --color: var(--nutri-text-light);
+    --border-radius: 12px;
+    height: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: none;
+    
+    ion-icon {
+      font-size: 1.3rem;
+    }
+    
+    &[disabled] {
+      --background: #cccccc;
+      opacity: 0.6;
+    }
+  }

@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { ProductService, Product } from './product.service';
 import { NutritionUpdateService } from './nutrition-update.service';
 import { environment } from 'src/environments/environment.prod';
+import { Recipe, RecipeService} from './recipe.service';
 
 export interface MealItemDTO {
   productId?: string;
@@ -70,6 +71,7 @@ export class DailyLogService {
     private http: HttpClient,
     private auth: AuthService,
     private productService: ProductService,
+    private recipeService: RecipeService,
     private nutritionUpdateService: NutritionUpdateService
   ) {}
   
@@ -119,15 +121,8 @@ export class DailyLogService {
     const itemObservables: Observable<MealItem>[] = itemDTOs.map(dto => {
       if (dto.productId) {
         return this.productService.getById(dto.productId).pipe(
-          map((product: Product | null) => {
-            if (!product) {
-              return {
-                name: `Producto ID ${dto.productId} no encontrado`,
-                calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0,
-                cantidad: dto.cantidad, productId: dto.productId
-              };
-            }
-            const factor = dto.cantidad / 100; // Los nutrientes del producto son por 100g
+          map((product: Product) => {
+            const factor = dto.cantidad / 100;
             return {
               name: product.nombre,
               calorias: (product.calorias || 0) * factor,
@@ -148,8 +143,30 @@ export class DailyLogService {
           })
         );
       } else if (dto.recipeId) {
-        // TODO: Implementar lógica para RecipeService similar a ProductService
-        return of({ name: 'Receta pendiente', calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0, cantidad: dto.cantidad, recipeId: dto.recipeId });
+        // Manejar recetas
+        return this.recipeService.getById(dto.recipeId).pipe(
+          map((recipe: Recipe) => {
+            // Calcular la proporción basada en el peso final
+            const factor = dto.cantidad / recipe.pesoFinal;
+            return {
+              name: recipe.nombre,
+              calorias: (recipe.calorias || 0) * factor,
+              proteinas: (recipe.proteinas || 0) * factor,
+              carbohidratos: (recipe.carbohidratos || 0) * factor,
+              grasas: (recipe.grasas || 0) * factor,
+              cantidad: dto.cantidad,
+              recipeId: dto.recipeId
+            };
+          }),
+          catchError(err => {
+            console.error(`Error obteniendo receta ${dto.recipeId}:`, err);
+            return of({
+              name: `Error cargando receta ID ${dto.recipeId}`,
+              calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0,
+              cantidad: dto.cantidad, recipeId: dto.recipeId
+            });
+          })
+        );
       }
       // Fallback si no hay ni productId ni recipeId
       return of({ name: 'Item inválido', calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0, cantidad: dto.cantidad });

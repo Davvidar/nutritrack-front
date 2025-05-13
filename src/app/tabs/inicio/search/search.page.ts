@@ -58,9 +58,12 @@ export class SearchPage implements OnInit {
   recentSearches: string[] = ['Pollo', 'Arroz', 'Pasta', 'Yogur', 'Manzana'];
   activeFilter: 'all' | 'local' | 'recipes' | 'favorites' = 'all';
   favorites: Set<string> = new Set();
+
+  filteredRecipes: Recipe[] = [];
   
   // Timeout para debounce de búsqueda
   searchTimeout: any = null;
+  returnToRecipe: string | null = null
 
   constructor(
     private productService: ProductService,
@@ -84,6 +87,9 @@ export class SearchPage implements OnInit {
       }
       if (params['meal']) {
         this.mealParam = params['meal'];
+      }
+      if (params['returnTo'] === 'create-recipe' && params['recipeId']) {
+        this.returnToRecipe = params['recipeId'];
       }
       console.log('Parámetros recibidos:', { date: this.dateParam, meal: this.mealParam });
     });
@@ -348,7 +354,24 @@ export class SearchPage implements OnInit {
   // Manejar selección de item
   onSelect(item: Product | Recipe | any) {
     console.log('Seleccionado item:', item);
-
+    
+    if (this.returnToRecipe && this.isProduct(item)) {
+      // Guardar temporalmente el producto seleccionado
+      localStorage.setItem('selectedIngredient', JSON.stringify(item));
+      
+      // Navegar de vuelta a la página de creación de receta
+      const route = this.returnToRecipe === 'new' 
+        ? '/tabs/inicio/create-recipe'
+        : `/tabs/inicio/recipe/${this.returnToRecipe}/edit`;
+      
+      this.router.navigate([route], {
+        queryParams: {
+          date: this.dateParam,
+          meal: this.mealParam
+        }
+      });
+      return;
+    }
     // Si es un producto de Open Food Facts
     if (item.isFromOpenFoodFacts) {
       this.presentOpenFoodFactsProductOptions(item);
@@ -746,5 +769,67 @@ export class SearchPage implements OnInit {
 
   trackByOpenFoodFacts(index: number, item: any): string {
     return item.codigoBarras || item._id || `off-${index}`;
+  }
+
+
+  goToCreateRecipe() {
+    this.router.navigate(['/tabs/inicio/create-recipe'], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+  
+  onSelectRecipe(recipe: Recipe) {
+    this.router.navigate(['/tabs/inicio/recipe', recipe._id], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+  
+  editRecipe(event: Event, recipe: Recipe) {
+    event.stopPropagation();
+    this.router.navigate(['/tabs/inicio/recipe', recipe._id, 'edit'], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+  
+  duplicateRecipe(event: Event, recipe: Recipe) {
+    event.stopPropagation();
+    
+    // Crear una copia de la receta
+    const recipeData = {
+      nombre: `${recipe.nombre} (copia)`,
+      ingredientes: recipe.ingredientes,
+      pesoFinal: recipe.pesoFinal,
+      calorias: recipe.calorias,
+      proteinas: recipe.proteinas,
+      carbohidratos: recipe.carbohidratos,
+      grasas: recipe.grasas,
+      azucares: recipe.azucares,
+      grasasSaturadas: recipe.grasasSaturadas,
+      fibra: recipe.fibra
+    };
+    
+    this.recipeService.create(recipeData).subscribe({
+      next: (newRecipe) => {
+        this.presentToast('Receta duplicada correctamente');
+        this.loadData(true); // Recargar la lista
+      },
+      error: (err) => {
+        console.error('Error al duplicar receta:', err);
+        this.presentErrorToast('Error al duplicar la receta');
+      }
+    });
+  }
+  
+  trackByRecipe(index: number, recipe: Recipe): string {
+    return recipe._id;
   }
 }

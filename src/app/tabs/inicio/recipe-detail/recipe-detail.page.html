@@ -1,141 +1,161 @@
 <ion-header>
-    <ion-toolbar [color]="'success'">
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
-      </ion-buttons>
-      <ion-title>
-        <div *ngIf="recipe">{{ recipe.nombre }}</div>
-      </ion-title>
-    </ion-toolbar>
-  </ion-header>
-  
-  <ion-content>
-    <!-- Spinner de carga -->
-    <div class="loading-container" *ngIf="loading">
-      <ion-spinner name="crescent"></ion-spinner>
-    </div>
-  
-    <!-- Mensaje de error -->
-    <div class="error-container" *ngIf="error">
-      <p>{{ error }}</p>
-      <ion-button (click)="loadRecipe()">Reintentar</ion-button>
-    </div>
-  
-    <div class="recipe-detail" *ngIf="recipe && !loading">
-      <!-- Subtítulo (peso final) -->
-      <h2 class="recipe-subtitle">Peso final: {{ recipe.pesoFinal }}g</h2>
-  
-      <!-- Selector de cantidad -->
-      <div class="cantidad-container">
-        <h3>Cantidad a consumir</h3>
-        <ion-item class="cantidad-input">
-          <ion-input 
-            type="number" 
-            inputmode="numeric" 
-            [(ngModel)]="cantidad" 
-            min="1" 
-            placeholder="100">
-          </ion-input>
-          <div class="cantidad-suffix">g</div>
-        </ion-item>
-      </div>
-  
-      <!-- Información nutricional por cantidad seleccionada -->
-      <div class="nutrition-card">
-        <h3 class="nutrition-title">Información nutricional para {{ cantidad }}g</h3>
-        
-        <!-- Círculo de calorías -->
-        <div class="calories-circle-container">
-          <div class="calories-circle">
-            <div class="calories-value">{{ caloriasTotales | number:'1.0-0' }}</div>
-            <div class="calories-unit">kcal</div>
-          </div>
-  
-          <!-- Macronutrientes principales -->
-          <div class="macros-list">
-            <div class="macro-item protein">
-              <div class="macro-name">Proteínas - {{ proteinasTotales | number:'1.0-0' }}g</div>
-            </div>
-            <div class="macro-item carbs">
-              <div class="macro-name">Carbohidratos - {{ carbohidratosTotales | number:'1.0-0' }}g</div>
-            </div>
-            <div class="macro-item fat">
-              <div class="macro-name">Grasas - {{ grasasTotales | number:'1.0-0' }}g</div>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Información detallada nutricional -->
-      <div class="nutrition-details">
-        <h3 class="nutrition-title">Información nutricional completa</h3>
-        
-        <div class="nutrient-row">
-          <div class="nutrient-icon calories-icon">C</div>
-          <div class="nutrient-name">Calorías</div>
-          <div class="nutrient-value">{{ recipe.calorias | number:'1.0-0' }} kcal</div>
-        </div>
-        
-        <div class="nutrient-row">
-          <div class="nutrient-icon fat-icon">G</div>
-          <div class="nutrient-name">Grasas</div>
-          <div class="nutrient-value">{{ recipe.grasas | number:'1.0-0' }}g</div>
-        </div>
-        
-        <div class="nutrient-row" *ngIf="recipe.grasasSaturadas !== undefined">
-          <div class="nutrient-icon"></div>
-          <div class="nutrient-name indent">saturadas</div>
-          <div class="nutrient-value">{{ recipe.grasasSaturadas | number:'1.0-0' }}g</div>
-        </div>
-        
-        <div class="nutrient-row">
-          <div class="nutrient-icon carbs-icon">H</div>
-          <div class="nutrient-name">H. de carbono</div>
-          <div class="nutrient-value">{{ recipe.carbohidratos | number:'1.0-0' }}g</div>
-        </div>
-        
-        <div class="nutrient-row" *ngIf="recipe.azucares !== undefined">
-          <div class="nutrient-icon"></div>
-          <div class="nutrient-name indent">Azúcares</div>
-          <div class="nutrient-value">{{ recipe.azucares | number:'1.0-0' }}g</div>
-        </div>
-        
-        <div class="nutrient-row">
-          <div class="nutrient-icon protein-icon">P</div>
-          <div class="nutrient-name">Proteínas</div>
-          <div class="nutrient-value">{{ recipe.proteinas | number:'1.0-0' }}g</div>
-        </div>
-        
-        <div class="nutrient-row" *ngIf="recipe.fibra !== undefined">
-          <div class="nutrient-icon"></div>
-          <div class="nutrient-name">Fibra</div>
-          <div class="nutrient-value">{{ recipe.fibra | number:'1.0-0' }}g</div>
-        </div>
-      </div>
-  
-      <!-- Ingredientes de la receta (plegables) -->
-      <div class="ingredients-card">
-        <div class="ingredients-header" (click)="toggleIngredients()">
-          <h3 class="ingredients-title">Ingredientes</h3>
-          <ion-icon [name]="showIngredients ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-        </div>
-        
-        <div class="ingredients-list" *ngIf="showIngredients">
-          <div class="ingredient-item" *ngFor="let ingredient of ingredients">
-            <div class="ingredient-name">{{ ingredient.name }}</div>
-            <div class="ingredient-quantity">{{ ingredient.cantidad }}g</div>
-          </div>
-          
-          <div class="no-ingredients" *ngIf="ingredients.length === 0">
-            <p>No hay ingredientes disponibles para mostrar</p>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Botón Añadir -->
-      <ion-button expand="block" class="add-button" (click)="addToMeal()">
-        Añadir receta
-        <ion-icon name="add-outline" slot="end"></ion-icon>
+  <ion-toolbar [color]="'success'">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div *ngIf="recipe">{{ recipe.nombre }}</div>
+    </ion-title>
+    <!-- Botones de edición y eliminación solo para el propietario -->
+    <ion-buttons slot="end" *ngIf="isOwner && recipe">
+      <ion-button (click)="editRecipe()">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
+      <ion-button (click)="deleteRecipe()" color="danger">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Spinner de carga -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-container" *ngIf="error">
+    <p>{{ error }}</p>
+    <ion-button (click)="loadRecipe()">Reintentar</ion-button>
+  </div>
+
+  <div class="recipe-detail" *ngIf="recipe && !loading">
+    <!-- Indicador de propiedad -->
+    <div class="ownership-indicator" *ngIf="isOwner">
+      <ion-chip color="primary">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <ion-label>Mi receta</ion-label>
+      </ion-chip>
     </div>
-  </ion-content>
+
+    <!-- Subtítulo (peso final) -->
+    <h2 class="recipe-subtitle">Peso final: {{ recipe.pesoFinal }}g</h2>
+
+    <!-- Selector de cantidad -->
+    <div class="cantidad-container">
+      <h3>Cantidad a consumir</h3>
+      <ion-item class="cantidad-input">
+        <ion-input 
+          type="number" 
+          inputmode="numeric" 
+          [(ngModel)]="cantidad" 
+          min="1" 
+          placeholder="100">
+        </ion-input>
+        <div class="cantidad-suffix">g</div>
+      </ion-item>
+    </div>
+
+    <!-- Información nutricional por cantidad seleccionada -->
+    <div class="nutrition-card">
+      <h3 class="nutrition-title">Información nutricional para {{ cantidad }}g</h3>
+      
+      <!-- Círculo de calorías -->
+      <div class="calories-circle-container">
+        <div class="calories-circle">
+          <div class="calories-value">{{ caloriasTotales }}</div>
+          <div class="calories-unit">kcal</div>
+        </div>
+
+        <!-- Macronutrientes principales -->
+        <div class="macros-list">
+          <div class="macro-item protein">
+            <div class="macro-name">Proteínas - {{ proteinasTotales }}g</div>
+          </div>
+          <div class="macro-item carbs">
+            <div class="macro-name">Carbohidratos - {{ carbohidratosTotales }}g</div>
+          </div>
+          <div class="macro-item fat">
+            <div class="macro-name">Grasas - {{ grasasTotales }}g</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información detallada nutricional -->
+    <div class="nutrition-details">
+      <h3 class="nutrition-title">Información nutricional completa</h3>
+      
+      <div class="nutrient-row">
+        <div class="nutrient-icon calories-icon">C</div>
+        <div class="nutrient-name">Calorías</div>
+        <div class="nutrient-value">{{ recipe.calorias | number:'1.0-0' }} kcal</div>
+      </div>
+      
+      <div class="nutrient-row">
+        <div class="nutrient-icon fat-icon">G</div>
+        <div class="nutrient-name">Grasas</div>
+        <div class="nutrient-value">{{ recipe.grasas | number:'1.0-0' }}g</div>
+      </div>
+      
+      <div class="nutrient-row" *ngIf="recipe.grasasSaturadas !== undefined">
+        <div class="nutrient-icon"></div>
+        <div class="nutrient-name indent">saturadas</div>
+        <div class="nutrient-value">{{ recipe.grasasSaturadas | number:'1.0-0' }}g</div>
+      </div>
+      
+      <div class="nutrient-row">
+        <div class="nutrient-icon carbs-icon">H</div>
+        <div class="nutrient-name">H. de carbono</div>
+        <div class="nutrient-value">{{ recipe.carbohidratos | number:'1.0-0' }}g</div>
+      </div>
+      
+      <div class="nutrient-row" *ngIf="recipe.azucares !== undefined">
+        <div class="nutrient-icon"></div>
+        <div class="nutrient-name indent">Azúcares</div>
+        <div class="nutrient-value">{{ recipe.azucares | number:'1.0-0' }}g</div>
+      </div>
+      
+      <div class="nutrient-row">
+        <div class="nutrient-icon protein-icon">P</div>
+        <div class="nutrient-name">Proteínas</div>
+        <div class="nutrient-value">{{ recipe.proteinas | number:'1.0-0' }}g</div>
+      </div>
+      
+      <div class="nutrient-row" *ngIf="recipe.fibra !== undefined">
+        <div class="nutrient-icon"></div>
+        <div class="nutrient-name">Fibra</div>
+        <div class="nutrient-value">{{ recipe.fibra | number:'1.0-0' }}g</div>
+      </div>
+    </div>
+
+    <!-- Ingredientes de la receta (plegables) -->
+    <div class="ingredients-card">
+      <div class="ingredients-header" (click)="toggleIngredients()">
+        <h3 class="ingredients-title">Ingredientes</h3>
+        <ion-icon [name]="showIngredients ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </div>
+      
+      <div class="ingredients-list" *ngIf="showIngredients">
+        <div class="ingredient-item" *ngFor="let ingredient of enrichedIngredients">
+          <div class="ingredient-info">
+            <div class="ingredient-name">{{ ingredient.product?.nombre || 'Producto no encontrado' }}</div>
+            <div class="ingredient-brand" *ngIf="ingredient.product?.marca">{{ ingredient.product?.marca ?? 'Marca no disponible' }}</div>
+          </div>
+          <div class="ingredient-quantity">{{ ingredient.cantidad }}g</div>
+        </div>
+        
+        <div class="no-ingredients" *ngIf="enrichedIngredients.length === 0">
+          <p>No hay ingredientes disponibles para mostrar</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón Añadir -->
+    <ion-button expand="block" class="add-button" (click)="addToMeal()">
+      Añadir receta
+      <ion-icon name="add-outline" slot="end"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

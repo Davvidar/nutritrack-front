@@ -1,330 +1,354 @@
 :host {
-    --recipe-bg-color: #fff;
-    --macro-protein-color: #5046c8; // Morado azulado
-    --macro-carbs-color: #ff8c42;   // Naranja
-    --macro-fat-color: #d4ca3a;     // Amarillo
-    --text-color: #333;
-    --text-light: #777;
-    --border-color: #ddd;
-    --success-color: #6dbd3c;       // Verde de la app
+  --recipe-bg-color: #fff;
+  --macro-protein-color: #5046c8; // Morado azulado
+  --macro-carbs-color: #ff8c42;   // Naranja
+  --macro-fat-color: #d4ca3a;     // Amarillo
+  --text-color: #333;
+  --text-light: #777;
+  --border-color: #ddd;
+  --success-color: #6dbd3c;       // Verde de la app
+}
+
+ion-header ion-toolbar {
+  --min-height: 60px;
+
+  ion-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+    --color: var(--success-color);
   }
   
-  ion-header ion-toolbar {
-    --min-height: 60px;
+  p {
+    margin: 20px 0;
+    color: var(--text-color);
+  }
+}
+
+.recipe-detail {
+  padding: 16px;
+  background-color: var(--recipe-bg-color);
+}
+
+.ownership-indicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
   
-    ion-title {
-      font-weight: 600;
-      font-size: 1.2rem;
+  ion-chip {
+    ion-icon {
+      margin-right: 4px;
     }
   }
+}
+
+.recipe-subtitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-light);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+// Contenedor de selección de cantidad
+.cantidad-container {
+  margin-bottom: 24px;
   
-  .loading-container, .error-container {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+  }
+  
+  .cantidad-input {
+    --background: #f7f7f7;
+    --border-radius: 12px;
+    --border-color: var(--border-color);
+    --border-width: 1px;
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    
+    ion-input {
+      --padding-start: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .cantidad-suffix {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      margin-left: 4px;
+    }
+  }
+}
+
+// Tarjeta de información nutricional
+.nutrition-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 24px;
+  
+  .nutrition-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  
+  .calories-circle-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .calories-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--macro-protein-color) 0%,
+      var(--macro-carbs-color) 33%, 
+      var(--macro-fat-color) 66%
+    );
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 300px;
+    position: relative;
+    border: 2px solid white;
+    overflow: hidden;
     
-    ion-spinner {
-      width: 48px;
-      height: 48px;
-      --color: var(--success-color);
-    }
-    
-    p {
-      margin: 20px 0;
-      color: var(--text-color);
-    }
-  }
-  
-  .recipe-detail {
-    padding: 16px;
-    background-color: var(--recipe-bg-color);
-  }
-  
-  .recipe-subtitle {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-light);
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  // Contenedor de selección de cantidad
-  .cantidad-container {
-    margin-bottom: 24px;
-    
-    h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-color);
-    }
-    
-    .cantidad-input {
-      --background: #f7f7f7;
-      --border-radius: 12px;
-      --border-color: var(--border-color);
-      --border-width: 1px;
-      --padding-start: 16px;
-      --inner-padding-end: 16px;
-      
-      ion-input {
-        --padding-start: 8px;
-        font-size: 1.1rem;
-        font-weight: 500;
-      }
-      
-      .cantidad-suffix {
-        font-size: 1.1rem;
-        color: var(--text-light);
-        margin-left: 4px;
-      }
-    }
-  }
-  
-  // Tarjeta de información nutricional
-  .nutrition-card {
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
-    margin-bottom: 24px;
-    
-    .nutrition-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-color);
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
-    
-    .calories-circle-container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .calories-circle {
-      width: 100px;
-      height: 100px;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      background-color: white;
       border-radius: 50%;
-      background: conic-gradient(
-        var(--macro-protein-color) 0%,
-        var(--macro-carbs-color) 33%, 
-        var(--macro-fat-color) 66%
-      );
+      z-index: 0;
+    }
+    
+    .calories-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+      z-index: 1;
+      line-height: 1;
+    }
+    
+    .calories-unit {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      z-index: 1;
+    }
+  }
+  
+  .macros-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .macro-item {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      
+      .macro-name {
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+      
+      &.protein .macro-name {
+        color: var(--macro-protein-color);
+      }
+      
+      &.carbs .macro-name {
+        color: var(--macro-carbs-color);
+      }
+      
+      &.fat .macro-name {
+        color: var(--macro-fat-color);
+      }
+    }
+  }
+}
+
+// Detalles nutricionales
+.nutrition-details {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 16px;
+  
+  .nutrition-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  
+  .nutrient-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .nutrient-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      border: 2px solid white;
-      overflow: hidden;
+      font-weight: 700;
+      font-size: 12px;
+      color: white;
+      margin-right: 12px;
+      flex-shrink: 0;
       
-      &::before {
-        content: '';
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        bottom: 8px;
-        background-color: white;
-        border-radius: 50%;
-        z-index: 0;
+      &.calories-icon {
+        background-color: #8c63d0;
       }
       
-      .calories-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--text-color);
-        z-index: 1;
-        line-height: 1;
+      &.protein-icon {
+        background-color: var(--macro-protein-color);
       }
       
-      .calories-unit {
-        font-size: 0.9rem;
-        color: var(--text-light);
-        z-index: 1;
+      &.carbs-icon {
+        background-color: var(--macro-carbs-color);
+      }
+      
+      &.fat-icon {
+        background-color: var(--macro-fat-color);
       }
     }
     
-    .macros-list {
+    .nutrient-name {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-color);
       
-      .macro-item {
-        display: flex;
-        align-items: center;
-        
-        .macro-name {
-          font-weight: 500;
-          font-size: 0.95rem;
-        }
-        
-        &.protein .macro-name {
-          color: var(--macro-protein-color);
-        }
-        
-        &.carbs .macro-name {
-          color: var(--macro-carbs-color);
-        }
-        
-        &.fat .macro-name {
-          color: var(--macro-fat-color);
-        }
+      &.indent {
+        padding-left: 36px; // Alineado con el texto principal
       }
     }
-  }
-  
-  // Detalles nutricionales
-  .nutrition-details {
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
-    margin-bottom: 16px;
     
-    .nutrition-title {
+    .nutrient-value {
       font-size: 0.95rem;
       font-weight: 600;
       color: var(--text-color);
-      margin-top: 0;
-      margin-bottom: 16px;
+      text-align: right;
+    }
+  }
+}
+
+// Tarjeta de ingredientes
+.ingredients-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 24px;
+  
+  .ingredients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    
+    .ingredients-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 0;
     }
     
-    .nutrient-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-      
-      .nutrient-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 700;
-        font-size: 12px;
-        color: white;
-        margin-right: 12px;
-        flex-shrink: 0;
-        
-        &.calories-icon {
-          background-color: #8c63d0;
-        }
-        
-        &.protein-icon {
-          background-color: var(--macro-protein-color);
-        }
-        
-        &.carbs-icon {
-          background-color: var(--macro-carbs-color);
-        }
-        
-        &.fat-icon {
-          background-color: var(--macro-fat-color);
-        }
-      }
-      
-      .nutrient-name {
-        flex: 1;
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--text-color);
-        
-        &.indent {
-          padding-left: 36px; // Alineado con el texto principal
-        }
-      }
-      
-      .nutrient-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-color);
-        text-align: right;
-      }
+    ion-icon {
+      font-size: 1.2rem;
+      color: var(--text-light);
     }
   }
   
-  // Tarjeta de ingredientes
-  .ingredients-card {
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
-    margin-bottom: 24px;
+  .ingredients-list {
+    margin-top: 16px;
     
-    .ingredients-header {
+    .ingredient-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
       
-      .ingredients-title {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-color);
-        margin: 0;
+      &:last-child {
+        border-bottom: none;
       }
       
-      ion-icon {
-        font-size: 1.2rem;
-        color: var(--text-light);
-      }
-    }
-    
-    .ingredients-list {
-      margin-top: 16px;
-      
-      .ingredient-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #f0f0f0;
-        
-        &:last-child {
-          border-bottom: none;
-        }
+      .ingredient-info {
+        flex: 1;
         
         .ingredient-name {
           font-size: 0.9rem;
           color: var(--text-color);
+          font-weight: 500;
         }
         
-        .ingredient-quantity {
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: var(--text-color);
+        .ingredient-brand {
+          font-size: 0.8rem;
+          color: var(--text-light);
+          margin-top: 2px;
         }
       }
       
-      .no-ingredients {
-        text-align: center;
-        padding: 16px 0;
-        color: var(--text-light);
+      .ingredient-quantity {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-color);
       }
     }
-  }
-  
-  // Botón de añadir
-  .add-button {
-    --background: var(--success-color);
-    --color: white;
-    --border-radius: 12px;
-    --box-shadow: 0 4px 8px rgba(109, 189, 60, 0.3);
-    margin: 0;
-    height: 50px;
-    font-weight: 600;
-    font-size: 1rem;
     
-    ion-icon {
-      margin-left: 8px;
-      font-size: 1.2rem;
+    .no-ingredients {
+      text-align: center;
+      padding: 16px 0;
+      color: var(--text-light);
     }
   }
+}
+
+// Botón de añadir
+.add-button {
+  --background: var(--success-color);
+  --color: white;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 8px rgba(109, 189, 60, 0.3);
+  margin: 0;
+  height: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  
+  ion-icon {
+    margin-left: 8px;
+    font-size: 1.2rem;
+  }
+}

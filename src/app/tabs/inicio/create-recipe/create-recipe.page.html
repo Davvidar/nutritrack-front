@@ -1,0 +1,108 @@
+<ion-header class="custom-header-curved">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/inicio/search" color="light"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ isEditMode ? 'Editar' : 'Nueva' }} receta</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content [fullscreen]="true" class="create-recipe-content">
+    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+      <!-- Información básica -->
+      <div class="form-fields-container">
+        <ion-item lines="none" class="transparent-item first-item">
+          <ion-label position="stacked">Nombre de la receta*</ion-label>
+          <ion-input formControlName="nombre" type="text" placeholder="Ej: Ensalada César"></ion-input>
+          <ion-note slot="error" *ngIf="recipeForm.get('nombre')?.touched && recipeForm.get('nombre')?.errors?.['required']">
+            El nombre es obligatorio
+          </ion-note>
+        </ion-item>
+        
+        <ion-item lines="none" class="transparent-item">
+          <ion-label position="stacked">Peso final (g)*</ion-label>
+          <ion-input formControlName="pesoFinal" type="number" placeholder="Ej: 250"></ion-input>
+          <ion-note slot="helper">Peso total de la receta una vez preparada</ion-note>
+          <ion-note slot="error" *ngIf="recipeForm.get('pesoFinal')?.touched && recipeForm.get('pesoFinal')?.errors?.['required']">
+            El peso final es obligatorio
+          </ion-note>
+        </ion-item>
+      </div>
+      
+      <!-- Ingredientes -->
+      <div class="section-header">
+        <h3>Ingredientes</h3>
+        <ion-button fill="clear" size="small" (click)="addIngredient()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Añadir
+        </ion-button>
+      </div>
+      
+      <div class="ingredients-container">
+        <div formArrayName="ingredientes">
+          <div class="ingredient-card" 
+               *ngFor="let ingredient of ingredientes.controls; let i = index"
+               [formGroupName]="i">
+            <div class="ingredient-header">
+              <div class="ingredient-info">
+                <h4>{{ ingredient.get('productName')?.value }}</h4>
+                <p>{{ ingredient.get('productBrand')?.value }}</p>
+              </div>
+              <ion-button fill="clear" color="danger" size="small" (click)="removeIngredient(i)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+            
+            <div class="ingredient-quantity">
+              <ion-item lines="none">
+                <ion-label position="stacked">Cantidad (g)</ion-label>
+                <ion-input 
+                  type="number" 
+                  formControlName="cantidad"
+                  (ionChange)="calculateTotalNutrition()"
+                  min="1">
+                </ion-input>
+              </ion-item>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Información nutricional calculada -->
+      <div class="nutrition-summary-card">
+        <h3>Información nutricional total</h3>
+        <div class="nutrition-grid">
+          <div class="nutrition-item">
+            <span class="nutrition-label">Calorías</span>
+            <span class="nutrition-value">{{ recipeForm.get('calorias')?.value }} kcal</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Proteínas</span>
+            <span class="nutrition-value">{{ recipeForm.get('proteinas')?.value }} g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Carbohidratos</span>
+            <span class="nutrition-value">{{ recipeForm.get('carbohidratos')?.value }} g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Grasas</span>
+            <span class="nutrition-value">{{ recipeForm.get('grasas')?.value }} g</span>
+          </div>
+        </div>
+        
+        <ion-note class="nutrition-note">
+          * Valores calculados automáticamente basados en los ingredientes
+        </ion-note>
+      </div>
+      
+      <!-- Botón de guardar -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="save-button"
+        [disabled]="recipeForm.invalid || ingredientes.length === 0">
+        {{ isEditMode ? 'Actualizar' : 'Crear' }} receta
+        <ion-icon name="checkmark-outline" slot="end"></ion-icon>
+      </ion-button>
+    </form>
+  </ion-content>

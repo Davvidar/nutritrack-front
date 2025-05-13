@@ -42,6 +42,17 @@ export const routes: Routes = [
       {
         path: 'inicio/create-product',
         loadComponent: () => import('./tabs/inicio/create-product/create-product.page').then(m => m.CreateProductPage)
+      },{
+        path: 'inicio/create-recipe',
+        loadComponent: () => import('./tabs/inicio/create-recipe/create-recipe.page').then(m => m.CreateRecipePage)
+      },
+      {
+        path: 'inicio/recipe/:id',
+        loadComponent: () => import('./tabs/inicio/recipe-detail/recipe-detail.page').then(m => m.RecipeDetailPage)
+      },
+      {
+        path: 'inicio/recipe/:id/edit',
+        loadComponent: () => import('./tabs/inicio/create-recipe/create-recipe.page').then(m => m.CreateRecipePage)
       },
 
       {

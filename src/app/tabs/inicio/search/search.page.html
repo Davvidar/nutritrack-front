@@ -164,6 +164,63 @@
                   </ion-icon>
                 </button>
               </div>
+              
+            </article>
+          </div>
+        </section>
+        <section class="recipes-section" *ngIf="activeFilter === 'recipes' && filteredRecipes.length > 0">
+          <h3 class="section-title" *ngIf="localFilteredItems.length > 0">
+            <ion-icon name="restaurant"></ion-icon>
+            Recetas
+          </h3>
+          
+          <div class="recipes-grid">
+            <article 
+              *ngFor="let recipe of filteredRecipes; trackBy: trackByRecipe"
+              class="recipe-card"
+              (click)="onSelectRecipe(recipe)">
+              
+              <div class="recipe-info">
+                <h4 class="recipe-name">{{ recipe.nombre }}</h4>
+                <p class="recipe-details">
+                  <ion-icon name="scale-outline"></ion-icon>
+                  {{ recipe.pesoFinal }}g
+                </p>
+                
+                <!-- Macros de la receta -->
+                <div class="macro-badges">
+                  <span class="macro-badge calories">
+                    <strong>{{ recipe.calorias }}</strong>
+                    <small>kcal</small>
+                  </span>
+                  <span class="macro-badge protein">
+                    <strong>{{ recipe.proteinas }}</strong>
+                    <small>P</small>
+                  </span>
+                  <span class="macro-badge carbs">
+                    <strong>{{ recipe.carbohidratos }}</strong>
+                    <small>C</small>
+                  </span>
+                  <span class="macro-badge fat">
+                    <strong>{{ recipe.grasas }}</strong>
+                    <small>G</small>
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Acciones rápidas -->
+              <div class="recipe-actions">
+                <button 
+                  class="action-button edit"
+                  (click)="editRecipe($event, recipe)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button 
+                  class="action-button duplicate"
+                  (click)="duplicateRecipe($event, recipe)">
+                  <ion-icon name="copy-outline"></ion-icon>
+                </button>
+              </div>
             </article>
           </div>
         </section>
@@ -270,9 +327,8 @@
   </main>
 
   <!-- Botón flotante para crear producto -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="goToCreateProduct()">
-      <ion-icon name="add"></ion-icon>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="activeFilter === 'recipes'">
+    <ion-fab-button (click)="goToCreateRecipe()">
+      <ion-icon name="restaurant"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-</ion-content>
