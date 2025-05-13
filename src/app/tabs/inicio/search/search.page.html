@@ -1,103 +1,278 @@
-<ion-header class="custom-search-header">
-  <ion-toolbar> <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/inicio" color="light"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ mealParam | titlecase }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="onScanBarcode()" color="light"> <ion-icon slot="icon-only" name="scan-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<!-- src/app/tabs/inicio/search/search.page.html -->
+<ion-content [fullscreen]="true" class="search-page">
+  <!-- Header flotante con blur -->
+  <header class="floating-header">
+    <div class="header-content">
+      <!-- Fila superior: navegación -->
+      <div class="navigation-row">
+        <ion-button fill="clear" class="back-button" (click)="goBack()">
+          <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        
+        <h1 class="page-title">Añadir a {{ mealParam }}</h1>
+        
+        <ion-button fill="clear" class="placeholder-button">
+          <!-- Botón placeholder para mantener el balance -->
+        </ion-button>
+      </div>
+      
+      <!-- Barra de búsqueda mejorada -->
+      <div class="search-container">
+        <div class="search-box">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <input 
+            type="search" 
+            [(ngModel)]="searchQuery"
+            (input)="onSearchChange()"
+            placeholder="Buscar alimentos..."
+            class="search-input">
+          <button 
+            *ngIf="searchQuery" 
+            (click)="clearSearch()"
+            class="clear-button">
+            <ion-icon name="close-circle"></ion-icon>
+          </button>
+          <button 
+            (click)="onScanBarcode()"
+            class="scan-button-inline">
+            <ion-icon name="scan-outline"></ion-icon>
+          </button>
+        </div>
+        
+        <!-- Filtros rápidos -->
+        <div class="quick-filters">
+          <button 
+            class="filter-chip"
+            [class.active]="activeFilter === 'all'"
+            (click)="setFilter('all')">
+            <ion-icon name="apps-outline"></ion-icon>
+            Todo
+          </button>
+          <button 
+            class="filter-chip"
+            [class.active]="activeFilter === 'local'"
+            (click)="setFilter('local')">
+            <ion-icon name="home-outline"></ion-icon>
+            Mis productos
+          </button>
+          <button 
+            class="filter-chip"
+            [class.active]="activeFilter === 'recipes'"
+            (click)="setFilter('recipes')">
+            <ion-icon name="restaurant-outline"></ion-icon>
+            Recetas
+          </button>
+          <button 
+            class="filter-chip"
+            [class.active]="activeFilter === 'favorites'"
+            (click)="setFilter('favorites')">
+            <ion-icon name="star-outline"></ion-icon>
+            Favoritos
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="header-search-segments">
-    <div class="search-bar-wrapper">
-      <div class="search-bar-field">
-        <ion-searchbar
-          [(ngModel)]="searchQuery"
-          (ionInput)="onSearchChange()"
-          placeholder="Buscar"
-          mode="ios"
-          animated="true"
-          debounce="300"
-          class="product-searchbar"
-          searchIcon="search-outline">
-        </ion-searchbar>
-        <ion-button fill="clear" class="filter-button-search" (click)="openFilterOptions()"> <ion-icon slot="icon-only" name="options-outline"></ion-icon>
+  <!-- Contenido principal con padding para el header -->
+  <main class="search-content">
+    <!-- Estados de la búsqueda -->
+    <div class="status-container" *ngIf="!loadingSearch">
+      <!-- Estado inicial sin búsqueda -->
+      <div class="empty-state" *ngIf="!searchQuery && localFilteredItems.length === 0">
+        <div class="empty-state-icon">
+          <ion-icon name="search-circle-outline"></ion-icon>
+        </div>
+        <h2>¿Qué deseas añadir?</h2>
+        <p>Busca en nuestra base de datos o escanea un código de barras</p>
+        
+        <!-- Sugerencias rápidas -->
+        <div class="suggestions">
+          <h3>Búsquedas frecuentes</h3>
+          <div class="suggestion-chips">
+            <button 
+              *ngFor="let suggestion of recentSearches"
+              (click)="searchQuery = suggestion; onSearchChange()"
+              class="suggestion-chip">
+              {{ suggestion }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultados de búsqueda -->
+      <div class="results-container" *ngIf="searchQuery || localFilteredItems.length > 0">
+        <!-- Estadísticas de resultados -->
+        <div class="results-stats" *ngIf="searchQuery">
+          <span class="stats-text">
+            <strong>{{ localFilteredItems.length }}</strong> resultados locales
+          </span>
+          <span class="stats-divider" *ngIf="openFoodFactsResults.length > 0">•</span>
+          <span class="stats-text" *ngIf="openFoodFactsResults.length > 0">
+            <strong>{{ openFoodFactsResults.length }}</strong> de Open Food Facts
+          </span>
+        </div>
+
+        <!-- Lista de productos locales -->
+        <section class="products-section" *ngIf="localFilteredItems.length > 0">
+          <h3 class="section-title" *ngIf="openFoodFactsResults.length > 0">
+            <ion-icon name="home"></ion-icon>
+            Tus productos
+          </h3>
+          
+          <div class="products-grid">
+            <article 
+              *ngFor="let item of localFilteredItems; trackBy: trackByFn"
+              class="product-card"
+              (click)="onSelect(item)">
+              
+              <!-- Información del producto -->
+              <div class="product-info">
+                <h4 class="product-name">{{ item.nombre }}</h4>
+                <p class="product-brand" *ngIf="isProduct(item) && item.marca">{{ item.marca }}</p>
+                
+                <!-- Macros en formato visual -->
+                <div class="macro-badges">
+                  <span class="macro-badge calories">
+                    <strong>{{ item.calorias }}</strong>
+                    <small>kcal</small>
+                  </span>
+                  <span class="macro-badge protein">
+                    <strong>{{ item.proteinas }}</strong>
+                    <small>P</small>
+                  </span>
+                  <span class="macro-badge carbs">
+                    <strong>{{ item.carbohidratos }}</strong>
+                    <small>C</small>
+                  </span>
+                  <span class="macro-badge fat">
+                    <strong>{{ item.grasas }}</strong>
+                    <small>G</small>
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Acciones rápidas -->
+              <div class="product-actions">
+                <button 
+                  class="action-button favorite"
+                  (click)="toggleFavorite($event, item)"
+                  *ngIf="isProduct(item)">
+                  <ion-icon 
+                    [name]="isFavorite(item) ? 'star' : 'star-outline'"
+                    [class.active]="isFavorite(item)">
+                  </ion-icon>
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Resultados de Open Food Facts -->
+        <section class="openfoodfacts-section" 
+                 *ngIf="openFoodFactsResults.length > 0 && activeFilter !== 'local'">
+          <h3 class="section-title">
+            <ion-icon name="globe"></ion-icon>
+            Open Food Facts
+          </h3>
+          
+          <div class="off-notice">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>Estos productos no están en tu base de datos. Puedes importarlos haciendo clic.</span>
+          </div>
+          
+          <div class="products-grid">
+            <article 
+              *ngFor="let item of openFoodFactsResults; trackBy: trackByOpenFoodFacts"
+              class="product-card off-card"
+              (click)="onSelect(item)">
+              
+              <div class="off-badge">
+                <ion-icon name="globe-outline"></ion-icon>
+              </div>
+              
+              <div class="product-info">
+                <h4 class="product-name">{{ item.nombre }}</h4>
+                <p class="product-brand" *ngIf="item.marca">{{ item.marca }}</p>
+                
+                <div class="macro-badges">
+                  <span class="macro-badge calories">
+                    <strong>{{ item.calorias }}</strong>
+                    <small>kcal</small>
+                  </span>
+                  <span class="macro-badge protein">
+                    <strong>{{ item.proteinas }}</strong>
+                    <small>P</small>
+                  </span>
+                  <span class="macro-badge carbs">
+                    <strong>{{ item.carbohidratos }}</strong>
+                    <small>C</small>
+                  </span>
+                  <span class="macro-badge fat">
+                    <strong>{{ item.grasas }}</strong>
+                    <small>G</small>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="product-actions">
+                <button 
+                  class="action-button import"
+                  (click)="importProduct($event, item)">
+                  <ion-icon name="add-circle-outline"></ion-icon>
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <!-- Sin resultados -->
+      <div class="no-results" *ngIf="searchQuery && localFilteredItems.length === 0 && openFoodFactsResults.length === 0 && !searchingOpenFoodFacts">
+        <div class="no-results-icon">
+          <ion-icon name="search-outline"></ion-icon>
+        </div>
+        <h2>No se encontraron resultados</h2>
+        <p>Intenta con otros términos o crea un nuevo producto</p>
+        <ion-button 
+          class="create-product-button"
+          (click)="goToCreateProduct()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear nuevo producto
         </ion-button>
       </div>
     </div>
 
-    <div class="segments-wrapper-outer">
-        <ion-segment [(ngModel)]="segment" (ionChange)="onSegmentChange($event)" mode="md" value="todos">
-          <ion-segment-button value="todos">
-            <ion-label>Todos</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="tuyos">
-            <ion-label>Tuyos</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="recetas">
-            <ion-label>Recetas</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-    </div>
-  </div>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="search-page-content">
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content></ion-refresher-content> </ion-refresher>
-
-  <div class="results-count-display" *ngIf="!loadingSearch && !error && filteredItems.length > 0 && totalItems > 0">
-    {{ getResultsMessage() }}
-  </div>
-
-  <div class="items-display-list" *ngIf="!loadingSearch && !error && filteredItems.length > 0">
-    <div class="custom-product-card" *ngFor="let item of filteredItems" (click)="onSelect(item)" role="button" [attr.aria-label]="'Seleccionar ' + item.nombre">
-      <div class="card-main-content">
-        <div class="info-section">
-          <div class="product-name-display">{{ item.nombre }}</div>
-          <div class="product-brand-display" *ngIf="isProduct(item) && item.marca">
-            {{ item.marca }}
-          </div>
-          <div class="product-macros-display">
-            <span class="macro-value calories">{{ item.calorias | number:'1.0-0' }} kcal</span>
-            <span class="macro-value protein">{{ item.proteinas | number:'1.0-0' }}g</span>
-            <span class="macro-value carbs">{{ item.carbohidratos | number:'1.0-0' }}g</span>
-            <span class="macro-value fat">{{ item.grasas | number:'1.0-0' }}g</span>
-          </div>
-        </div>
-        <ion-icon name="chevron-forward-outline" class="chevron-icon-display" aria-hidden="true"></ion-icon>
+    <!-- Loading states -->
+    <div class="loading-container" *ngIf="loadingSearch">
+      <div class="loading-spinner">
+        <ion-spinner name="crescent"></ion-spinner>
       </div>
+      <p>Buscando productos...</p>
     </div>
-  </div>
 
-  <div class="status-message-display no-results-display" *ngIf="!loadingSearch && !error && filteredItems.length === 0">
-    <ion-icon name="search-outline" class="status-icon"></ion-icon>
-    <h3>No se encontraron resultados</h3>
-    <p>Intenta con otros términos de búsqueda o crea un nuevo elemento.</p>
-    <ion-button fill="outline" (click)="goToCreateProduct()" class="action-button">
-      <ion-icon name="add-outline" slot="start"></ion-icon>
-      Crear nuevo producto
-    </ion-button>
-  </div>
+    <!-- Loading de Open Food Facts -->
+    <div class="off-loading" *ngIf="searchingOpenFoodFacts && !loadingSearch">
+      <ion-spinner name="dots"></ion-spinner>
+      <span>Buscando en Open Food Facts...</span>
+    </div>
 
-  <div class="status-message-display loading-display" *ngIf="loadingSearch && filteredItems.length === 0">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Buscando...</p>
-  </div>
+    <!-- Infinite scroll -->
+    <ion-infinite-scroll 
+      threshold="100px" 
+      (ionInfinite)="onIonInfinite($event)" 
+      [disabled]="!hasMoreItems || loadingMore">
+      <ion-infinite-scroll-content
+        loadingSpinner="circular"
+        loadingText="Cargando más productos...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </main>
 
-  <div class="status-message-display error-display" *ngIf="error && !loadingSearch">
-    <ion-icon name="alert-circle-outline" class="status-icon error-icon"></ion-icon>
-    <h3>¡Ups! Algo salió mal</h3>
-    <p>{{ error }}</p>
-    <ion-button fill="outline" (click)="loadData(true)" class="action-button error-button">Reintentar</ion-button>
-  </div>
-
-  <ion-infinite-scroll threshold="100px" (ionInfinite)="onIonInfinite($event)" *ngIf="hasMoreItems && !loadingSearch">
-    <ion-infinite-scroll-content
-      loadingSpinner="circular"
-      loadingText="Cargando más...">
-    </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
-
-  </ion-content>
+  <!-- Botón flotante para crear producto -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="goToCreateProduct()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

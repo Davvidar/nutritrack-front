@@ -9,6 +9,8 @@ import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { ProductService, Product } from '../../../services/product.service';
 import { RecipeService, Recipe } from '../../../services/recipe.service';
 import { BarcodeScannerService } from '../../../services/barcode-scanner.service';
+import { AuthService } from '../../../services/auth.service';
+import { OpenFoodFactsService } from '../../../services/open-food-facts.service';
 
 @Component({
   selector: 'app-search',
@@ -21,9 +23,13 @@ export class SearchPage implements OnInit {
   searchQuery: string = '';
   segment: 'todos' | 'tuyos' | 'recetas' = 'todos';
 
-  products: Product[] = [];
-  recipes: Recipe[] = [];
-  filteredItems: Array<Product | Recipe> = [];
+  // Arrays completos de datos
+  allProducts: Product[] = [];
+  allRecipes: Recipe[] = [];
+  
+  // Arrays paginados para mostrar
+  localFilteredItems: Array<Product | Recipe> = [];
+  filteredItems: Array<Product | Recipe> = []; // Mantener por compatibilidad
   
   // Parámetros de la ruta
   dateParam: string = '';
@@ -33,7 +39,7 @@ export class SearchPage implements OnInit {
   loading: boolean = false;
   error: string | null = null;
   
-  // Propiedades nuevas para paginación
+  // Propiedades para paginación
   pageSize: number = 10;
   currentPage: number = 0;
   totalItems: number = 0;
@@ -43,6 +49,19 @@ export class SearchPage implements OnInit {
   loadingSearch: boolean = false;
   loadingMore: boolean = false;
   
+  // Open Food Facts
+  openFoodFactsResults: any[] = [];
+  showOpenFoodFactsResults: boolean = true;
+  searchingOpenFoodFacts: boolean = false;
+  
+  // Búsquedas recientes y filtros
+  recentSearches: string[] = ['Pollo', 'Arroz', 'Pasta', 'Yogur', 'Manzana'];
+  activeFilter: 'all' | 'local' | 'recipes' | 'favorites' = 'all';
+  favorites: Set<string> = new Set();
+  
+  // Timeout para debounce de búsqueda
+  searchTimeout: any = null;
+
   constructor(
     private productService: ProductService,
     private recipeService: RecipeService,
@@ -52,9 +71,11 @@ export class SearchPage implements OnInit {
     private toastController: ToastController,
     private platform: Platform,
     private alertController: AlertController,
-    private barcodeScannerService: BarcodeScannerService
+    private barcodeScannerService: BarcodeScannerService,
+    private openFoodFactsService: OpenFoodFactsService,
+    private authService: AuthService
   ) {}
-  
+
   ngOnInit() {
     // Recuperar parámetros de la URL
     this.route.queryParams.subscribe(params => {
@@ -66,8 +87,17 @@ export class SearchPage implements OnInit {
       }
       console.log('Parámetros recibidos:', { date: this.dateParam, meal: this.mealParam });
     });
-    
+
     this.loadData(true);
+    this.loadUserFavorites();
+  }
+
+  private loadUserFavorites(): void {
+    this.authService.currentUser$.subscribe(user => {
+      if (user && user.favoritos) {
+        this.favorites = new Set(user.favoritos.map(fav => fav.refId?.toString()));
+      }
+    });
   }
 
   ionViewWillEnter() {
@@ -75,204 +105,106 @@ export class SearchPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    // Asegurarse de que el escáner se detiene cuando salimos de la página
     this.barcodeScannerService.stopScan();
   }
 
-  // Preparar el escáner de código de barras
-  async prepareScanner() {
-    try {
-      // Verificar permisos de cámara
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      
-      if (status.granted) {
-        console.log('Permisos de cámara concedidos');
-      } else if (status.denied) {
-        // Si está denegado, intentar solicitar permiso
-        const newStatus = await BarcodeScanner.checkPermission({ force: true });
-        if (!newStatus.granted) {
-          this.presentErrorToast('Se requiere permiso de cámara para escanear códigos de barras');
-        }
-      }
-    } catch (err) {
-      console.error('Error al preparar escáner:', err);
+  // Método para limpiar búsqueda
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.onSearchChange();
+  }
+
+  // Método para establecer filtro
+  setFilter(filter: 'all' | 'local' | 'recipes' | 'favorites'): void {
+    this.activeFilter = filter;
+    
+    // Actualizar el segmento basado en el filtro
+    switch (filter) {
+      case 'local':
+        this.segment = 'tuyos';
+        break;
+      case 'recipes':
+        this.segment = 'recetas';
+        break;
+      default:
+        this.segment = 'todos';
     }
+    
+    this.loadData(true);
   }
 
-  // Implementación mejorada del escáner de código de barras
-  async onScanBarcode() {
-    try {
-      // Verificar si estamos en una plataforma nativa
-      if (!this.platform.is('capacitor')) {
-        await this.presentToast('El escáner solo funciona en dispositivos móviles');
-        return;
-      }
+  // Método para volver atrás
+  goBack(): void {
+    this.router.navigate(['/tabs/inicio']);
+  }
 
-      // Usar el servicio para escanear
-      const barcode = await this.barcodeScannerService.startScan();
-      
-      if (barcode) {
-        console.log('Código escaneado:', barcode);
-        await this.handleBarcodeResult(barcode);
-      } else {
-        console.log('Escaneo cancelado o sin resultado');
-      }
-    } catch (err) {
-      console.error('Error durante el escaneo:', err);
-      this.presentErrorToast('Error al escanear el código de barras');
+  // Verificar si es favorito
+  isFavorite(item: Product): boolean {
+    return this.favorites.has(item._id);
+  }
+
+  // Alternar favorito
+  toggleFavorite(event: Event, item: Product): void {
+    event.stopPropagation();
+    
+    if (this.favorites.has(item._id)) {
+      this.favorites.delete(item._id);
+      this.presentToast('Eliminado de favoritos');
+    } else {
+      this.favorites.add(item._id);
+      this.presentToast('Añadido a favoritos');
     }
+    
+    // TODO: Guardar favoritos en el backend
+    // this.saveFavorites();
   }
 
-  // Verificar permisos de cámara
-  async checkPermission(): Promise<boolean> {
-    try {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-
-      if (status.granted) {
-        return true;
-      }
-
-      if (status.denied) {
-        await this.presentErrorToast('Por favor, habilita el permiso de cámara en la configuración de la app');
-        return false;
-      }
-
-      if (status.neverAsked) {
-        const newStatus = await BarcodeScanner.checkPermission({ force: true });
-        if (newStatus.granted) {
-          return true;
-        }
-      }
-
-      if (status.restricted || status.unknown) {
-        return false;
-      }
-
-      return false;
-    } catch (err) {
-      console.error('Error verificando permisos:', err);
-      return false;
-    }
+  // Importar producto de Open Food Facts
+  importProduct(event: Event, item: any): void {
+    event.stopPropagation();
+    this.importProductFromOpenFoodFacts(item);
   }
 
-  // Manejar el resultado del escaneo
-  async handleBarcodeResult(barcode: string) {
-    const loading = await this.presentLoading();
-
-    try {
-      // Buscar producto por código de barras
-      this.productService.getByBarcode(barcode).subscribe({
-        next: (product) => {
-          loading.dismiss();
-          // Si se encuentra el producto, navegar a su página de detalle
-          this.router.navigate(['/tabs/inicio/product', product._id], {
-            queryParams: {
-              date: this.dateParam,
-              meal: this.mealParam
-            }
-          });
-          this.presentToast('Producto encontrado');
-        },
-        error: (err) => {
-          loading.dismiss();
-          if (err.status === 404) {
-            // Si no se encuentra, ofrecer crear un nuevo producto
-           /*  this.presentNotFoundAlert(barcode); */
-           this.router.navigate(['/tabs/inicio/create-product'], {
-            queryParams: {
-              date: this.dateParam,
-              meal: this.mealParam,
-              barcode: barcode // Pasar el código como parámetro
-            }
-          });
-          } else {
-            this.presentErrorToast('Error al buscar el producto');
-          }
-        }
-      });
-    } catch (err) {
-      loading.dismiss();
-      console.error('Error procesando código de barras:', err);
-      this.presentErrorToast('Error al procesar el código de barras');
-    }
-  }
-
-  // Alerta cuando no se encuentra el producto
-  async presentNotFoundAlert(barcode: string) {
-    const alert = await this.alertController.create({
-      header: 'Producto no encontrado',
-      message: `No se encontró ningún producto con el código ${barcode}. ¿Deseas crear uno nuevo?`,
-      buttons: [
-       
-        {
-          text: 'Ok',
-          handler: () => {
-            this.router.navigate(['/tabs/inicio/create-product'], {
-              queryParams: {
-                date: this.dateParam,
-                meal: this.mealParam,
-                barcode: barcode // Pasar el código como parámetro
-              }
-            });
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  // ... resto de métodos existentes ...
-
-  // Versión optimizada de loadData con paginación
+  // Cargar datos
   loadData(reset: boolean = false) {
     if (reset) {
       this.currentPage = 0;
-      this.filteredItems = [];
+      this.localFilteredItems = [];
+      this.allProducts = [];
+      this.allRecipes = [];
     }
-    
+
     this.error = null;
     this.loadingSearch = true;
-    
-    // Mostrar loading spinner
-    this.presentLoading();
-    
-    if (this.segment === 'recetas') {
+
+    if (this.activeFilter === 'recipes' || this.segment === 'recetas') {
       this.loadRecipes(reset);
+    } else if (this.activeFilter === 'favorites') {
+      this.loadFavorites(reset);
     } else {
       this.loadProducts(reset);
     }
   }
-  
+
   private loadProducts(reset: boolean) {
-    const isMisProducts = this.segment === 'tuyos';
-    
+    const isMisProducts = this.activeFilter === 'local' || this.segment === 'tuyos';
+
     this.productService.searchProducts(
-      this.searchQuery, 
+      this.searchQuery,
       isMisProducts,
       false
     ).subscribe({
       next: (response: Product[]) => {
-        this.dismissLoading();
         this.loadingSearch = false;
         
-        // Manejar respuesta paginada
-        const items = response;
-        const total = items.length;
+        // Almacenar todos los productos
+        this.allProducts = response;
+        this.totalItems = response.length;
         
-        if (reset) {
-          this.filteredItems = items;
-        } else {
-          this.filteredItems = [...this.filteredItems, ...items];
-        }
-        
-        // Actualizar metadatos de paginación
-        this.totalItems = total;
-        this.hasMoreItems = items.length === this.pageSize;
-        this.loading = false;
+        // Paginar los resultados
+        this.paginateResults(reset);
       },
       error: (err) => {
-        this.dismissLoading();
         this.loadingSearch = false;
         this.loading = false;
         console.error('Error al cargar productos:', err);
@@ -281,31 +213,29 @@ export class SearchPage implements OnInit {
       }
     });
   }
-  
+
   private loadRecipes(reset: boolean) {
     this.recipeService.getAll().subscribe({
       next: (recipes) => {
-        this.dismissLoading();
         this.loadingSearch = false;
         
-        // Extraer solo los datos relevantes para la paginación
-        const startIndex = this.currentPage * this.pageSize;
-        const endIndex = startIndex + this.pageSize;
-        const pageItems = recipes.slice(startIndex, endIndex);
-        
-        if (reset) {
-          this.filteredItems = pageItems;
-        } else {
-          this.filteredItems = [...this.filteredItems, ...pageItems];
+        // Filtrar por búsqueda si hay query
+        let filteredRecipes = recipes;
+        if (this.searchQuery) {
+          const query = this.searchQuery.toLowerCase();
+          filteredRecipes = recipes.filter(recipe => 
+            recipe.nombre.toLowerCase().includes(query)
+          );
         }
         
-        // Actualizar metadatos de paginación
-        this.totalItems = recipes.length;
-        this.hasMoreItems = endIndex < recipes.length;
-        this.loading = false;
+        // Almacenar todas las recetas
+        this.allRecipes = filteredRecipes;
+        this.totalItems = filteredRecipes.length;
+        
+        // Paginar los resultados
+        this.paginateResults(reset);
       },
       error: (err) => {
-        this.dismissLoading();
         this.loadingSearch = false;
         this.loading = false;
         console.error('Error al cargar recetas:', err);
@@ -315,31 +245,119 @@ export class SearchPage implements OnInit {
     });
   }
 
-  onSearchChange() {
-    // Al cambiar la búsqueda, recargamos los datos con el filtro actualizado
-    this.loadData(true);
-  }
-
-  onSegmentChange(event: any) {
-    this.segment = event.detail.value;
-    this.loadData(true);
-  }
-
-  goToCreateProduct() {
-    this.router.navigate(['/tabs/inicio/create-product'], { 
-      queryParams: { 
-        date: this.dateParam,
-        meal: this.mealParam
-      } 
+  private loadFavorites(reset: boolean) {
+    // Filtrar productos favoritos
+    this.productService.searchProducts(this.searchQuery, false, true).subscribe({
+      next: (response: Product[]) => {
+        this.loadingSearch = false;
+        
+        // Filtrar solo favoritos
+        const favoriteProducts = response.filter(product => 
+          this.favorites.has(product._id)
+        );
+        
+        this.allProducts = favoriteProducts;
+        this.totalItems = favoriteProducts.length;
+        
+        // Paginar los resultados
+        this.paginateResults(reset);
+      },
+      error: (err) => {
+        this.loadingSearch = false;
+        this.loading = false;
+        console.error('Error al cargar favoritos:', err);
+        this.error = 'No se pudieron cargar los favoritos';
+        this.presentErrorToast('Error al cargar favoritos');
+      }
     });
   }
 
-  onSelect(item: Product | Recipe) {
+  private paginateResults(reset: boolean) {
+    const items = this.activeFilter === 'recipes' || this.segment === 'recetas' 
+      ? this.allRecipes 
+      : this.allProducts;
+    
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    const pageItems = items.slice(startIndex, endIndex);
+    
+    if (reset) {
+      this.localFilteredItems = pageItems;
+    } else {
+      this.localFilteredItems = [...this.localFilteredItems, ...pageItems];
+    }
+    
+    // Mantener compatibilidad
+    this.filteredItems = this.localFilteredItems;
+    
+    // Actualizar estado de paginación
+    this.hasMoreItems = endIndex < items.length;
+    this.loading = false;
+    this.loadingMore = false;
+  }
+
+  // Manejar cambio de búsqueda
+  onSearchChange() {
+    // Cancelar búsqueda anterior
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    // Aplicar debounce
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 0;
+      this.loadData(true);
+
+      // Buscar en Open Food Facts si hay query y no estamos en filtro local
+      if (this.searchQuery.trim() && this.activeFilter !== 'local' && this.activeFilter !== 'recipes') {
+        this.searchOpenFoodFacts();
+      } else {
+        this.openFoodFactsResults = [];
+      }
+    }, 300); // 300ms de debounce
+  }
+
+  // Buscar en Open Food Facts
+  searchOpenFoodFacts() {
+    if (!navigator.onLine) {
+      console.log('No hay conexión a internet para buscar en Open Food Facts');
+      this.openFoodFactsResults = [];
+      return;
+    }
+
+    this.searchingOpenFoodFacts = true;
+    this.openFoodFactsResults = [];
+
+    this.openFoodFactsService.searchByText(this.searchQuery, 1, 20).subscribe({
+      next: (results) => {
+        this.searchingOpenFoodFacts = false;
+        this.openFoodFactsResults = results;
+      },
+      error: (err) => {
+        console.error('Error buscando en Open Food Facts:', err);
+        this.searchingOpenFoodFacts = false;
+        this.openFoodFactsResults = [];
+
+        if (!navigator.onLine) {
+          this.presentToast('No hay conexión a internet para buscar en Open Food Facts', 'warning');
+        }
+      }
+    });
+  }
+
+  // Manejar selección de item
+  onSelect(item: Product | Recipe | any) {
     console.log('Seleccionado item:', item);
-    
-    // Determinar si es producto o receta basado en la estructura
+
+    // Si es un producto de Open Food Facts
+    if (item.isFromOpenFoodFacts) {
+      this.presentOpenFoodFactsProductOptions(item);
+      return;
+    }
+
+    // Determinar si es producto o receta
     const isProduct = this.isProduct(item);
-    
+
     if (isProduct) {
       this.router.navigate(['/tabs/inicio/product', item._id], {
         queryParams: {
@@ -357,68 +375,354 @@ export class SearchPage implements OnInit {
       });
     }
   }
-  
-  // Método para TypeGuard
+
+  // TypeGuard para producto
   isProduct(item: any): item is Product {
     return 'marca' in item;
   }
 
-  // Cargar más items (paginación)
-  loadMore() {
+  // Crear nuevo producto
+  goToCreateProduct() {
+    this.router.navigate(['/tabs/inicio/create-product'], {
+      queryParams: {
+        date: this.dateParam,
+        meal: this.mealParam
+      }
+    });
+  }
+
+  // Scroll infinito
+  onIonInfinite(event: any) {
     if (this.hasMoreItems && !this.loadingMore) {
       this.loadingMore = true;
       this.currentPage++;
-      this.loadData(false);
-    }
-  }
-  
-  // Método para actualizar cuando el usuario llegue al final de la lista
-  onIonInfinite(event: any) {
-    if (this.hasMoreItems) {
-      this.loadMore();
-      // Usar setTimeout para dar tiempo a que se completen las operaciones asíncronas
+      
+      // Paginar más resultados
+      this.paginateResults(false);
+      
+      // Completar el evento
       setTimeout(() => {
         event.target.complete();
-      }, 1000);
+        if (!this.hasMoreItems) {
+          event.target.disabled = true;
+        }
+      }, 500);
     } else {
       event.target.complete();
-      if (this.filteredItems.length > 0) {
-        this.presentToast('No hay más resultados disponibles');
-      }
+      event.target.disabled = true;
     }
   }
-  
-  // Toast informativo
-  async presentToast(message: string) {
+
+  // Escáner de código de barras
+  async onScanBarcode() {
+    try {
+      // Verificar si estamos en una plataforma nativa
+      if (!this.platform.is('capacitor')) {
+        await this.presentToast('El escáner solo funciona en dispositivos móviles', 'warning');
+        return;
+      }
+
+      // Usar el servicio para escanear
+      const barcode = await this.barcodeScannerService.startScan();
+
+      if (barcode) {
+        console.log('Código escaneado:', barcode);
+        await this.handleBarcodeResult(barcode);
+      } else {
+        console.log('Escaneo cancelado o sin resultado');
+      }
+    } catch (err) {
+      console.error('Error durante el escaneo:', err);
+      this.presentErrorToast('Error al escanear el código de barras');
+    }
+  }
+
+  // Manejar resultado del código de barras
+  async handleBarcodeResult(barcode: string) {
+    const loading = await this.presentLoading('Buscando producto...');
+    try {
+      // 1. Primero buscar en la base de datos local
+      this.productService.getByBarcode(barcode).subscribe({
+        next: (product) => {
+          loading.dismiss();
+          // Si se encuentra el producto localmente, navegar a su página de detalle
+          this.router.navigate(['/tabs/inicio/product', product._id], {
+            queryParams: {
+              date: this.dateParam,
+              meal: this.mealParam
+            }
+          });
+          this.presentToast('Producto encontrado');
+        },
+        error: async (err) => {
+          if (err.status === 404) {
+            // 2. Si no se encuentra localmente, buscar en Open Food Facts
+            console.log('Producto no encontrado localmente, buscando en Open Food Facts...');
+
+            this.openFoodFactsService.searchAndConvert(barcode).subscribe({
+              next: async (productData) => {
+                loading.dismiss();
+
+                if (productData) {
+                  // Se encontró en Open Food Facts
+                  await this.presentOpenFoodFactsProductAlert(productData, barcode);
+                } else {
+                  // No se encontró ni local ni en Open Food Facts
+                  await this.presentNotFoundAlertWithCreateOption(barcode);
+                }
+              },
+              error: (openFoodError) => {
+                loading.dismiss();
+                console.error('Error al buscar en Open Food Facts:', openFoodError);
+                // Si falla la búsqueda en Open Food Facts, ofrecer crear manualmente
+                this.router.navigate(['/tabs/inicio/create-product'], {
+                  queryParams: {
+                    date: this.dateParam,
+                    meal: this.mealParam,
+                    barcode: barcode
+                  }
+                });
+              }
+            });
+          } else {
+            loading.dismiss();
+            this.presentErrorToast('Error al buscar el producto');
+          }
+        }
+      });
+    } catch (err) {
+      loading.dismiss();
+      console.error('Error procesando código de barras:', err);
+      this.presentErrorToast('Error al procesar el código de barras');
+    }
+  }
+
+  // Alertas de Open Food Facts
+  async presentOpenFoodFactsProductAlert(productData: any, barcode: string) {
+    const alert = await this.alertController.create({
+      header: 'Producto encontrado',
+      subHeader: 'Open Food Facts',
+      message: `Se encontró "${productData.nombre}" de ${productData.marca || 'marca desconocida'}. ¿Deseas importar este producto?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Ver detalles',
+          handler: () => {
+            this.presentProductDetailsModal(productData);
+          }
+        },
+        {
+          text: 'Importar',
+          handler: () => {
+            this.importProductFromOpenFoodFacts(productData);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async presentOpenFoodFactsProductOptions(productData: any) {
+    const alert = await this.alertController.create({
+      header: productData.nombre,
+      subHeader: productData.marca || 'Sin marca',
+      message: 'Este producto viene de Open Food Facts. ¿Qué deseas hacer?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Ver información',
+          handler: () => {
+            this.presentProductDetailsModal(productData);
+          }
+        },
+        {
+          text: 'Importar y añadir',
+          handler: () => {
+            this.importAndAddProduct(productData);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async presentProductDetailsModal(productData: any) {
+    const alert = await this.alertController.create({
+      header: productData.nombre,
+      subHeader: productData.marca || 'Sin marca',
+      message: `
+        Información nutricional por 100g:
+        - Calorías: ${productData.calorias} kcal
+        - Proteínas: ${productData.proteinas}g
+        - Carbohidratos: ${productData.carbohidratos}g
+        - Grasas: ${productData.grasas}g
+        ${productData.azucares !== undefined ? `- Azúcares: ${productData.azucares}g` : ''}
+        ${productData.fibra !== undefined ? `- Fibra: ${productData.fibra}g` : ''}
+        ${productData.sal !== undefined ? `- Sal: ${productData.sal}g` : ''}
+      `,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Importar',
+          handler: () => {
+            this.importProductFromOpenFoodFacts(productData);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async importProductFromOpenFoodFacts(productData: any) {
+    const loading = await this.presentLoading('Importando producto...');
+
+    const productToCreate = { ...productData };
+    delete productToCreate._id;
+    delete productToCreate.isFromOpenFoodFacts;
+    delete productToCreate.imagenUrl;
+
+    this.productService.create(productToCreate).subscribe({
+      next: (createdProduct) => {
+        loading.dismiss();
+        this.presentToast('Producto importado correctamente');
+
+        this.router.navigate(['/tabs/inicio/product', createdProduct._id], {
+          queryParams: {
+            date: this.dateParam,
+            meal: this.mealParam
+          }
+        });
+      },
+      error: (err) => {
+        loading.dismiss();
+        console.error('Error al importar producto:', err);
+
+        if (err.error?.message?.includes('duplicate key') && err.error?.message?.includes('codigoBarras')) {
+          this.presentErrorToast('Este producto ya existe en tu base de datos');
+        } else {
+          this.presentErrorToast('Error al importar el producto');
+        }
+      }
+    });
+  }
+
+  async importAndAddProduct(productData: any) {
+    const loading = await this.presentLoading('Importando producto...');
+
+    const productToCreate = { ...productData };
+    delete productToCreate._id;
+    delete productToCreate.isFromOpenFoodFacts;
+    delete productToCreate.imagenUrl;
+
+    this.productService.create(productToCreate).subscribe({
+      next: (createdProduct) => {
+        loading.dismiss();
+        this.presentToast('Producto importado correctamente');
+
+        this.router.navigate(['/tabs/inicio/product', createdProduct._id], {
+          queryParams: {
+            date: this.dateParam,
+            meal: this.mealParam
+          }
+        });
+      },
+      error: (err) => {
+        loading.dismiss();
+        console.error('Error al importar producto:', err);
+
+        if (err.error?.message?.includes('duplicate key') && err.error?.message?.includes('codigoBarras')) {
+          // Si ya existe, buscar el producto local y navegar a él
+          this.productService.getByBarcode(productData.codigoBarras).subscribe({
+            next: (existingProduct) => {
+              this.presentToast('Este producto ya existe en tu base de datos');
+              this.router.navigate(['/tabs/inicio/product', existingProduct._id], {
+                queryParams: {
+                  date: this.dateParam,
+                  meal: this.mealParam
+                }
+              });
+            },
+            error: () => {
+              this.presentErrorToast('Error al importar el producto');
+            }
+          });
+        } else {
+          this.presentErrorToast('Error al importar el producto');
+        }
+      }
+    });
+  }
+
+  async presentNotFoundAlertWithCreateOption(barcode: string) {
+    const alert = await this.alertController.create({
+      header: 'Producto no encontrado',
+      message: `No se encontró ningún producto con el código ${barcode} ni en tu base de datos ni en Open Food Facts. ¿Deseas crear uno nuevo?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Crear producto',
+          handler: () => {
+            this.router.navigate(['/tabs/inicio/create-product'], {
+              queryParams: {
+                date: this.dateParam,
+                meal: this.mealParam,
+                barcode: barcode
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // Utilidades
+  async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
-      position: 'bottom'
+      position: 'bottom',
+      color,
+      cssClass: 'custom-toast',
+      buttons: [
+        {
+          icon: 'close',
+          role: 'cancel',
+          handler: () => {
+            console.log('Toast dismissed');
+          }
+        }
+      ]
     });
-    toast.present();
+    await toast.present();
   }
-  
-  // Mostrar loading spinner
-  async presentLoading() {
+
+  async presentLoading(message: string = 'Cargando...') {
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
+      message,
       spinner: 'circular',
-      duration: 10000 // Timeout por si algo falla
+      duration: 10000
     });
     await loading.present();
     return loading;
   }
-  
-  // Ocultar loading spinner
-  async dismissLoading() {
-    try {
-      await this.loadingController.dismiss().catch(() => {});
-    } catch (err) {
-      console.log('Error al cerrar loading, posiblemente ya cerrado');
-    }
-  }
-  
-  // Mostrar mensajes de error
+
   async presentErrorToast(message: string) {
     const toast = await this.toastController.create({
       message,
@@ -434,28 +738,13 @@ export class SearchPage implements OnInit {
     });
     toast.present();
   }
-  
-  // Método para refrescar los datos manualmente (pull-to-refresh)
-  doRefresh(event: any) {
-    this.loadData(true);
-    
-    // Cerrar el refresher después de recibir datos o después de un tiempo
-    setTimeout(() => {
-      event.target.complete();
-    }, 2000);
+
+  // Track by functions
+  trackByFn(index: number, item: any): string {
+    return item._id || item.codigoBarras || index.toString();
   }
-  
-  // Método para obtener el mensaje de resultados
-  getResultsMessage(): string {
-    if (this.filteredItems.length === 0) {
-      return 'No se encontraron resultados';
-    }
-    
-    return `Mostrando ${this.filteredItems.length} de ${this.totalItems} resultados`;
-  }
-  
-  openFilterOptions(): void {
-    // Implement the logic for opening filter options
-    console.log('Filter options opened');
+
+  trackByOpenFoodFacts(index: number, item: any): string {
+    return item.codigoBarras || item._id || `off-${index}`;
   }
 }

@@ -23,6 +23,12 @@ export interface UserProfile {
     carbohidratos: number;
     grasas: number;
   };
+  
+  // Favoritos del usuario
+  favoritos?: Array<{
+    tipo: 'product' | 'recipe';
+    refId: string;
+  }>;
 
   // Campos opcionales/extendidos
   consumoActual?: {
@@ -33,8 +39,9 @@ export interface UserProfile {
   };
   pesoAnterior?: number;
   pesoHoy?: number;
+  rol?: 'user' | 'admin';
+  isActive?: boolean;
 }
-
 
 export interface RegisterData {
   nombre: string;

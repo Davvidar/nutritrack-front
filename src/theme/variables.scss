@@ -3,7 +3,59 @@
 // src/theme/variables.scss
 
 
+  // src/app/tabs/inicio/search/search.page.scss
+
+// ===== VARIABLES Y COLORES =====
+:host {
+  // Colores principales de NutriTrack
+  --nutri-primary-green: #6ab04c;
+  --nutri-primary-green-light: #7fc55e;
+  --nutri-primary-green-dark: #5a9d3e;
   
+  // Colores de texto
+  --nutri-text-light: #ffffff;
+  --nutri-text-dark: #333333;
+  --nutri-text-medium: #555555;
+  --nutri-text-muted: #777777;
+  --nutri-text-placeholder: #999999;
+  
+  // Colores de fondo
+  --nutri-background-page: #f4f5f7;
+  --nutri-card-background: #ffffff;
+  --nutri-background-accent: #f9f9f9;
+  
+  // Colores de macros (consistentes con el diseño)
+  --macro-kcal-color: #8a63d2;
+  --macro-protein-color: #5046c8;
+  --macro-carbs-color: #ff8c42;
+  --macro-fat-color: #d4ca3a;
+  
+  // Colores de estados
+  --nutri-success: #28a745;
+  --nutri-warning: #ffc107;
+  --nutri-danger: #dc3545;
+  --nutri-info: #17a2b8;
+  
+  // Bordes y sombras
+  --nutri-border-color: #e0e0e0;
+  --nutri-border-radius: 12px;
+  --nutri-shadow-soft: 0 3px 6px rgba(0, 0, 0, 0.08);
+  --nutri-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --nutri-shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.15);
+  
+  // Transiciones
+  --nutri-transition-fast: 0.2s ease-out;
+  --nutri-transition-normal: 0.3s ease-out;
+  --nutri-transition-slow: 0.5s ease-out;
+  
+  // Espaciados
+  --nutri-spacing-xs: 4px;
+  --nutri-spacing-sm: 8px;
+  --nutri-spacing-md: 16px;
+  --nutri-spacing-lg: 24px;
+  --nutri-spacing-xl: 32px;
+}
+
   ion-item.input-item {
     --border-color: var(--nutri-border-color);
     --border-radius: 17px;
