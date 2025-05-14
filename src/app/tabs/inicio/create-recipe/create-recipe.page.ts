@@ -7,6 +7,7 @@ import { ProductService, Product } from '../../../services/product.service';
 import { RecipeService, Recipe } from '../../../services/recipe.service';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { firstValueFrom } from 'rxjs';
+import { IngredientSelectorModal } from 'src/app/components/ingredient-selector/ingredient-selector.modal';
 
 @Component({
     selector: 'app-create-recipe',
@@ -147,16 +148,24 @@ export class CreateRecipePage implements OnInit {
         }
     }
     
-    addIngredient() {
-        // Por ahora, navegamos a la búsqueda
-        // En el futuro, implementaremos el modal de selección
-        this.router.navigate(['/tabs/inicio/search'], {
-            queryParams: {
-                returnTo: 'create-recipe',
-                recipeId: this.recipeId || 'new'
+  addIngredient() {
+        this.modalController.create({
+            component: IngredientSelectorModal,
+            componentProps: {
+                dateParam: this.dateParam,
+                mealParam: this.mealParam
             }
+        }).then(modal => {
+            modal.present();
+            modal.onDidDismiss().then((data) => {
+                if (data.data) {
+                    const product = data.data as Product;
+                    this.addIngredientToForm(product);
+                }
+            });
         });
     }
+    
     
     addIngredientToForm(product: Product, cantidad: number = 100) {
         const ingredientGroup = this.fb.group({

@@ -17,7 +17,7 @@
 [currentConsumption]="currentConsumption">
 </app-metrics-summary>
 <ion-content>
-
+  <app-weight-tracker [selectedDate]="selectedDate"></app-weight-tracker>
   <ion-spinner *ngIf="loading" class="global-spinner"></ion-spinner>
 <!--   <div class="loading-overlay" *ngIf="loading"></div>   -->
   <!-- Meals Section -->

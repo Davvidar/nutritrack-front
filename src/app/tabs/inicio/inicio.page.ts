@@ -17,11 +17,11 @@ import { Observable, Subscription, forkJoin } from 'rxjs';
 import { Recipe, RecipeService } from 'src/app/services/recipe.service';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { NutritionData, NutritionSummaryComponent } from 'src/app/components/nutrition-summary/nutrition-summary.component';
-
+import { WeightTrackerComponent } from 'src/app/components/weight-tracker/weight-tracker.component';
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [IonicModule, CommonModule, WeekSliderComponent, MetricsSummaryComponent, MealAccordionComponent],
+  imports: [IonicModule, CommonModule, WeekSliderComponent, MetricsSummaryComponent, MealAccordionComponent, WeightTrackerComponent],
   templateUrl: './inicio.page.html',
   styleUrls: ['./inicio.page.scss']
 })

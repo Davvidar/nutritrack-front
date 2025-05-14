@@ -54,9 +54,9 @@
   background: var(--nutri-primary);
   backdrop-filter: blur(10px);
   box-shadow: var(--nutri-shadow-sm);
-  
+  border-radius: 0 0 0 30px;
   .header-content {
-    padding: 0 16px;
+    padding: 0 0px;
     padding-top: env(safe-area-inset-top);
   }
 }
@@ -110,6 +110,7 @@
   padding: 0 12px;
   height: 48px;
   transition: all 0.3s ease;
+  margin: 0px 16px;
   
   &:focus-within {
     box-shadow: 0 0 0 2px var(--nutri-primary);
@@ -142,13 +143,15 @@
     cursor: pointer;
     color: var(--nutri-text-secondary);
     transition: all 0.2s ease;
+
     
     &:hover {
       color: var(--nutri-text-primary);
     }
     
     ion-icon {
-      font-size: 20px;
+      font-size: 28px;
+      
     }
   }
   
@@ -164,8 +167,8 @@
 // === Filtros Rápidos ===
 .quick-filters {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
+  gap: 4px;
+  overflow-x: auto ;
   margin-top: 12px;
   padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
@@ -563,12 +566,14 @@ ion-fab {
   bottom: 16px;
   right: 16px;
   
+  
   ion-fab-button {
     --background: var(--nutri-primary);
     --color: var(--nutri-text-light);
     --box-shadow: var(--nutri-shadow-lg);
     width: 56px;
     height: 56px;
+    margin: 10px;
     
     ion-icon {
       font-size: 24px;

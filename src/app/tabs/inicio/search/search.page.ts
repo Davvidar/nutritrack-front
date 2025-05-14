@@ -354,7 +354,7 @@ export class SearchPage implements OnInit {
   // Manejar selección de item
   onSelect(item: Product | Recipe | any) {
     console.log('Seleccionado item:', item);
-    
+
     if (this.returnToRecipe && this.isProduct(item)) {
       // Guardar temporalmente el producto seleccionado
       localStorage.setItem('selectedIngredient', JSON.stringify(item));
@@ -435,19 +435,69 @@ export class SearchPage implements OnInit {
       event.target.disabled = true;
     }
   }
+  async prepareScanner() {
+    try {
+      // Verificar permisos de cámara
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      
+      if (status.granted) {
+        console.log('Permisos de cámara concedidos');
+      } else if (status.denied) {
+        // Si está denegado, intentar solicitar permiso
+        const newStatus = await BarcodeScanner.checkPermission({ force: true });
+        if (!newStatus.granted) {
+          this.presentErrorToast('Se requiere permiso de cámara para escanear códigos de barras');
+        }
+      }
+    } catch (err) {
+      console.error('Error al preparar escáner:', err);
+    }
+  }
+
+  async checkPermission(): Promise<boolean> {
+    try {
+      const status = await BarcodeScanner.checkPermission({ force: true });
+
+      if (status.granted) {
+        return true;
+      }
+
+      if (status.denied) {
+        await this.presentErrorToast('Por favor, habilita el permiso de cámara en la configuración de la app');
+        return false;
+      }
+
+      if (status.neverAsked) {
+        const newStatus = await BarcodeScanner.checkPermission({ force: true });
+        if (newStatus.granted) {
+          return true;
+        }
+      }
+
+      if (status.restricted || status.unknown) {
+        return false;
+      }
+
+      return false;
+    } catch (err) {
+      console.error('Error verificando permisos:', err);
+      return false;
+    }
+  }
+
 
   // Escáner de código de barras
   async onScanBarcode() {
     try {
       // Verificar si estamos en una plataforma nativa
       if (!this.platform.is('capacitor')) {
-        await this.presentToast('El escáner solo funciona en dispositivos móviles', 'warning');
+        await this.presentToast('El escáner solo funciona en dispositivos móviles');
         return;
       }
 
       // Usar el servicio para escanear
       const barcode = await this.barcodeScannerService.startScan();
-
+      
       if (barcode) {
         console.log('Código escaneado:', barcode);
         await this.handleBarcodeResult(barcode);
@@ -462,13 +512,14 @@ export class SearchPage implements OnInit {
 
   // Manejar resultado del código de barras
   async handleBarcodeResult(barcode: string) {
-    const loading = await this.presentLoading('Buscando producto...');
+    const loading = await this.presentLoading();
+
     try {
-      // 1. Primero buscar en la base de datos local
+      // Buscar producto por código de barras
       this.productService.getByBarcode(barcode).subscribe({
         next: (product) => {
           loading.dismiss();
-          // Si se encuentra el producto localmente, navegar a su página de detalle
+          // Si se encuentra el producto, navegar a su página de detalle
           this.router.navigate(['/tabs/inicio/product', product._id], {
             queryParams: {
               date: this.dateParam,
@@ -477,38 +528,12 @@ export class SearchPage implements OnInit {
           });
           this.presentToast('Producto encontrado');
         },
-        error: async (err) => {
+        error: (err) => {
+          loading.dismiss();
           if (err.status === 404) {
-            // 2. Si no se encuentra localmente, buscar en Open Food Facts
-            console.log('Producto no encontrado localmente, buscando en Open Food Facts...');
-
-            this.openFoodFactsService.searchAndConvert(barcode).subscribe({
-              next: async (productData) => {
-                loading.dismiss();
-
-                if (productData) {
-                  // Se encontró en Open Food Facts
-                  await this.presentOpenFoodFactsProductAlert(productData, barcode);
-                } else {
-                  // No se encontró ni local ni en Open Food Facts
-                  await this.presentNotFoundAlertWithCreateOption(barcode);
-                }
-              },
-              error: (openFoodError) => {
-                loading.dismiss();
-                console.error('Error al buscar en Open Food Facts:', openFoodError);
-                // Si falla la búsqueda en Open Food Facts, ofrecer crear manualmente
-                this.router.navigate(['/tabs/inicio/create-product'], {
-                  queryParams: {
-                    date: this.dateParam,
-                    meal: this.mealParam,
-                    barcode: barcode
-                  }
-                });
-              }
-            });
+            // Si no se encuentra, ofrecer crear un nuevo producto
+            this.presentNotFoundAlert(barcode);
           } else {
-            loading.dismiss();
             this.presentErrorToast('Error al buscar el producto');
           }
         }
@@ -518,6 +543,32 @@ export class SearchPage implements OnInit {
       console.error('Error procesando código de barras:', err);
       this.presentErrorToast('Error al procesar el código de barras');
     }
+  }
+  async presentNotFoundAlert(barcode: string) {
+    const alert = await this.alertController.create({
+      header: 'Producto no encontrado',
+      message: `No se encontró ningún producto con el código ${barcode}. ¿Deseas crear uno nuevo?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Crear producto',
+          handler: () => {
+            this.router.navigate(['/tabs/inicio/create-product'], {
+              queryParams: {
+                date: this.dateParam,
+                meal: this.mealParam,
+                barcode: barcode // Pasar el código como parámetro
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   // Alertas de Open Food Facts

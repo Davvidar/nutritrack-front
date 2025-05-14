@@ -75,10 +75,7 @@
     --min-height: 60px; // Un poco más de altura
     --border-color: var(--nutri-input-border); // Color de línea si se usa 'lines="full"'
   
-    &.first-item { // Para el primer item si tiene borde superior redondeado
-      // border-top-left-radius: 16px;
-      // border-top-right-radius: 16px;
-    }
+    
   
     ion-label[position="stacked"] {
       font-size: 0.8rem;

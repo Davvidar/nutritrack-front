@@ -35,7 +35,7 @@
           <button 
             (click)="onScanBarcode()"
             class="scan-button-inline">
-            <ion-icon name="scan-outline"></ion-icon>
+            <ion-icon name="barcode-outline"></ion-icon>
           </button>
         </div>
         
@@ -327,8 +327,20 @@
   </main>
 
   <!-- Botón flotante para crear producto -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="activeFilter === 'recipes'">
-    <ion-fab-button (click)="goToCreateRecipe()">
-      <ion-icon name="restaurant"></ion-icon>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="floating-button">
+    <ion-fab-button>
+      <ion-icon name="chevron-up-circle"></ion-icon>
     </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button>
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="goToCreateRecipe()">
+        <ion-icon name="restaurant"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="goToCreateProduct()">
+        <ion-icon name="add-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
   </ion-fab>
+

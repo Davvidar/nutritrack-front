@@ -7,7 +7,7 @@
     --nutri-text-dark: #333333;
     --nutri-text-medium: #666666;
     --nutri-text-placeholder: #b0b0b0;
-    --nutri-input-border: #e0e0e0;
+    --nutri-input-border: #b9b9b9;
     
     // Colores de macros
     --macro-calories-bg: #8c63d0;
@@ -79,29 +79,30 @@
     ion-label[position="stacked"] {
       font-size: 0.8rem;
       font-weight: 500;
-      color: var(--nutri-text-medium);
+      color: var(--nutri-text-dark);
       margin-bottom: 2px;
       transform: none;
       padding-left: 2px;
+      margin-top: 8px;
     }
     
-    ion-input {
+ ion-input {
       --padding-top: 8px;
       --padding-bottom: 8px;
       --placeholder-color: var(--nutri-text-placeholder);
       font-size: 1rem;
       color: var(--nutri-text-dark);
       border: 1px solid var(--nutri-input-border);
-      border-radius: 8px;
-      padding-left: 12px !important;
+      border-radius: 12px;
+      padding-left: 12px !important; // Forzar padding interno
       padding-right: 12px !important;
-      margin-top: 4px;
+      margin: 8px 0;
+     // Espacio desde el label
     }
-    
-    ion-note[slot="helper"] {
+  
+    ion-note[slot="error"] {
+      padding-left: 2px;
       font-size: 0.75rem;
-      color: var(--nutri-text-medium);
-      margin-top: 4px;
     }
     
     ion-note[slot="error"] {
@@ -168,7 +169,7 @@
     
     .ingredient-quantity {
       ion-item {
-        --background: #f7f7f7;
+        --background: #ffffff;
         --border-radius: 8px;
         --padding-start: 12px;
         --padding-end: 12px;
@@ -183,6 +184,12 @@
           --padding-start: 0;
           font-size: 1rem;
           font-weight: 500;
+            color: var(--nutri-text-dark);
+            border: 1px solid var(--nutri-input-border);
+            border-radius: 8px;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+
         }
       }
     }

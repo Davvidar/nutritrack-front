@@ -1,0 +1,94 @@
+<!-- src/app/components/weight-tracker/weight-tracker.component.html -->
+<div class="weight-tracker-container">
+  <div class="weight-card">
+    <div class="weight-header">
+      <h3>{{ formatDateHeader() }}</h3>
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        (click)="toggleHistory()"
+        *ngIf="weightHistory.length > 0">
+        <ion-icon [name]="showHistory ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div class="current-weight-section">
+      <!-- Loading spinner -->
+      <div class="loading-weight" *ngIf="loading && !editMode">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+      
+      <!-- Display weight -->
+      <div class="weight-display" *ngIf="!editMode && !loading">
+        <div class="weight-value" *ngIf="currentWeight">
+          <span class="number">{{ currentWeight }}</span>
+          <span class="unit">kg</span>
+        </div>
+        <div class="no-weight" *ngIf="!currentWeight">
+          <ion-icon name="scale-outline"></ion-icon>
+          <p>Sin registro para esta fecha</p>
+        </div>
+        
+        <ion-button 
+          (click)="toggleEditMode()"
+          [fill]="currentWeight ? 'clear' : 'solid'"
+          size="small"
+          shape="round">
+          <ion-icon [name]="currentWeight ? 'create-outline' : 'add-outline'" slot="start"></ion-icon>
+          {{ currentWeight ? 'Editar' : 'Añadir peso' }}
+        </ion-button>
+      </div>
+      
+      <!-- Edit weight input -->
+      <div class="weight-input" *ngIf="editMode">
+        <ion-item lines="none">
+          <ion-input 
+            type="number" 
+            [(ngModel)]="newWeight" 
+            placeholder="Peso en kg"
+            step="0.1"
+            min="0"
+            inputmode="decimal">
+          </ion-input>
+          <span slot="end" class="input-unit">kg</span>
+        </ion-item>
+        
+        <div class="input-actions">
+          <ion-button 
+            size="small" 
+            fill="clear" 
+            (click)="toggleEditMode()">
+            Cancelar
+          </ion-button>
+          <ion-button 
+            size="small" 
+            (click)="saveWeight()"
+            [disabled]="!newWeight || loading">
+            <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+            <span *ngIf="!loading">Guardar</span>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Weight history -->
+    <div class="weight-history" *ngIf="showHistory && weightHistory.length > 0">
+      <h4>Histórico de peso</h4>
+      <div class="history-list">
+        <div class="history-item" 
+             *ngFor="let entry of weightHistory; let i = index"
+             [class.selected]="isSelectedDate(entry.fecha)">
+          <div class="date">{{ formatDate(entry.fecha) }}</div>
+          <div class="weight">
+            <span class="value">{{ entry.peso }} kg</span>
+            <span class="change" *ngIf="getWeightChange(entry.peso, i) as change"
+                  [class.positive]="change > 0"
+                  [class.negative]="change < 0">
+              {{ change > 0 ? '+' : '' }}{{ change | number:'1.1-1' }} kg
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
