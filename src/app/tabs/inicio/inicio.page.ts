@@ -65,37 +65,36 @@ export class InicioPage implements OnInit, OnDestroy {
 
   ) { }
 
-  ngOnInit() {
+   ngOnInit() {
     this.buildWeek();
-    const today = this.week.find(d => d.date.toDateString() === new Date().toDateString()) || this.week[0];
-    // Cargar objetivos desde perfil usuario
-    this.authService.getProfile().subscribe((user: UserProfile) => {
-      const obj = user.objetivosNutricionales || {} as any;
-      this.dailyGoals = {
-        calories: obj.calorias || 0,
-        protein: obj.proteinas || 0,
-        carbs: obj.carbohidratos || 0,
-        fat: obj.grasas || 0
-      };
-      // Tras cargar objetivos, cargar día y métricas
-      this.onDaySelected(today);
-    });
-
-    this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
+    const todayObject = this.week.find(d => this.datesAreOnSameDay(d.date, new Date()));
+    const dayToSelect = todayObject || (this.week.length > 0 ? this.week[0] : undefined);
+ 
+       if (dayToSelect) {
+      this.authService.getProfile().subscribe((user: UserProfile) => {
+        const obj = user.objetivosNutricionales || {} as any;
+        this.dailyGoals = {
+          calories: obj.calorias || 0,
+          protein: obj.proteinas || 0,
+          carbs: obj.carbohidratos || 0,
+          fat: obj.grasas || 0
+        };
+        this.onDaySelected(dayToSelect); // Llama a onDaySelected con el día correcto
+      });
+    } else {
+        console.warn("InicioPage: No se pudo determinar el día inicial a seleccionar.");
+        // Manejar el caso donde la semana no se pudo construir o está vacía
+    }
+  this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
       .subscribe({
         next: (dateStr: string) => {
           try {
             console.log('InicioPage: Actualizando por cambio en:', dateStr);
-
-            // Convertir string a objeto Date
             const date = new Date(dateStr);
-
-            // Verificar si la fecha corresponde a la fecha actualmente seleccionada
-            const activeDay = this.week.find(d => d.active);
-            if (activeDay && this.datesAreOnSameDay(activeDay.date, date)) {
+            if (this.datesAreOnSameDay(this.selectedDate, date)) { // Compara con this.selectedDate
               console.log('InicioPage: Recargando datos para fecha actual:', dateStr);
-              this.loadSummary(activeDay.date);
-              this.loadDailyLog(activeDay.date);
+              this.loadSummary(this.selectedDate);
+              this.loadDailyLog(this.selectedDate);
             }
           } catch (err) {
             console.error('InicioPage: Error al procesar actualización:', err);
@@ -136,10 +135,11 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   onDaySelected(day: WeekDay) {
-    this.week.forEach(d => d.active = d.date.toDateString() === day.date.toDateString());
-    this.loadSummary(day.date);
-    this.loadDailyLog(day.date);
-  }
+  this.week.forEach(d => d.active = d.date.toDateString() === day.date.toDateString());
+  this.selectedDate = new Date(day.date); // << AÑADIR ESTA LÍNEA O ASEGURAR QUE SE ACTUALIZA
+  this.loadSummary(day.date);
+  this.loadDailyLog(day.date);
+}
 
   private loadDailyLog(date: Date) {
     // Opcional: activar loading aquí también
