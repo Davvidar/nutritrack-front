@@ -20,24 +20,26 @@ import { DailyLogService, SummaryResponse } from 'src/app/services/daily-log.ser
 export class PerfilPage implements OnInit, OnDestroy {
   // Referencia directa al componente
   @ViewChild(NutritionSummaryComponent) nutritionSummaryComponent?: NutritionSummaryComponent;
-  
+
   profile: UserProfile | null = null;
   loading = true;
   error: string | null = null;
-  
+
   // Control para forzar recreación del componente
   showNutritionSummary: boolean = true;
-  
+
   // Ambos formatos de datos
   nutritionSummaryData: NutritionData | null = null;
   dailyGoals: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   currentConsumption: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-  
+
   // Para el círculo de calorías en perfil
-  caloriesConsumed: number = 0; 
+  caloriesConsumed: number = 0;
   caloriesPercentage: number = 0;
   caloriesGradient: string = 'conic-gradient(#e0e0e0 0% 100%)';
   today: Date = new Date();
+
+  weightStartDate = new Date(new Date().setMonth(new Date().getMonth() - 2));
 
   private nutritionSubscription?: Subscription;
   private profileSubscription?: Subscription;
@@ -48,7 +50,7 @@ export class PerfilPage implements OnInit, OnDestroy {
     private dailyLogService: DailyLogService,
     private nutritionUpdateService: NutritionUpdateService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadProfileAndNutrition();
@@ -63,17 +65,17 @@ export class PerfilPage implements OnInit, OnDestroy {
 
             if (this.datesAreOnSameDay(today, updatedDate)) {
               console.log('PerfilPage: Fecha de actualización corresponde a hoy, recargando datos nutricionales');
-              
+
               // Estrategia 1: Destruir temporalmente el componente
               this.showNutritionSummary = false;
-              
+
               // Recargar los datos
               this.loadDailyNutritionSummary();
-              
+
               // Recrear el componente después de un breve retraso
               setTimeout(() => {
                 this.showNutritionSummary = true;
-                
+
                 // Estrategia 2: Forzar detección de cambios después de recrear
                 setTimeout(() => {
                   this.forceNutritionSummaryUpdate();
@@ -90,6 +92,93 @@ export class PerfilPage implements OnInit, OnDestroy {
       });
   }
 
+
+  getWeightChange(): number | null {
+    if (!this.profile) return null;
+    const actual = this.profile.pesoHoy || this.profile.peso || 0;
+    const inicial = this.profile.pesoAnterior || this.profile.peso || 0;
+    return actual - inicial;
+  }
+
+  getTargetWeight(): number {
+    if (!this.profile) return 0;
+
+    // Lógica para determinar peso objetivo
+    // Se puede calcular basado en el objetivo del usuario, IMC, etc.
+    const currentWeight = this.profile.peso || 0;
+
+    if (this.profile.objetivo === 'perder peso') {
+      return Math.round((currentWeight * 0.9) * 10) / 10; // 10% menos
+    } else if (this.profile.objetivo === 'ganar músculo') {
+      return Math.round((currentWeight * 1.05) * 10) / 10; // 5% más
+    } else {
+      return currentWeight; // Mantener peso
+    }
+  }
+  getWeightRemaining(): number | null {
+    if (!this.profile) return null;
+
+    const targetWeight = this.getTargetWeight();
+    const currentWeight = this.profile.pesoHoy || this.profile.peso || 0;
+
+    // Si objetivo es perder peso, será negativo
+    // Si objetivo es ganar, será positivo
+    const remaining = targetWeight - currentWeight;
+
+    // Devolver valor absoluto redondeado a 1 decimal
+    return Math.abs(Math.round(remaining * 10) / 10);
+  }
+
+  // Método para ir a la pantalla de edición de perfil
+  editProfile(): void {
+    // Navegar a edición de perfil o abrir modal
+    console.log('Navegar a edición de perfil');
+    // this.router.navigate(['/editar-perfil']);
+  }
+
+  // Método para abrir configuración
+  openSettings(): void {
+    // Abrir configuración
+    console.log('Abrir configuración');
+    // this.router.navigate(['/configuracion']);
+  }
+
+  // Método para añadir entrada de peso
+  addWeightEntry(): void {
+    // Lógica para añadir entrada de peso
+    console.log('Añadir entrada de peso');
+
+    // Aquí puedes abrir un modal o alert para añadir el peso
+    // Ejemplo con AlertController:
+    /*
+    this.alertController.create({
+      header: 'Añadir Peso',
+      inputs: [
+        {
+          name: 'weight',
+          type: 'number',
+          placeholder: 'Peso (kg)',
+          min: 30,
+          max: 200
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Guardar',
+          handler: (data) => {
+            // Lógica para guardar el peso
+            console.log('Peso a guardar:', data.weight);
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+    */
+  }
+
   loadProfileAndNutrition(): void {
     this.loading = true;
     this.error = null;
@@ -97,7 +186,7 @@ export class PerfilPage implements OnInit, OnDestroy {
     this.profileSubscription = this.auth.getProfile().subscribe({
       next: (profileData: UserProfile) => {
         this.profile = profileData;
-        
+
         // Cargar objetivos desde el perfil
         if (profileData.objetivosNutricionales) {
           this.dailyGoals = {
@@ -107,14 +196,14 @@ export class PerfilPage implements OnInit, OnDestroy {
             fat: profileData.objetivosNutricionales.grasas || 0
           };
         }
-        
+
         // Una vez que el perfil está cargado, carga el resumen nutricional
         this.loadDailyNutritionSummary();
-        
+
         // Los datos de peso simulados
         if (this.profile && this.profile.peso) {
-            if (this.profile.pesoAnterior === undefined) this.profile.pesoAnterior = this.profile.peso - 0.4;
-            if (this.profile.pesoHoy === undefined) this.profile.pesoHoy = this.profile.peso - 0.1;
+          if (this.profile.pesoAnterior === undefined) this.profile.pesoAnterior = this.profile.peso - 0.4;
+          if (this.profile.pesoHoy === undefined) this.profile.pesoHoy = this.profile.peso - 0.1;
         }
       },
       error: (err: any) => {
@@ -138,19 +227,19 @@ export class PerfilPage implements OnInit, OnDestroy {
   forceNutritionSummaryUpdate(): void {
     if (this.nutritionSummaryComponent) {
       console.log('Actualizando componente nutrition-summary directamente');
-      
+
       // Establecer datos directamente en el componente
       this.nutritionSummaryComponent.nutritionData = this.nutritionSummaryData;
-      
+
       // Forzar actualización de las barras
       this.nutritionSummaryComponent.updateProgressBars();
-      
+
       // Detectar cambios
       this.nutritionSummaryComponent.cdr.detectChanges();
     } else {
       console.log('El componente nutrition-summary no está disponible para actualización directa');
     }
-    
+
     // También forzar detección de cambios en este componente
     this.cdr.detectChanges();
   }
@@ -166,7 +255,7 @@ export class PerfilPage implements OnInit, OnDestroy {
     this.dailyLogService.getSummary(today).subscribe({
       next: (summary: SummaryResponse) => {
         console.log('PerfilPage: Recibidos datos de resumen nutricional:', summary);
-        
+
         // Actualizar los datos en formato metrics-summary (nuestra fuente de verdad)
         this.currentConsumption = {
           calories: summary.consumido?.calorias || 0,
@@ -174,7 +263,7 @@ export class PerfilPage implements OnInit, OnDestroy {
           carbs: summary.consumido?.carbohidratos || 0,
           fat: summary.consumido?.grasas || 0
         };
-        
+
         // Crear un nuevo objeto para nutrition-summary (importante: nuevo objeto, no modificar el existente)
         this.nutritionSummaryData = {
           consumido: {
@@ -196,9 +285,9 @@ export class PerfilPage implements OnInit, OnDestroy {
             grasas: this.dailyGoals.fat - this.currentConsumption.fat
           }
         };
-        
+
         console.log('PerfilPage: Datos de nutritionSummaryData actualizados:', JSON.stringify(this.nutritionSummaryData));
-        
+
         // También actualizar datos para el círculo de calorías
         this.caloriesConsumed = this.currentConsumption.calories;
         if (this.dailyGoals.calories > 0) {
@@ -209,10 +298,10 @@ export class PerfilPage implements OnInit, OnDestroy {
         } else {
           this.caloriesPercentage = 0;
         }
-        
+
         this.updateCaloriesGradient();
         this.loading = false;
-        
+
         // Intentar actualizar el componente directamente si está disponible
         setTimeout(() => {
           this.forceNutritionSummaryUpdate();
@@ -221,25 +310,25 @@ export class PerfilPage implements OnInit, OnDestroy {
       error: (err) => {
         console.error('PerfilPage: Error al cargar el resumen nutricional diario', err);
         this.error = 'No se pudo cargar el resumen nutricional.';
-        
+
         // Resetear a valores por defecto
         this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
         this.nutritionSummaryData = {
           consumido: { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
-          objetivo: { 
-            calorias: this.dailyGoals.calories, 
+          objetivo: {
+            calorias: this.dailyGoals.calories,
             proteinas: this.dailyGoals.protein,
             carbohidratos: this.dailyGoals.carbs,
             grasas: this.dailyGoals.fat
           },
-          diferencia: { 
+          diferencia: {
             calorias: this.dailyGoals.calories,
             proteinas: this.dailyGoals.protein,
             carbohidratos: this.dailyGoals.carbs,
             grasas: this.dailyGoals.fat
           }
         };
-        
+
         this.loading = false;
       }
     });
@@ -255,8 +344,8 @@ export class PerfilPage implements OnInit, OnDestroy {
   private datesAreOnSameDay(first: Date, second: Date): boolean {
     if (!first || !second) return false;
     return first.getFullYear() === second.getFullYear() &&
-           first.getMonth() === second.getMonth() &&
-           first.getDate() === second.getDate();
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate();
   }
 
   logout(): void {
@@ -271,17 +360,17 @@ export class PerfilPage implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   refreshData(): void {
     // Estrategia combinada: destruir, recargar, recrear y actualizar
     this.showNutritionSummary = false;
-    
+
     setTimeout(() => {
       this.loadDailyNutritionSummary();
-      
+
       setTimeout(() => {
         this.showNutritionSummary = true;
-        
+
         setTimeout(() => {
           this.forceNutritionSummaryUpdate();
         }, 100);

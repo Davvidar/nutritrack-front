@@ -1,106 +1,87 @@
-<div class="weight-tracker-wrapper ion-padding">
-  <ion-card class="weight-card-main">
-    <ion-card-header class="ion-no-padding">
-      <ion-item lines="none" class="header-item">
-        <ion-icon name="barbell-outline" slot="start" color="primary" class="header-icon"></ion-icon>
-        <ion-label>
-          <h2>{{ formatDateHeader() }}</h2>
-          <p *ngIf="!editMode && currentWeight">Último registro: {{ currentWeight }} kg</p>
-          <p *ngIf="!editMode && !currentWeight && !loading">Añade tu peso para hoy</p>
-          <p *ngIf="editMode">Actualizando peso...</p>
-        </ion-label>
-        <ion-button
-          fill="clear"
-          size="small"
-          slot="end"
-          (click)="toggleHistory()"
-          *ngIf="weightHistory.length > 0 && !editMode"
-          class="history-toggle-button"
-          aria-label="Mostrar u ocultar historial">
-          <ion-icon slot="icon-only" [name]="showHistory ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'" color="medium"></ion-icon>
-        </ion-button>
-      </ion-item>
-    </ion-card-header>
+<div class="weight-tracker-compact">
+  <!-- Header siempre visible -->
+  <div class="weight-header" (click)="toggleExpanded()" [class.expanded]="isExpanded">
+    <div class="header-left">
+      <ion-icon name="scale-outline" [color]="currentWeight ? 'primary' : 'medium'"></ion-icon>
+      <span class="header-title">{{ formatDateHeader() }}</span>
+      <span class="current-weight" *ngIf="currentWeight && !editMode">{{ currentWeight }} kg</span>
+    </div>
+    
+    <div class="header-right">
+      <ion-button 
+        *ngIf="!editMode && !isExpanded" 
+        fill="clear" 
+        size="small" 
+        (click)="toggleEditMode($event)">
+        <ion-icon [name]="currentWeight ? 'pencil-outline' : 'add-circle-outline'" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-icon 
+        name="chevron-down-outline" 
+        class="expand-icon" 
+        [class.rotated]="isExpanded">
+      </ion-icon>
+    </div>
+  </div>
 
-    <ion-card-content>
-      <div class="loading-section" *ngIf="loading && !editMode">
-        <ion-spinner name="dots" color="primary"></ion-spinner>
-        <p>Cargando datos...</p>
+  <!-- Sección de edición (siempre visible cuando está en modo edición) -->
+  <div class="edit-section" *ngIf="editMode" [@slideInOut]>
+    <ion-item class="weight-input-item" lines="none">
+      <ion-input
+        type="number"
+        [(ngModel)]="newWeight"
+        placeholder="Peso (kg)"
+        inputmode="decimal"
+        step="0.1"
+        min="0">
+      </ion-input>
+      <ion-button 
+        slot="end" 
+        fill="clear" 
+        size="small"
+        (click)="saveWeight()" 
+        [disabled]="!newWeight || loading">
+        <ion-icon name="checkmark-outline" slot="icon-only" color="success"></ion-icon>
+      </ion-button>
+      <ion-button 
+        slot="end" 
+        fill="clear" 
+        size="small"
+        (click)="toggleEditMode($event)">
+        <ion-icon name="close-outline" slot="icon-only" color="medium"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </div>
+
+  <!-- Contenido expandible (histórico) -->
+  <div class="expandable-content" *ngIf="isExpanded" [@expandCollapse]>
+    <div class="history-header">
+      <span>Últimos 7 días</span>
+      <ion-button fill="clear" size="small" (click)="toggleEditMode($event)" *ngIf="!editMode">
+        <ion-icon [name]="currentWeight ? 'pencil-outline' : 'add-circle-outline'" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="loading-container" *ngIf="loading">
+      <ion-spinner name="dots" color="primary"></ion-spinner>
+    </div>
+
+    <div class="weekly-history" *ngIf="!loading && weeklyHistory.length > 0">
+      <div class="history-item" 
+           *ngFor="let entry of weeklyHistory" 
+           [class.today]="isToday(entry.fecha)">
+        <div class="date">{{ formatShortDate(entry.fecha) }}</div>
+        <div class="weight">{{ entry.peso }} kg</div>
+        <div class="change" *ngIf="getChange(entry) !== null">
+         <ion-icon 
+    [name]="getChange(entry)! > 0 ? 'arrow-up' : 'arrow-down'"
+    [color]="getChange(entry)! > 0 ? 'danger' : 'success'">
+  </ion-icon>
+          <span>{{ getChangeAbsolute(entry) | number:'1.1-1' }}</span>
       </div>
+    </div>
 
-      <div class="display-section" *ngIf="!editMode && !loading">
-        <div class="weight-value-display" *ngIf="currentWeight" (click)="toggleEditMode()">
-          <span class="number">{{ currentWeight }}</span>
-          <span class="unit">kg</span>
-          <ion-icon name="pencil-outline" class="edit-icon" color="medium"></ion-icon>
-        </div>
-        <div class="no-data-section" *ngIf="!currentWeight">
-          <ion-icon name="scale-outline" color="medium" class="no-data-icon"></ion-icon>
-          <p>No hay registro para esta fecha.</p>
-          <ion-button expand="block" fill="outline" (click)="toggleEditMode()" shape="round">
-            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-            Añadir Peso
-          </ion-button>
-        </div>
-      </div>
-
-      <div class="edit-section" *ngIf="editMode">
-        <ion-item lines="full" class="weight-input-item">
-          <ion-input
-            type="number"
-            [(ngModel)]="newWeight"
-            label="Peso (kg)"
-            labelPlacement="floating"
-            placeholder="Ej: 70.5"
-            clearInput
-            inputmode="decimal"
-            step="0.1"
-            min="0">
-          </ion-input>
-        </ion-item>
-        <div class="edit-actions">
-          <ion-button fill="outline" (click)="toggleEditMode()" shape="round" size="small">
-            <ion-icon name="close-outline" slot="start"></ion-icon>
-            Cancelar
-          </ion-button>
-          <ion-button (click)="saveWeight()" [disabled]="!newWeight || loading" shape="round" size="small">
-            <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
-            <ion-icon *ngIf="!loading" name="save-outline" slot="start"></ion-icon>
-            Guardar
-          </ion-button>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-  <div class="history-section" [ngClass]="{'history-visible': showHistory, 'history-hidden': !showHistory}">
-    <ion-list *ngIf="weightHistory.length > 0" class="history-list-transparent">
-      <ion-list-header class="history-list-header">
-        <ion-label color="medium">Historial Reciente</ion-label>
-      </ion-list-header>
-      <ion-item *ngFor="let entry of weightHistory; let i = index"
-                [ngClass]="{'selected-history-item': isSelectedDate(entry.fecha)}"
-                lines="inset"
-                button
-                detail="false"
-                class="history-entry">
-        <ion-label>
-          <h3>{{ entry.peso }} kg</h3>
-          <p>{{ formatDate(entry.fecha) }}</p>
-        </ion-label>
-        <div slot="end" class="weight-change" *ngIf="getWeightChange(entry.peso, i) as change">
-          <ion-icon [name]="change > 0 ? 'trending-up-outline' : 'trending-down-outline'"
-                    [color]="change > 0 ? 'danger' : 'success'"
-                    class="change-icon"></ion-icon>
-          <span [ngClass]="{'positive-change': change > 0, 'negative-change': change < 0}">
-            {{ change > 0 ? '+' : '' }}{{ change | number:'1.0-1' }}
-          </span>
-        </div>
-      </ion-item>
-    </ion-list>
-    <div *ngIf="weightHistory.length === 0 && showHistory" class="no-history-message ion-text-center ion-padding-top">
-        <ion-icon name="archive-outline" color="medium" style="font-size: 2rem;"></ion-icon>
-        <p>Aún no hay historial de peso.</p>
+    <div class="no-data" *ngIf="!loading && weeklyHistory.length === 0">
+      <p>Sin registros esta semana</p>
     </div>
   </div>
 </div>

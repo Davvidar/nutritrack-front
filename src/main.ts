@@ -1,6 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import {provideAnimations} from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, arrowForward } from 'ionicons/icons';
@@ -30,6 +31,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideIonicAngular(),
     provideHttpClient(),
+    provideAnimations(),
     importProvidersFrom(IonicModule.forRoot()),
     provideRouter(routes),
     {

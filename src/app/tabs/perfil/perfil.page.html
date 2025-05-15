@@ -1,105 +1,177 @@
-<!-- src/app/tabs/perfil/perfil.page.html -->
-<ion-header class="profile-header">
-  <ion-toolbar class="nutri-header">
+<ion-header class="profile-header ion-no-border">
+  <ion-toolbar>
     <ion-title>
-      <div>nutritrack</div>
-      <div class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</div>
-      <div class="profile-objective">Objetivo: {{ profile?.objetivo }}</div>
+      <div class="header-content">
+        <img src="../../../assets/Nutritrack_letras.png" alt="">
+<!--         <div class="header-actions">
+          <ion-button fill="clear" (click)="editProfile()">
+            <ion-icon slot="icon-only" name="create-outline" color="light"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" (click)="openSettings()">
+            <ion-icon slot="icon-only" name="settings-outline" color="light"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" (click)="logout()">
+            <ion-icon slot="icon-only" name="log-out-outline" color="light"></ion-icon>
+          </ion-button>
+        </div> -->
+      </div>
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" class="header-icon-button">
-        <ion-icon slot="icon-only" name="settings-outline" color="light"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" class="header-icon-button">
-        <ion-icon slot="icon-only" name="create-outline" color="light"></ion-icon>
-      </ion-button>
-      <ion-button (click)="logout()" fill="clear" class="header-icon-button">
-        <ion-icon slot="icon-only" name="log-out-outline" color="light"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
+  <div class="profile-info">
+    <h1 class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</h1>
+    <div class="objective-badge">
+      <ion-icon name="flag"></ion-icon>
+      <span> Objetivo: {{ profile?.objetivo || 'Sin objetivo definido' }}</span>
+    </div>
+  </div>
 </ion-header>
 
 <ion-content class="profile-content">
-  <ng-container *ngIf="loading">
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="loading-container">
     <ion-spinner name="crescent"></ion-spinner>
-  </ng-container>
+    <p>Cargando perfil...</p>
+  </div>
 
-  <ng-container *ngIf="error">
-    <div class="ion-padding">
-      <p class="error">{{ error }}</p>
-    </div>
-  </ng-container>
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="error-container">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <p>{{ error }}</p>
+    <ion-button size="small" (click)="refreshData()">Reintentar</ion-button>
+  </div>
 
-  <ng-container *ngIf="profile">
-    <div class="ion-padding">
-      <!-- Componente de nutrición con estrategia de recreación -->
-      <div *ngIf="showNutritionSummary">
+  <!-- Contenido principal -->
+  <ng-container *ngIf="profile && !loading">
+    <!-- Resumen Nutrición -->
+    <div class="nutrition-container">
+      <h2 class="section-title">
+        <ion-icon name="nutrition-outline"></ion-icon>
+        Nutrición de Hoy
+      </h2>
+      
+      <ng-container *ngIf="showNutritionSummary">
         <app-nutrition-summary 
           [nutritionData]="nutritionSummaryData"
           [date]="today">
         </app-nutrition-summary>
+      </ng-container>
+      
+      <!-- Micro estadísticas nutricionales -->
+ 
+    </div>
+    
+    <!-- Progreso de Peso -->
+    <div class="weight-container">
+      <h2 class="section-title">
+        <ion-icon name="trending-down-outline"></ion-icon>
+        Progresión de Peso
+        <ion-button fill="clear" size="small" (click)="addWeightEntry()" class="add-button">
+          <ion-icon name="add-circle-outline"></ion-icon>
+          Añadir
+        </ion-button>
+      </h2>
+      
+      <div class="weight-summary">
+        <div class="weight-card initial">
+          <div class="hexagon-shape orange-hexagon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="weight-label">Peso Inicial</div>
+          <div class="weight-value">{{ (profile.peso || 0).toFixed(1) }}kg</div>
+          <div class="weight-date">{{ weightStartDate | date:'MMM dd' }}</div>
+        </div>
+        
+        <div class="weight-current-container">
+          <div class="weight-card current">
+            <div class="weight-value">{{ (profile.pesoHoy || profile.peso || 0).toFixed(1) }}</div>
+            <div class="weight-unit">kg</div>
+            <div class="weight-change" *ngIf="getWeightChange() as change" 
+                 [class.weight-loss]="change < 0"
+                 [class.weight-gain]="change > 0">
+              <ion-icon [name]="change < 0 ? 'trending-down' : 'trending-up'"></ion-icon>
+              {{ change > 0 ? '+' : '' }}{{ change.toFixed(1) }}kg
+            </div>
+          </div>
+          <div class="weight-date-current">Actual</div>
+        </div>
+        
+        <div class="weight-card target">
+          <div class="hexagon-shape purple-hexagon">
+            <ion-icon name="flag-outline"></ion-icon>
+          </div>
+          <div class="weight-label">Peso Objetivo</div>
+          <div class="weight-value">{{ getTargetWeight() }}kg</div>
+          <div class="weight-remaining" *ngIf="getWeightRemaining() as remaining">
+            Faltan {{ remaining }}kg
+          </div>
+        </div>
       </div>
       
-      <!-- Spinner mientras se recrea el componente -->
-      <div *ngIf="!showNutritionSummary" class="nutrition-loading">
-        <ion-spinner name="crescent"></ion-spinner>
+      <!-- Gráfico de peso simplificado -->
+      <div class="weight-chart-container">
+        <div class="weight-chart-placeholder">
+          <div class="chart-line"></div>
+          <div class="chart-dot start"></div>
+          <div class="chart-dot current"></div>
+          <div class="chart-dot target"></div>
+        </div>
+        <div class="chart-labels">
+          <span>Inicio</span>
+          <span>Actual</span>
+          <span>Objetivo</span>
+        </div>
       </div>
-
-      <!-- Botón para refrescar manualmente (opcional) -->
-      <ion-button 
-        *ngIf="nutritionSummaryData?.consumido?.calorias === 0"
-        fill="clear" 
-        size="small" 
-        (click)="refreshData()" 
-        class="refresh-button">
-        <ion-icon name="refresh-outline" slot="start"></ion-icon>
-        Recargar datos
-      </ion-button>
-  
-      <h2 class="section-title">Progresión del peso</h2>
-      <ion-grid class="weight-grid">
-        <ion-row>
-          <ion-col size="4">
-            <ion-card class="weight-card">
-              <ion-card-content class="ion-text-center">
-                <div class="hexagon-shape orange-hexagon"></div>
-                <div class="weight-label">Media anterior</div>
-                <div class="weight-value">{{ (profile.pesoAnterior || (profile.peso || 0) - 0.4).toFixed(1) }}Kg</div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-          <ion-col size="4">
-            <ion-card class="weight-card">
-              <ion-card-content class="ion-text-center">
-                <div class="hexagon-shape yellow-hexagon"></div>
-                <div class="weight-label">Media actual</div>
-                <div class="weight-value">{{ (profile.peso || 0).toFixed(1) }}Kg</div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-          <ion-col size="4">
-            <ion-card class="weight-card">
-              <ion-card-content class="ion-text-center">
-                <div class="hexagon-shape purple-hexagon"></div>
-                <div class="weight-label">Hoy</div>
-                <div class="weight-value">{{ (profile.pesoHoy || (profile.peso || 0) - 0.1).toFixed(1) }}Kg</div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-
-      <h2 class="section-title">Histórico de peso</h2>
-      <ion-card class="weight-history-card">
-        <ion-card-content>
-          <ion-list class="weight-history-list">
-            <!-- Contenido del histórico... -->
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+    </div>
+    
+    <!-- Información Personal -->
+    <div class="personal-info">
+      <h2 class="section-title">
+        <ion-icon name="person-outline"></ion-icon>
+        Información Personal
+        <ion-button fill="clear" size="small" (click)="editProfile()" class="edit-button">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+      </h2>
+      
+      <ion-list lines="none" class="info-list">
+        <ion-item>
+          <ion-icon name="body-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Altura</h3>
+            <p>{{ profile.altura }} cm</p>
+          </ion-label>
+        </ion-item>
         
-      <!-- Resto del contenido de la página que ya tenías... -->
-    </div> 
+        <ion-item>
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Edad</h3>
+            <p>{{ profile.edad }} años</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-icon name="transgender-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Sexo</h3>
+            <p>{{ profile.sexo | titlecase }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-icon name="fitness-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Nivel de actividad</h3>
+            <p>{{ profile.actividad | titlecase }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+    
+    <!-- Botón para cerrar sesión -->
+    <ion-button expand="block" fill="outline" class="logout-button" (click)="logout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
   </ng-container>
 </ion-content>
