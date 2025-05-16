@@ -415,6 +415,18 @@ export class DailyLogService {
     
     return `${year}-${month}-${day}`;
   }
+
+  getWeightWeeklyAverage(): Observable<{media: number | null, diasConDatos: number}> {
+  return this.http.get<{media: number | null, diasConDatos: number}>(
+    `${environment.API_URL}/weight/media-semanal`,
+    { headers: this.auth.getAuthHeaders() }
+  ).pipe(
+    catchError(error => {
+      console.error('Error obteniendo media semanal de peso:', error);
+      return of({ media: null, diasConDatos: 0 });
+    })
+  );
+}
   removeItemFromMeal(
     date: Date,
     mealType: string,

@@ -1,6 +1,6 @@
 // src/app/tabs/perfil/perfil.page.ts
 import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService, UserProfile } from '../../services/auth.service';
@@ -9,11 +9,13 @@ import { MetricsSummaryComponent, Macros } from '../../components/metrics-summar
 import { Subscription } from 'rxjs';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { DailyLogService, SummaryResponse } from 'src/app/services/daily-log.service';
-
+import { WeeklyWeightAverageComponent } from 'src/app/components/weekly-weight-average/weekly-weight-average.component';
+import { NutritionGoalsModalComponent  } from 'src/app/components/nutrition-goals-edit/nutrition-goals-edit.modal';
+import { ProfileEditModalComponent } from 'src/app/components/profile-edit-modal/profile-edit-modal.component';
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterModule, NutritionSummaryComponent, MetricsSummaryComponent],
+  imports: [IonicModule, CommonModule, RouterModule,  NutritionSummaryComponent, MetricsSummaryComponent, WeeklyWeightAverageComponent],
   templateUrl: './perfil.page.html',
   styleUrls: ['./perfil.page.scss']
 })
@@ -49,7 +51,8 @@ export class PerfilPage implements OnInit, OnDestroy {
     private router: Router,
     private dailyLogService: DailyLogService,
     private nutritionUpdateService: NutritionUpdateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalController: ModalController
   ) { }
 
   ngOnInit(): void {
@@ -92,6 +95,93 @@ export class PerfilPage implements OnInit, OnDestroy {
       });
   }
 
+async openNutritionGoalsModal() {
+  // Asume que 'this.profile.objetivosNutricionales' tiene los datos actuales
+  const currentGoalsFromProfile = this.profile?.objetivosNutricionales || {
+    calorias: 2000, // Valores por defecto si no existen
+    proteinas: 100,
+    carbohidratos: 250,
+    grasas: 70
+  };
+
+  const modal = await this.modalController.create({
+    component: NutritionGoalsModalComponent,
+    componentProps: {
+      currentGoals: currentGoalsFromProfile // <--- Aquí pasas los datos actuales
+    },
+    // ... otras opciones del modal como cssClass, breakpoints ...
+  });
+
+  await modal.present();
+
+  const { data, role } = await modal.onWillDismiss();
+  if (role === 'confirm' && data) {
+    console.log('Nuevos objetivos guardados:', data);
+    // Aquí actualizas los objetivos del usuario en tu servicio/backend
+    // y refrescas la UI de la página de perfil si es necesario.
+  }
+}
+
+
+
+  // Método para actualizar objetivos nutricionales en el backend
+  private updateNutritionGoals(nutritionGoals: any) {
+    this.loading = true;
+    
+    // Preparar datos para la actualización
+    const updateData = {
+      objetivosNutricionales: nutritionGoals
+    };
+    
+    this.auth.updateProfile(updateData).subscribe({
+      next: (updatedProfile) => {
+        // Actualizar el perfil local
+        this.profile = updatedProfile;
+        
+        // Actualizar los valores de dailyGoals para el componente de métricas
+        this.dailyGoals = {
+          calories: nutritionGoals.calorias || 0,
+          protein: nutritionGoals.proteinas || 0,
+          carbs: nutritionGoals.carbohidratos || 0,
+          fat: nutritionGoals.grasas || 0
+        };
+        
+        // Actualizar también nutritionSummaryData
+        if (this.nutritionSummaryData) {
+          this.nutritionSummaryData = {
+            ...this.nutritionSummaryData,
+            objetivo: {
+              calorias: nutritionGoals.calorias || 0,
+              proteinas: nutritionGoals.proteinas || 0,
+              carbohidratos: nutritionGoals.carbohidratos || 0,
+              grasas: nutritionGoals.grasas || 0
+            },
+            diferencia: {
+              calorias: (nutritionGoals.calorias || 0) - (this.nutritionSummaryData.consumido?.calorias || 0),
+              proteinas: (nutritionGoals.proteinas || 0) - (this.nutritionSummaryData.consumido?.proteinas || 0),
+              carbohidratos: (nutritionGoals.carbohidratos || 0) - (this.nutritionSummaryData.consumido?.carbohidratos || 0),
+              grasas: (nutritionGoals.grasas || 0) - (this.nutritionSummaryData.consumido?.grasas || 0)
+            }
+          };
+        }
+        
+        // Forzar actualización de la interfaz
+        this.refreshData();
+        
+        // Notificar éxito
+        // Podríamos usar un toast aquí
+        console.log('Objetivos nutricionales actualizados con éxito');
+        
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al actualizar objetivos nutricionales:', err);
+        // Notificar error
+        // Podríamos usar un toast aquí
+        this.loading = false;
+      }
+    });
+  }
 
   getWeightChange(): number | null {
     if (!this.profile) return null;
@@ -130,11 +220,32 @@ export class PerfilPage implements OnInit, OnDestroy {
   }
 
   // Método para ir a la pantalla de edición de perfil
-  editProfile(): void {
-    // Navegar a edición de perfil o abrir modal
-    console.log('Navegar a edición de perfil');
-    // this.router.navigate(['/editar-perfil']);
+   async editProfile(): Promise<void> {
+    if (!this.profile) {
+      console.error('No hay perfil para editar');
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: ProfileEditModalComponent,
+      componentProps: {
+        profile: this.profile
+      },
+      cssClass: 'profile-edit-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      // Actualizar perfil local si recibimos datos del modal
+      this.profile = data;
+      
+      // Recargar la información para actualizar la UI
+      this.loadProfileAndNutrition();
+    }
   }
+
 
   // Método para abrir configuración
   openSettings(): void {
@@ -143,41 +254,8 @@ export class PerfilPage implements OnInit, OnDestroy {
     // this.router.navigate(['/configuracion']);
   }
 
-  // Método para añadir entrada de peso
-  addWeightEntry(): void {
-    // Lógica para añadir entrada de peso
-    console.log('Añadir entrada de peso');
 
-    // Aquí puedes abrir un modal o alert para añadir el peso
-    // Ejemplo con AlertController:
-    /*
-    this.alertController.create({
-      header: 'Añadir Peso',
-      inputs: [
-        {
-          name: 'weight',
-          type: 'number',
-          placeholder: 'Peso (kg)',
-          min: 30,
-          max: 200
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Guardar',
-          handler: (data) => {
-            // Lógica para guardar el peso
-            console.log('Peso a guardar:', data.weight);
-          }
-        }
-      ]
-    }).then(alert => alert.present());
-    */
-  }
+
 
   loadProfileAndNutrition(): void {
     this.loading = true;

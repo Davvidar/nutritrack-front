@@ -1,0 +1,36 @@
+<div class="weight-summary">
+      <div class="weight-card initial">
+        <div class="hexagon-shape orange-hexagon">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="weight-label">Peso Inicial</div>
+        <div class="weight-value">{{ (profile?.peso || 0).toFixed(1) }}kg</div>
+        <div class="weight-date">{{ weightStartDate | date:'MMM dd' }}</div>
+      </div>
+      
+      <div class="weight-current-container">
+        <div class="weight-card current">
+          <div class="weight-value">{{ (profile?.pesoHoy || profile?.peso || 0).toFixed(1) }}</div>
+          <div class="weight-unit">kg</div>
+          <div class="weight-change" *ngIf="getWeightChange() as change" 
+               [class.weight-loss]="change < 0"
+               [class.weight-gain]="change > 0">
+            <ion-icon [name]="change < 0 ? 'trending-down' : 'trending-up'"></ion-icon>
+            {{ change > 0 ? '+' : '' }}{{ change.toFixed(1) }}kg
+          </div>
+        </div>
+        <div class="weight-date-current">Hoy</div>
+      </div>
+      
+      <div class="weight-card target">
+        <div class="hexagon-shape purple-hexagon">
+          <ion-icon name="analytics-outline"></ion-icon>
+        </div>
+        <div class="weight-label">Media Semanal</div>
+        <div class="weight-value" *ngIf="weeklyAverage !== null">{{ weeklyAverage.toFixed(1) }}kg</div>
+        <div class="weight-value" *ngIf="weeklyAverage === null">Sin datos</div>
+        <div class="weight-remaining" *ngIf="dataDays > 0">
+          {{ dataDays }} día{{ dataDays !== 1 ? 's' : '' }} registrados
+        </div>
+      </div>
+    </div>

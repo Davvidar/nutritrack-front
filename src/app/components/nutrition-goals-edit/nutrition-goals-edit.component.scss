@@ -1,0 +1,340 @@
+// src/app/modals/nutrition-goals-edit/nutrition-goals-edit.component.scss
+
+// --- Variables de Color y Estilo (Consistentes con la app) ---
+:host {
+  --nutri-primary-green: #6ab04c; // Verde principal de Nutritrack
+  --nutri-text-dark: #2c3e50;
+  --nutri-text-medium: #555f6b;
+  --nutri-text-light: #ffffff;
+  --nutri-background-light-input: #f7f8fa; // Fondo claro para inputs
+  --nutri-border-color: #e0e2e7; // Borde sutil
+  --nutri-card-background: #ffffff;
+  --nutri-card-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  --nutri-card-radius: 16px;
+
+  // Colores de macros (ajustar para contraste y claridad)
+  --color-protein: #5046c8; // Azul/Púrpura
+  --color-carbs: #ff8c42;   // Naranja
+  --color-fat: #d4ca3a;     // Rojo/Coral
+
+
+  --ion-color-primary: var(--nutri-primary-green); // Usar el verde principal para el color primario de Ionic
+}
+
+// --- Estilos del Header del Modal ---
+ion-toolbar.custom-modal-toolbar {
+  --background: var(--nutri-primary-green);
+  --color: var(--nutri-text-light);
+  text-align: center; // Centrar título si no hay botones de start
+
+  ion-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .close-button { // Estilo para el botón de cerrar
+    --padding-start: 6px;
+    --padding-end: 6px;
+  }
+}
+
+// --- Contenido del Modal ---
+ion-content.nutrition-goals-content {
+  --background: var(--nutri-background-light-input); // Fondo general del contenido
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; // Espacio entre tarjetas y botón
+}
+
+// --- Estilo General para Tarjetas ---
+.goals-card {
+  background: var(--nutri-card-background);
+  border-radius: var(--nutri-card-radius);
+  padding: 18px;
+  box-shadow: var(--nutri-card-shadow);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--nutri-text-dark);
+  }
+}
+
+// --- Tarjeta de Calorías ---
+.calories-card {
+  .calculate-macros-button {
+    font-size: 0.8rem;
+    --color: var(--nutri-primary-green);
+    height: 32px;
+    text-transform: none;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    ion-icon { margin-right: 4px; }
+  }
+
+  .calories-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--nutri-background-light-input);
+    padding: 4px 16px; // Ajustar padding
+    border-radius: 10px;
+    border: 1px solid var(--nutri-border-color);
+    margin-bottom: 8px;
+
+    .calories-input-field {
+      font-size: 1.8rem; // Tamaño grande para el input de calorías
+      font-weight: 700;
+      --padding-top: 10px;
+      --padding-bottom: 10px;
+      --padding-start: 0;
+      flex: 1;
+      color: var(--nutri-text-dark);
+      text-align: center; // Centrar el número
+    }
+  }
+}
+
+// --- Tarjeta de Macronutrientes ---
+.macros-card {
+  .card-header {
+    flex-direction: column; // Título arriba, botones abajo
+    align-items: flex-start; // Alinear título a la izquierda
+    gap: 10px;
+  }
+
+  .distribution-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap; // Permitir que los botones pasen a otra línea
+    gap: 8px;
+
+    .preset-button {
+      font-size: 0.75rem; // Botones más pequeños
+      --color: var(--nutri-primary-green);
+      --border-color: var(--nutri-primary-green);
+      --border-radius: 20px;
+      height: 30px;
+      text-transform: none;
+      margin: 0; // Quitar margen por defecto
+    }
+  }
+
+  // Barra de Progreso de Macros
+  .macros-progress-bar-container {
+    margin-bottom: 18px;
+  }
+
+  .macros-progress-bar {
+    display: flex;
+    height: 22px; // Altura de la barra
+    border-radius: 11px; // Redondeado
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); // Sombra interna sutil
+    margin-bottom: 6px;
+
+    .progress-segment {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nutri-text-light);
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: width 0.4s ease-in-out;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+
+      // Mostrar etiqueta de datos si hay suficiente espacio
+      &[data-label]:not([style*="width: 0%"]):not([style*="width: 1%"]):not([style*="width: 2%"]):not([style*="width: 3%"]):not([style*="width: 4%"]):not([style*="width: 5%"]):not([style*="width: 6%"]):not([style*="width: 7%"]):not([style*="width: 8%"]):not([style*="width: 9%"]) {
+        &::after {
+          content: attr(data-label);
+        }
+      }
+
+
+      &.protein { background-color: var(--color-protein); }
+      &.carbs { background-color: var(--color-carbs); }
+      &.fat { background-color: var(--color-fat); }
+    }
+  }
+
+  .percentage-labels-container {
+    display: flex;
+    justify-content: space-around; // Distribuir etiquetas
+
+    .percentage-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-align: center;
+      flex: 1; // Ocupar espacio igual
+
+      &.protein { color: var(--color-protein); }
+      &.carbs { color: var(--color-carbs); }
+      &.fat { color: var(--color-fat); }
+    }
+  }
+
+  // Inputs para Macros
+  .macros-inputs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // Espacio entre cada input de macro
+    margin-top: 20px;
+  }
+
+  .macro-input-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .macro-label-icon {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 0.95rem;
+
+      .macro-icon-circle {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--nutri-text-light);
+        font-size: 0.85rem;
+        font-weight: bold;
+      }
+      &.protein .macro-icon-circle { background-color: var(--color-protein); }
+      &.carbs .macro-icon-circle { background-color: var(--color-carbs); }
+      &.fat .macro-icon-circle { background-color: var(--color-fat); }
+
+      &.protein { color: var(--color-protein); }
+      &.carbs { color: var(--color-carbs); }
+      &.fat { color: var(--color-fat); }
+    }
+  }
+}
+
+// Estilo común para input + unidad (kcal, g)
+.input-field-with-unit, .calories-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--nutri-background-light-input);
+  border-radius: 10px;
+  border: 1px solid var(--nutri-border-color);
+  overflow: hidden; // Para que el borde redondeado funcione bien
+
+  .macro-input-field, .calories-input-field { // Aplicar a ambos inputs
+    font-size: 1.1rem;
+    font-weight: 600;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --padding-start: 12px; // Padding para el número
+    --padding-end: 0; // Sin padding al final del input
+    text-align: right;
+    color: var(--nutri-text-dark);
+    flex-grow: 1; // Input ocupa el espacio
+  }
+
+  .unit-label {
+    font-size: 0.9rem;
+    color: var(--nutri-text-medium);
+    padding: 0 12px; // Padding para la unidad
+    background-color: transparent; // Asegurar fondo
+    white-space: nowrap; // Evitar que "kcal" se parta
+  }
+}
+.input-field-with-unit { // Específico para macros si necesitan diferente ancho
+   width: 120px; // Ancho fijo para inputs de gramos
+}
+
+
+// --- Mensajes de Validación y Error ---
+.error-note {
+  display: block;
+  font-size: 0.75rem;
+  padding-left: 4px; // Pequeña indentación
+  margin-top: 4px;
+
+  &.macro-error { // Para errores de macros, alinearlos a la derecha
+    text-align: right;
+    padding-right: 4px;
+    padding-left: 0;
+  }
+}
+
+.validation-message-container {
+  margin-top: 16px;
+  .warning-note {
+    display: flex; // Para alinear icono y texto
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+    background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.1); // Fondo amarillo claro
+    border-radius: 8px;
+    text-align: left; // Alinear texto a la izquierda
+    font-size: 0.8rem;
+    color: var(--ion-color-warning-shade, #d9a600); // Texto amarillo oscuro
+    ion-icon { font-size: 1.1rem; }
+  }
+}
+
+// --- Botón de Guardar ---
+.save-goals-button {
+  --background: var(--nutri-primary-green);
+  --background-activated: #548f41; // Verde más oscuro al pulsar
+  --color: var(--nutri-text-light);
+  --border-radius: 12px;
+  height: 50px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-transform: none; // Sin mayúsculas
+  margin-top: 10px; // Espacio sobre el botón
+
+  ion-spinner { // Estilo para el spinner dentro del botón
+    width: 22px;
+    height: 22px;
+    margin-right: 8px; // Si el texto está visible
+  }
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
+// --- Tarjeta de Información Adicional ---
+.info-card-container {
+  background: rgba(var(--ion-color-primary-rgb, 96, 162, 74), 0.08); // Fondo verde muy claro
+  border-radius: var(--nutri-card-radius);
+  margin-top: 24px; // Espacio desde el botón de guardar
+
+  .info-item {
+    --background: transparent; // Item transparente sobre el fondo de la tarjeta
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+
+    .info-icon {
+      font-size: 1.8rem; // Icono de información más grande
+      margin-right: 12px;
+      align-self: flex-start; // Alinear icono arriba si el texto es largo
+      margin-top: 2px;
+    }
+
+    .info-text p {
+      font-size: 0.85rem;
+      color: var(--nutri-text-medium); // Texto legible
+      line-height: 1.5; // Espaciado para lectura
+      margin: 4px 0;
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+}

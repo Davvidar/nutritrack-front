@@ -1,0 +1,170 @@
+nutrition-goals-edit.modal<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Objetivos Nutricionales</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="nutrition-goals-content">
+  <form [formGroup]="goalsForm" (ngSubmit)="onSubmit()">
+    <!-- Tarjeta de calorías -->
+    <div class="calories-card">
+      <div class="card-header">
+        <ion-label>Objetivo diario de calorías</ion-label>
+        <ion-button 
+          fill="clear" 
+          size="small" 
+          (click)="calculateFromPercentages()" 
+          [disabled]="!goalsForm.get('calorias')?.valid">
+          <ion-icon name="calculator-outline" slot="start"></ion-icon>
+          Calcular macros
+        </ion-button>
+      </div>
+      
+      <div class="calories-input">
+        <ion-input 
+          type="number" 
+          formControlName="calorias" 
+          placeholder="2000" 
+          min="800" 
+          max="10000"
+          inputmode="numeric">
+        </ion-input>
+        <span class="unit">kcal</span>
+      </div>
+      
+      <ion-note color="danger" *ngIf="goalsForm.get('calorias')?.hasError('required') && goalsForm.get('calorias')?.touched">
+        Las calorías son obligatorias
+      </ion-note>
+      <ion-note color="danger" *ngIf="goalsForm.get('calorias')?.hasError('min') && goalsForm.get('calorias')?.touched">
+        Mínimo 800 kcal
+      </ion-note>
+      <ion-note color="danger" *ngIf="goalsForm.get('calorias')?.hasError('max') && goalsForm.get('calorias')?.touched">
+        Máximo 10000 kcal
+      </ion-note>
+    </div>
+    
+    <!-- Tarjeta de macros -->
+    <div class="macros-card">
+      <div class="card-header">
+        <ion-label>Macronutrientes</ion-label>
+        <div class="distribution-buttons">
+          <ion-button fill="clear" size="small" (click)="setBalancedDistribution()">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Balanceado
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="setHighProteinDistribution()">
+            <ion-icon name="barbell-outline" slot="start"></ion-icon>
+            Alto en proteína
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="setLowCarbDistribution()">
+            <ion-icon name="flame-outline" slot="start"></ion-icon>
+            Bajo en carbos
+          </ion-button>
+        </div>
+      </div>
+      
+      <div class="macros-visual">
+        <div class="macro-bar">
+          <div class="macro-segment protein" [style.width.%]="proteinPercentage">P</div>
+          <div class="macro-segment carbs" [style.width.%]="carbsPercentage">C</div>
+          <div class="macro-segment fat" [style.width.%]="fatPercentage">G</div>
+        </div>
+        <div class="percentage-labels">
+          <span class="percentage protein">{{ proteinPercentage }}%</span>
+          <span class="percentage carbs">{{ carbsPercentage }}%</span>
+          <span class="percentage fat">{{ fatPercentage }}%</span>
+        </div>
+      </div>
+      
+      <div class="macros-inputs">
+        <!-- Proteínas -->
+        <div class="macro-input-group">
+          <div class="macro-label protein">
+            <ion-icon name="fitness-outline"></ion-icon>
+            <span>Proteínas</span>
+          </div>
+          <div class="input-with-unit">
+            <ion-input 
+              type="number" 
+              formControlName="proteinas" 
+              placeholder="120" 
+              min="10" 
+              max="500"
+              inputmode="numeric">
+            </ion-input>
+            <span class="unit">g</span>
+          </div>
+        </div>
+        
+        <!-- Carbohidratos -->
+        <div class="macro-input-group">
+          <div class="macro-label carbs">
+            <ion-icon name="restaurant-outline"></ion-icon>
+            <span>Carbohidratos</span>
+          </div>
+          <div class="input-with-unit">
+            <ion-input 
+              type="number" 
+              formControlName="carbohidratos" 
+              placeholder="250" 
+              min="10" 
+              max="800"
+              inputmode="numeric">
+            </ion-input>
+            <span class="unit">g</span>
+          </div>
+        </div>
+        
+        <!-- Grasas -->
+        <div class="macro-input-group">
+          <div class="macro-label fat">
+            <ion-icon name="water-outline"></ion-icon>
+            <span>Grasas</span>
+          </div>
+          <div class="input-with-unit">
+            <ion-input 
+              type="number" 
+              formControlName="grasas" 
+              placeholder="70" 
+              min="10" 
+              max="300"
+              inputmode="numeric">
+            </ion-input>
+            <span class="unit">g</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="validation-messages">
+        <ion-note color="danger" *ngIf="(proteinPercentage + carbsPercentage + fatPercentage) > 105 || (proteinPercentage + carbsPercentage + fatPercentage) < 95">
+          La distribución de macros debe sumar aproximadamente 100% (actual: {{ proteinPercentage + carbsPercentage + fatPercentage }}%)
+        </ion-note>
+      </div>
+    </div>
+    
+    <!-- Botón de guardar -->
+    <ion-button 
+      expand="block" 
+      type="submit" 
+      class="save-button" 
+      [disabled]="goalsForm.invalid || loading">
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      <span *ngIf="!loading">Guardar cambios</span>
+    </ion-button>
+  </form>
+  
+  <div class="info-card">
+    <ion-item lines="none">
+      <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        <p>Los valores recomendados se basan en tu peso, altura, edad, género, nivel de actividad y objetivo.</p>
+        <p>Puedes ajustar estos valores manualmente según tus necesidades específicas.</p>
+      </ion-label>
+    </ion-item>
+  </div>
+</ion-content>

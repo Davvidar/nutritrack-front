@@ -1,0 +1,191 @@
+<ion-header>
+  <ion-toolbar class="custom-modal-toolbar">
+    <ion-title>Objetivos Nutricionales</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear" color="light" class="close-button">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="nutrition-goals-content ion-padding">
+  <form [formGroup]="goalsForm" (ngSubmit)="onSubmit()">
+
+    <div class="goals-card calories-card">
+      <div class="card-header">
+        <ion-label class="card-title">Objetivo diario de calorías</ion-label>
+        <ion-button
+          fill="clear"
+          size="small"
+          (click)="calculateMacrosFromStandardPercentages()"
+          [disabled]="!goalsForm.get('calorias')?.valid || (goalsForm.get('calorias')?.value || 0) === 0"
+          class="calculate-macros-button">
+          <ion-icon name="calculator-outline" slot="start"></ion-icon>
+          Distribuir macros
+        </ion-button>
+      </div>
+
+      <div class="calories-input-wrapper">
+        <ion-input
+          type="number"
+          formControlName="calorias"
+          placeholder="2000"
+          min="800"
+          max="10000"
+          inputmode="numeric"
+          class="calories-input-field">
+        </ion-input>
+        <span class="unit-label">kcal</span>
+      </div>
+
+      <ion-note color="danger" class="error-note" *ngIf="goalsForm.get('calorias')?.hasError('required') && goalsForm.get('calorias')?.touched">
+        Las calorías son obligatorias.
+      </ion-note>
+      <ion-note color="danger" class="error-note" *ngIf="goalsForm.get('calorias')?.hasError('min') && goalsForm.get('calorias')?.touched">
+        Mínimo 800 kcal.
+      </ion-note>
+      <ion-note color="danger" class="error-note" *ngIf="goalsForm.get('calorias')?.hasError('max') && goalsForm.get('calorias')?.touched">
+        Máximo 10000 kcal.
+      </ion-note>
+    </div>
+
+    <div class="goals-card macros-card">
+      <div class="card-header">
+        <ion-label class="card-title">Macronutrientes</ion-label>
+        <div class="distribution-buttons-wrapper">
+          <ion-button fill="outline" size="small" (click)="setBalancedDistribution()" class="preset-button">
+            Balanceado
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="setHighProteinDistribution()" class="preset-button">
+            Alto Proteína
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="setLowCarbDistribution()" class="preset-button">
+            Bajo Carbos
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="setHighCarbDistribution()" class="preset-button">
+            Alto Carbos
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="macros-progress-bar-container" *ngIf="(goalsForm.get('calorias')?.value || 0) > 0">
+        <div class="macros-progress-bar">
+          <div class="progress-segment protein" [style.width.%]="proteinPercentage" [attr.data-label]="proteinPercentage + '% P'"></div>
+          <div class="progress-segment carbs" [style.width.%]="carbsPercentage" [attr.data-label]="carbsPercentage + '% C'"></div>
+          <div class="progress-segment fat" [style.width.%]="fatPercentage" [attr.data-label]="fatPercentage + '% G'"></div>
+        </div>
+        <div class="percentage-labels-container">
+          <span class="percentage-label protein">{{ proteinPercentage }}% Proteína</span>
+          <span class="percentage-label carbs">{{ carbsPercentage }}% Carbos</span>
+          <span class="percentage-label fat">{{ fatPercentage }}% Grasa</span>
+        </div>
+      </div>
+
+      <div class="macros-inputs-container">
+        <div class="macro-input-row">
+          <div class="macro-label-icon protein">
+            <div class="macro-icon-circle protein-bg">P</div>
+            <span>Proteínas</span>
+          </div>
+          <div class="input-field-with-unit">
+            <ion-input
+              type="number"
+              formControlName="proteinas"
+              placeholder="120"
+              min="10"
+              max="500"
+              inputmode="numeric"
+              class="macro-input-field">
+            </ion-input>
+            <span class="unit-label">g</span>
+          </div>
+        </div>
+         <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('proteinas')?.hasError('required') && goalsForm.get('proteinas')?.touched">
+            Obligatorio.
+          </ion-note>
+          <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('proteinas')?.hasError('min') && goalsForm.get('proteinas')?.touched">
+            Mín. 10g.
+          </ion-note>
+
+        <div class="macro-input-row">
+          <div class="macro-label-icon carbs">
+            <div class="macro-icon-circle carbs-bg">H</div>
+            <span>Carbohidratos</span>
+          </div>
+          <div class="input-field-with-unit">
+            <ion-input
+              type="number"
+              formControlName="carbohidratos"
+              placeholder="250"
+              min="10"
+              max="800"
+              inputmode="numeric"
+              class="macro-input-field">
+            </ion-input>
+            <span class="unit-label">g</span>
+          </div>
+        </div>
+        <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('carbohidratos')?.hasError('required') && goalsForm.get('carbohidratos')?.touched">
+            Obligatorio.
+        </ion-note>
+        <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('carbohidratos')?.hasError('min') && goalsForm.get('carbohidratos')?.touched">
+            Mín. 10g.
+        </ion-note>
+
+        <div class="macro-input-row">
+          <div class="macro-label-icon fat">
+            <div class="macro-icon-circle fat-bg">G</div>
+            <span>Grasas</span>
+          </div>
+          <div class="input-field-with-unit">
+            <ion-input
+              type="number"
+              formControlName="grasas"
+              placeholder="70"
+              min="10"
+              max="300"
+              inputmode="numeric"
+              class="macro-input-field">
+            </ion-input>
+            <span class="unit-label">g</span>
+          </div>
+        </div>
+        <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('grasas')?.hasError('required') && goalsForm.get('grasas')?.touched">
+            Obligatorio.
+        </ion-note>
+        <ion-note color="danger" class="error-note macro-error" *ngIf="goalsForm.get('grasas')?.hasError('min') && goalsForm.get('grasas')?.touched">
+            Mín. 10g.
+        </ion-note>
+      </div>
+
+      <div class="validation-message-container" *ngIf="goalsForm.get('calorias')?.value > 0 && (proteinPercentage + carbsPercentage + fatPercentage < 98 || proteinPercentage + carbsPercentage + fatPercentage > 102)">
+        <ion-note color="warning" class="warning-note">
+          <ion-icon name="warning-outline" slot="start"></ion-icon>
+          La distribución de macros suma {{ proteinPercentage + carbsPercentage + fatPercentage }}%. Idealmente, debería estar cerca del 100%.
+        </ion-note>
+      </div>
+    </div>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="save-goals-button"
+      [disabled]="goalsForm.invalid || loading">
+      <ion-spinner *ngIf="loading" name="dots" color="light"></ion-spinner>
+      <span *ngIf="!loading">Guardar Cambios</span>
+      <ion-icon *ngIf="!loading" name="checkmark-done-outline" slot="end"></ion-icon>
+    </ion-button>
+  </form>
+
+  <div class="info-card-container">
+    <ion-item lines="none" class="info-item">
+      <ion-icon name="information-circle-outline" slot="start" color="primary" class="info-icon"></ion-icon>
+      <ion-label class="ion-text-wrap info-text">
+        <p>Los valores recomendados se basan en tu perfil. Puedes ajustarlos manualmente según tus necesidades.</p>
+        <p>1g Proteína = 4 kcal | 1g Carbohidrato = 4 kcal | 1g Grasa = 9 kcal.</p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+</ion-content>

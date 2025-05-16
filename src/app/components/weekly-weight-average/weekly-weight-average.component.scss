@@ -1,0 +1,116 @@
+// src/app/components/weekly-weight-average/weekly-weight-average.component.scss
+:host {
+  --card-border-radius: 16px;
+  --weight-card-size: 110px;
+  --hexagon-size: 40px;
+  --color-weight-loss: #27ae60;
+  --color-weight-gain: #e74c3c;
+}
+
+.weight-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  
+  .weight-card {
+    width: var(--weight-card-size);
+    text-align: center;
+    position: relative;
+    
+    .hexagon-shape {
+      width: var(--hexagon-size);
+      height: var(--hexagon-size);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      
+      ion-icon {
+        font-size: 20px;
+        color: white;
+      }
+    }
+    
+    .orange-hexagon { background-color: #E65100; }
+    .purple-hexagon { background-color: #7B1FA2; }
+    
+    .weight-label {
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin-bottom: 5px;
+    }
+    
+    .weight-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      line-height: 1.2;
+    }
+    
+    .weight-date, .weight-remaining {
+      font-size: 0.75rem;
+      color: var(--ion-color-medium);
+      margin-top: 5px;
+    }
+  }
+  
+  .weight-current-container {
+    text-align: center;
+    
+    .weight-card.current {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 5px;
+      
+      .weight-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--ion-color-primary);
+      }
+      
+      .weight-unit {
+        font-size: 1.2rem;
+        color: var(--ion-color-primary-shade);
+        font-weight: 500;
+      }
+      
+      .weight-change {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border-radius: 15px;
+        padding: 3px 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        
+        &.weight-loss {
+          color: var(--color-weight-loss);
+        }
+        
+        &.weight-gain {
+          color: var(--color-weight-gain);
+        }
+        
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+    
+    .weight-date-current {
+      font-size: 0.85rem;
+      color: var(--ion-color-primary);
+      font-weight: 500;
+    }
+  }
+}

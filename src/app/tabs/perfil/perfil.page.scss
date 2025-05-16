@@ -4,7 +4,7 @@
   --header-height: 180px;
   --weight-card-size: 110px;
   --hexagon-size: 40px;
-  
+
   --color-weight-loss: #27ae60;
   --color-weight-gain: #e74c3c;
   --color-calories: #8c63d0;
@@ -17,55 +17,82 @@
 
 // Header estilizado con gradiente
 ion-header.profile-header {
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+  background: linear-gradient(135deg, var(--ion-color-primary));
   height: var(--header-height);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 30px 30px;
 
-  .profile-info{
+  .profile-info {
     display: flex;
     flex-direction: column;
     margin-left: 15px;
   }
-  .profile-name{
+
+  .profile-name {
     font-size: 1.8rem;
     font-weight: 700;
     color: white;
   }
+
+  .ajustes{
+      display: flex;
+      justify-content: space-between;
+   
+    }
+    .ajustes ion-button{
+      padding-right: 20px;
+    }
+
   ion-toolbar {
     --background: transparent;
     --color: white;
     --min-height: 60px;
+ 
 
-    
+
     .header-content {
-  
-      width: 100%;
-      padding: 10px 0;
-    }
+
+    margin: 0;
     
+    &.ion-no-border {
+        ion-toolbar {
+          --border-width: 0;
+          
+        }
+      }
+    ion-toolbar.nutri-header {
+        --border-width: 0;
+        --background: var(--ion-color-primary);
+        text-align: center;
+       
+    }
+    }
+
     text-align: center;
+
     .user-info {
+
+      
       h1 {
         font-size: 1.8rem;
         font-weight: 700;
         margin: 0 0 8px 0;
         color: white;
       }
-      
-      
+
+
       .objective-badge {
         display: inline-flex;
         align-items: center;
         background: rgba(255, 255, 255, 0.2);
         border-radius: 20px;
         padding: 4px 12px;
-        
+
         ion-icon {
           margin-right: 6px;
           font-size: 16px;
         }
-        
+
         span {
           font-size: 0.9rem;
           font-weight: 500;
@@ -73,55 +100,43 @@ ion-header.profile-header {
       }
     }
     
-    .header-actions {
-      display: flex;
-      gap: 5px;
-      
-      ion-button {
-        --padding-start: 8px;
-        --padding-end: 8px;
-        height: 40px;
-        
-        ion-icon {
-          font-size: 1.2rem;
-        }
-      }
-    }
+
   }
 }
 
 // Contenido principal con margen superior negativo para solapar con el header
 ion-content.profile-content {
   --background: #f4f5f8;
-  
-  .loading-container, .error-container {
+
+  .loading-container,
+  .error-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
     text-align: center;
-    
+
     ion-spinner {
       margin-bottom: 20px;
       width: 50px;
       height: 50px;
       color: var(--ion-color-primary);
     }
-    
+
     ion-icon {
       font-size: 50px;
       color: var(--ion-color-danger);
       margin-bottom: 20px;
     }
-    
+
     p {
       margin-bottom: 20px;
       color: var(--ion-color-medium);
       font-size: 16px;
     }
   }
-  
+
   // Sección de título común
   .section-title {
     display: flex;
@@ -131,20 +146,21 @@ ion-content.profile-content {
     color: var(--ion-color-dark);
     margin: 0 0 15px 0;
     padding: 0 5px;
-    
+
     ion-icon {
       margin-right: 10px;
       font-size: 1.3rem;
       color: var(--ion-color-primary);
     }
-    
-    .add-button, .edit-button {
+
+    .add-button,
+    .edit-button {
       margin-left: auto;
       font-size: 0.9rem;
       --padding-start: 8px;
       --padding-end: 8px;
       height: 30px;
-      
+
       ion-icon {
         font-size: 1.1rem;
         margin-right: 4px;
@@ -152,22 +168,33 @@ ion-content.profile-content {
       }
     }
   }
-  
+
   // Contenedor de nutrición
   .nutrition-container {
     background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     border-radius: var(--card-border-radius);
-    margin: -60px 16px 20px;
+    margin: 5px 16px 20px;
     padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 10;
-    
+
+    .nutrition-header {
+      display: flex;
+      justify-content: space-between;
+
+      ion-icon {
+        font-size: 30px;
+        color: (--ion-color-primary);
+        top: auto;
+      }
+    }
+
     .stats-cards {
       display: flex;
       gap: 15px;
       margin-top: 20px;
-      
+
       .stat-card {
         flex: 1;
         display: flex;
@@ -175,7 +202,7 @@ ion-content.profile-content {
         background: var(--ion-color-light);
         border-radius: 12px;
         padding: 15px;
-        
+
         .stat-icon {
           width: 40px;
           height: 40px;
@@ -184,31 +211,31 @@ ion-content.profile-content {
           align-items: center;
           justify-content: center;
           margin-right: 12px;
-          
+
           ion-icon {
             font-size: 20px;
             color: white;
           }
-          
+
           &.calories-icon {
             background-color: var(--color-calories);
           }
-          
+
           &.protein-icon {
             background-color: var(--color-protein);
           }
         }
-        
+
         .stat-data {
           display: flex;
           flex-direction: column;
-          
+
           .stat-label {
             font-size: 0.8rem;
             color: var(--ion-color-medium);
             margin-bottom: 4px;
           }
-          
+
           .stat-value {
             font-size: 1.1rem;
             font-weight: 600;
@@ -218,7 +245,7 @@ ion-content.profile-content {
       }
     }
   }
-  
+
   // Contenedor de peso
   .weight-container {
     background: white;
@@ -226,18 +253,18 @@ ion-content.profile-content {
     margin: 0 16px 20px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    
+
     .weight-summary {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 30px;
-      
+
       .weight-card {
         width: var(--weight-card-size);
         text-align: center;
         position: relative;
-        
+
         .hexagon-shape {
           width: var(--hexagon-size);
           height: var(--hexagon-size);
@@ -246,59 +273,68 @@ ion-content.profile-content {
           align-items: center;
           justify-content: center;
           border-radius: 8px;
-          
+
           ion-icon {
             font-size: 20px;
             color: white;
           }
         }
-        
-        .orange-hexagon { background-color: #E65100; }
-        .yellow-hexagon { background-color: #FFA000; }
-        .purple-hexagon { background-color: #7B1FA2; }
-        
+
+        .orange-hexagon {
+          background-color: #E65100;
+        }
+
+        .yellow-hexagon {
+          background-color: #FFA000;
+        }
+
+        .purple-hexagon {
+          background-color: #7B1FA2;
+        }
+
         .weight-label {
           font-size: 0.8rem;
           color: var(--ion-color-medium);
           margin-bottom: 5px;
         }
-        
+
         .weight-value {
           font-size: 1.5rem;
           font-weight: 700;
           color: var(--ion-color-dark);
           line-height: 1.2;
         }
-        
-        .weight-date, .weight-remaining {
+
+        .weight-date,
+        .weight-remaining {
           font-size: 0.75rem;
           color: var(--ion-color-medium);
           margin-top: 5px;
         }
       }
-      
+
       .weight-current-container {
         text-align: center;
-        
+
         .weight-card.current {
           display: flex;
           align-items: baseline;
           justify-content: center;
           gap: 5px;
           margin-bottom: 5px;
-          
+
           .weight-value {
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--ion-color-primary);
           }
-          
+
           .weight-unit {
             font-size: 1.2rem;
             color: var(--ion-color-primary-shade);
             font-weight: 500;
           }
-          
+
           .weight-change {
             position: absolute;
             top: -20px;
@@ -313,21 +349,21 @@ ion-content.profile-content {
             display: flex;
             align-items: center;
             gap: 3px;
-            
+
             &.weight-loss {
               color: var(--color-weight-loss);
             }
-            
+
             &.weight-gain {
               color: var(--color-weight-gain);
             }
-            
+
             ion-icon {
               font-size: 1rem;
             }
           }
         }
-        
+
         .weight-date-current {
           font-size: 0.85rem;
           color: var(--ion-color-primary);
@@ -335,16 +371,16 @@ ion-content.profile-content {
         }
       }
     }
-    
+
     // Gráfico simplificado
     .weight-chart-container {
       margin-top: 20px;
-      
+
       .weight-chart-placeholder {
         position: relative;
         height: 40px;
         margin: 0 auto;
-        
+
         .chart-line {
           position: absolute;
           top: 50%;
@@ -354,7 +390,7 @@ ion-content.profile-content {
           background: linear-gradient(to right, #E65100, var(--ion-color-primary), #7B1FA2);
           transform: translateY(-50%);
         }
-        
+
         .chart-dot {
           position: absolute;
           width: 14px;
@@ -362,12 +398,12 @@ ion-content.profile-content {
           border-radius: 50%;
           top: 50%;
           transform: translateY(-50%);
-          
+
           &.start {
             left: 0;
             background-color: #E65100;
           }
-          
+
           &.current {
             left: 50%;
             background-color: var(--ion-color-primary);
@@ -377,20 +413,20 @@ ion-content.profile-content {
             border: 2px solid white;
             box-shadow: 0 0 0 2px var(--ion-color-primary);
           }
-          
+
           &.target {
             right: 0;
             background-color: #7B1FA2;
           }
         }
       }
-      
+
       .chart-labels {
         display: flex;
         justify-content: space-between;
         margin-top: 10px;
         padding: 0 5px;
-        
+
         span {
           font-size: 0.8rem;
           color: var(--ion-color-medium);
@@ -398,7 +434,7 @@ ion-content.profile-content {
       }
     }
   }
-  
+
   // Información personal
   .personal-info {
     background: white;
@@ -406,22 +442,22 @@ ion-content.profile-content {
     margin: 0 16px 20px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    
+
     .info-list {
       background: transparent;
-      
+
       ion-item {
         --background: transparent;
         --padding-start: 0;
         --inner-padding-end: 0;
         --min-height: 50px;
-        
+
         ion-icon {
           color: var(--ion-color-primary);
           font-size: 1.2rem;
           margin-right: 15px;
         }
-        
+
         ion-label {
           h3 {
             font-size: 0.95rem;
@@ -429,7 +465,7 @@ ion-content.profile-content {
             color: var(--ion-color-dark);
             margin-bottom: 2px;
           }
-          
+
           p {
             font-size: 1rem;
             color: var(--ion-color-medium-shade);
@@ -438,7 +474,7 @@ ion-content.profile-content {
       }
     }
   }
-  
+
   // Botón de cerrar sesión al final
   .logout-button {
     margin: 0 16px 40px;
@@ -455,7 +491,7 @@ ion-content.profile-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   ion-spinner {
     width: 40px;
     height: 40px;
@@ -468,7 +504,7 @@ ion-content.profile-content {
   margin: 0 auto;
   --color: var(--ion-color-primary);
   font-size: 0.9rem;
-  
+
   ion-icon {
     margin-right: 5px;
   }
