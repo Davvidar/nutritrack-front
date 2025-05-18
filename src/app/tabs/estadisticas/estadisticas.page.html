@@ -1,0 +1,108 @@
+<ion-header>
+  <ion-toolbar class="nutri-header">
+    <img src="../../../assets/Nutritrack_letras.png" alt="logo NutriTrack" class="nutri-header" />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="calendar-container">
+    <div class="month-navigation">
+      <ion-button fill="clear" (click)="prevMonth()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+      <h2>{{ monthName }}</h2>
+      <ion-button fill="clear" (click)="nextMonth()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div class="weekdays-header">
+      <div class="weekday">L</div>
+      <div class="weekday">M</div>
+      <div class="weekday">X</div>
+      <div class="weekday">J</div>
+      <div class="weekday">V</div>
+      <div class="weekday">S</div>
+      <div class="weekday">D</div>
+    </div>
+    
+    <div class="calendar-grid">
+      <div class="calendar-day" 
+           *ngFor="let day of calendarDays"
+           [class.outside-month]="day.date.getMonth() !== currentMonth.getMonth()"
+           [class.today]="isToday(day.date)"
+           [class.selected]="isSelected(day.date)"
+           [class.has-data]="day.hasData"
+           (click)="selectDate(day.date)">
+        <span class="day-number">{{ day.date.getDate() }}</span>
+        <div class="day-weight" *ngIf="day.hasData && day.weight">
+          {{ day.weight }}kg
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="day-stats-container">
+    <h3 class="selected-date-title">
+      <ion-icon name="calendar-outline"></ion-icon>
+      {{ formatDate(selectedDate) }}
+    </h3>
+    
+    <ion-spinner *ngIf="loading" class="stats-spinner"></ion-spinner>
+    
+    <app-nutrition-stats-card
+        [nutritionData]="nutritionData"
+        [date]="selectedDate"
+        *ngIf="!loading"> 
+    </app-nutrition-stats-card>
+    </div>
+  
+  <div class="weight-chart-container">
+    <h3 class="section-title">
+      <ion-icon name="trending-up-outline"></ion-icon>
+      Evolución del Peso
+    </h3>
+    
+    <ion-card class="styled-card" *ngIf="!loading && weightData && weightData.length > 0">
+      <ion-card-content>
+        <app-weight-chart [weightData]="weightData"></app-weight-chart>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="no-data-card styled-card" *ngIf="!loading && (!weightData || weightData.length === 0)">
+      <ion-card-content>
+        <ion-icon name="scale-outline"></ion-icon>
+        <p>No hay suficientes datos para mostrar la evolución</p>
+        <ion-note>Registra tu peso diariamente para ver la evolución</ion-note>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  
+  <div class="stats-summary-container" *ngIf="!loading && weightData && weightData.length > 1">
+    <ion-card class="styled-card">
+      <ion-card-header>
+        <ion-card-title>Resumen</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="summary-item">
+          <div class="summary-label">Peso inicial</div>
+          <div class="summary-value">{{ weightData[0].peso || '–' }} kg</div>
+        </div>
+        
+        <div class="summary-item">
+          <div class="summary-label">Peso actual</div>
+          <div class="summary-value">{{ weightData[weightData.length - 1].peso || '–' }} kg</div>
+        </div>
+        
+        <div class="summary-item" *ngIf="weightData.length > 1">
+          <div class="summary-label">Cambio total</div>
+          <div class="summary-value" 
+               [class.weight-gain]="weightData[0] && weightData[weightData.length - 1] && (weightData[weightData.length - 1].peso - weightData[0].peso) > 0"
+               [class.weight-loss]="weightData[0] && weightData[weightData.length - 1] && (weightData[weightData.length - 1].peso - weightData[0].peso) < 0">
+            {{ weightData[0] && weightData[weightData.length - 1] ? (weightData[weightData.length - 1].peso - weightData[0].peso).toFixed(1) : '–' }} kg
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

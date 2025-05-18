@@ -59,6 +59,10 @@ export const routes: Routes = [
         path: 'perfil',
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
       },
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./tabs/estadisticas/estadisticas.page').then(m => m.EstadisticasPage)
+      },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }
     ]
   },

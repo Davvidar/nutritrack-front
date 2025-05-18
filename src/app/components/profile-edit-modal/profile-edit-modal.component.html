@@ -16,34 +16,37 @@
   </div>
 
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
-    <ion-list lines="full" class="ion-no-margin">
-      <ion-list-header lines="full">
+
+    <section class="form-section">
+      <ion-list-header class="ion-no-padding">
         <ion-label>Información Personal</ion-label>
       </ion-list-header>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Nombre <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="nombre" type="text" required></ion-input>
+        <ion-input formControlName="nombre" type="text" required placeholder="Introduce tu nombre"></ion-input>
         <ion-note slot="error" *ngIf="profileForm.get('nombre')?.touched && profileForm.get('nombre')?.errors?.['required']">
           El nombre es obligatorio
         </ion-note>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Apellido <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="apellido" type="text" required></ion-input>
+        <ion-input formControlName="apellido" type="text" required placeholder="Introduce tu apellido"></ion-input>
         <ion-note slot="error" *ngIf="profileForm.get('apellido')?.touched && profileForm.get('apellido')?.errors?.['required']">
           El apellido es obligatorio
         </ion-note>
       </ion-item>
+    </section>
 
-      <ion-list-header lines="full">
+    <section class="form-section">
+      <ion-list-header class="ion-no-padding">
         <ion-label>Datos Biométricos</ion-label>
       </ion-list-header>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Peso (kg) <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="peso" type="number" required inputmode="decimal"></ion-input>
+        <ion-input formControlName="peso" type="number" required inputmode="decimal" placeholder="Ej: 70.5"></ion-input>
         <ion-note slot="error" *ngIf="profileForm.get('peso')?.touched && profileForm.get('peso')?.errors?.['required']">
           El peso es obligatorio
         </ion-note>
@@ -52,9 +55,9 @@
         </ion-note>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Altura (cm) <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="altura" type="number" required inputmode="decimal"></ion-input>
+        <ion-input formControlName="altura" type="number" required inputmode="decimal" placeholder="Ej: 175"></ion-input>
         <ion-note slot="error" *ngIf="profileForm.get('altura')?.touched && profileForm.get('altura')?.errors?.['required']">
           La altura es obligatoria
         </ion-note>
@@ -63,9 +66,9 @@
         </ion-note>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Edad <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="edad" type="number" required inputmode="numeric"></ion-input>
+        <ion-input formControlName="edad" type="number" required inputmode="numeric" placeholder="Ej: 30"></ion-input>
         <ion-note slot="error" *ngIf="profileForm.get('edad')?.touched && profileForm.get('edad')?.errors?.['required']">
           La edad es obligatoria
         </ion-note>
@@ -74,23 +77,25 @@
         </ion-note>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Sexo <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="sexo" interface="action-sheet" cancelText="Cancelar">
+        <ion-select formControlName="sexo" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu sexo">
           <ion-select-option *ngFor="let s of sexos" [value]="s">{{ s | titlecase }}</ion-select-option>
         </ion-select>
         <ion-note slot="error" *ngIf="profileForm.get('sexo')?.touched && profileForm.get('sexo')?.errors?.['required']">
           El sexo es obligatorio
         </ion-note>
       </ion-item>
+    </section>
 
-      <ion-list-header lines="full">
+    <section class="form-section">
+      <ion-list-header class="ion-no-padding">
         <ion-label>Objetivos y Actividad</ion-label>
       </ion-list-header>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Objetivo <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="objetivo" interface="action-sheet" cancelText="Cancelar">
+        <ion-select formControlName="objetivo" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu objetivo">
           <ion-select-option *ngFor="let o of objetivos" [value]="o">{{ o | titlecase }}</ion-select-option>
         </ion-select>
         <ion-note slot="error" *ngIf="profileForm.get('objetivo')?.touched && profileForm.get('objetivo')?.errors?.['required']">
@@ -98,16 +103,16 @@
         </ion-note>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label position="stacked">Nivel de actividad <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="actividad" interface="action-sheet" cancelText="Cancelar">
+        <ion-select formControlName="actividad" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu nivel">
           <ion-select-option *ngFor="let a of actividades" [value]="a">{{ a | titlecase }}</ion-select-option>
         </ion-select>
         <ion-note slot="error" *ngIf="profileForm.get('actividad')?.touched && profileForm.get('actividad')?.errors?.['required']">
           El nivel de actividad es obligatorio
         </ion-note>
       </ion-item>
-    </ion-list>
+    </section>
 
     <div class="form-actions">
       <ion-button expand="block" type="submit" [disabled]="profileForm.invalid">

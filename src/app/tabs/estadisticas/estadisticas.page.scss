@@ -1,0 +1,279 @@
+// src/app/tabs/estadisticas/estadisticas.page.scss
+
+// Variables para colores y estilos consistentes
+:host {
+  --calendar-bg-color: var(--ion-color-light);
+  --calendar-border: #e0e0e0;
+  --day-hover-bg: #f5f5f5;
+  --day-selected-bg: var(--ion-color-primary);
+  --day-selected-color: white;
+  --day-outside-month-color: #bdbdbd;
+  --day-today-border: var(--ion-color-primary);
+  --day-has-data-indicator: var(--ion-color-primary);
+  
+  // Colores para nutricionales (ahora principalmente en nutrition-stats-card)
+  --color-calories: #8c63d0;
+  --color-protein: #5046c8;
+  --color-carbs: #ff8c42;
+  --color-fat: #d4ca3a;
+  
+  // Colores para peso
+  --color-weight-gain: #e74c3c;
+  --color-weight-loss: #27ae60;
+}
+
+// Estilo base para las tarjetas en esta página para consistencia
+.styled-card {
+  margin-left: 0; // Containers (like .weight-chart-container) already have margin
+  margin-right: 0;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Estilos del header
+ion-header.nutri-header {
+  img {
+    display: block;
+    margin: 0 auto;
+    height: 40px;
+    padding: 8px 0;
+  }
+}
+
+// Contenedor del calendario
+.calendar-container {
+  background: white;
+  border-radius: 10px; // Manteniendo su estilo distintivo
+  margin: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Manteniendo su sombra distintiva
+  
+  .month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    
+    ion-button {
+      --color: var(--ion-color-primary);
+      margin: 0;
+      height: 36px;
+    }
+  }
+  
+  .weekdays-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+    
+    .weekday {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      padding: 8px 0;
+    }
+  }
+  
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: var(--day-hover-bg);
+      }
+      
+      &.outside-month {
+        .day-number {
+          color: var(--day-outside-month-color);
+        }
+      }
+      
+      &.today {
+        border: 2px solid var(--day-today-border);
+        font-weight: 600;
+      }
+      
+      &.selected {
+        background-color: var(--day-selected-bg);
+        .day-number, .day-weight { // Ensure weight text is also visible
+          color: var(--day-selected-color);
+        }
+      }
+      
+      &.has-data {
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 4px; // Ligeramente más visible
+          width: 5px;  // Ligeramente más visible
+          height: 5px; // Ligeramente más visible
+          border-radius: 50%;
+          background-color: var(--day-has-data-indicator);
+        }
+        // Cambiar color del punto si el día está seleccionado para asegurar visibilidad
+        &.selected::after {
+            background-color: var(--day-selected-color); // e.g., white
+        }
+      }
+      
+      .day-number {
+        font-size: 0.9rem;
+      }
+      
+      .day-weight {
+        font-size: 0.7rem;
+        color: var(--ion-color-medium); // Se cambiará a blanco si está seleccionado (ver arriba)
+      }
+    }
+  }
+}
+
+// Estilos para la sección de estadísticas del día
+.day-stats-container {
+  margin: 16px;
+  
+  .selected-date-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px; // Aumentado para más espacio antes de la card
+    color: var(--ion-color-dark);
+    
+    ion-icon {
+      color: var(--ion-color-primary);
+      font-size: 1.2rem;
+    }
+  }
+  
+  .stats-spinner {
+    display: block;
+    margin: 40px auto;
+    --color: var(--ion-color-primary);
+  }
+
+  // Los estilos de .nutrition-summary, .nutrition-item, .nutrition-row, etc.,
+  // han sido eliminados porque app-nutrition-stats-card ahora los maneja.
+  
+  .no-data-card { // Este es el general, si app-nutrition-stats-card no se muestra
+    text-align: center;
+    padding: 24px 16px;
+    // .styled-card se aplicará desde HTML para border-radius y box-shadow
+
+    ion-icon {
+      font-size: 48px;
+      color: var(--ion-color-medium);
+      margin-bottom: 16px;
+    }
+    
+    p {
+      margin: 0 0 8px 0;
+      font-size: 1rem; 
+      color: var(--ion-color-dark);
+    }
+    ion-note { // Específico para el empty state del gráfico de peso
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+    }
+  }
+}
+
+// Estilos para el gráfico de peso
+.weight-chart-container {
+  margin: 16px;
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--ion-color-dark);
+    
+    ion-icon {
+      color: var(--ion-color-primary);
+      font-size: 1.2rem;
+    }
+  }
+  
+  // Eliminar estilos de canvas aquí, ya que WeightChartComponent los maneja
+  // canvas {
+  //   width: 100% !important;
+  //   height: 200px !important; // Conflictuaba con el componente
+  // }
+
+  // Aplicar .styled-card a ion-card directamente en el HTML
+}
+
+// Estilos para el resumen estadístico
+.stats-summary-container {
+  margin: 16px;
+  
+  // Aplicar .styled-card a ion-card directamente en el HTML
+
+  ion-card-title { // Estilo ya presente en el componente, aquí para el resumen
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0; // Ajustar padding si es dentro de ion-card-content
+    border-bottom: 1px solid var(--ion-color-light-shade);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-label {
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+    }
+    
+    .summary-value {
+      font-size: 1rem;
+      font-weight: 600;
+      
+      &.weight-gain {
+        color: var(--color-weight-gain);
+      }
+      
+      &.weight-loss {
+        color: var(--color-weight-loss);
+      }
+    }
+  }
+}
+
+// Responsive: La responsividad de la nutrición ahora es manejada por NutritionStatsCardComponent
+// El media query anterior que solo afectaba a .nutrition-summary puede ser eliminado si no hay otras reglas.
+// El @media (min-width: 576px) block original solo contenía .nutrition-summary .nutrition-row

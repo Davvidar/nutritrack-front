@@ -1,4 +1,3 @@
-// src/app/tabs/inicio/search/search.page.ts
 import { Component, OnInit } from '@angular/core';
 import { IonicModule, LoadingController, ToastController, Platform, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -11,6 +10,7 @@ import { RecipeService, Recipe } from '../../../services/recipe.service';
 import { BarcodeScannerService } from '../../../services/barcode-scanner.service';
 import { AuthService } from '../../../services/auth.service';
 import { OpenFoodFactsService } from '../../../services/open-food-facts.service';
+import { FavoritesService } from '../../../services/favorites.service';
 
 @Component({
   selector: 'app-search',
@@ -76,7 +76,8 @@ export class SearchPage implements OnInit {
     private alertController: AlertController,
     private barcodeScannerService: BarcodeScannerService,
     private openFoodFactsService: OpenFoodFactsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private favoritesService: FavoritesService
   ) {}
 
   ngOnInit() {
@@ -99,10 +100,9 @@ export class SearchPage implements OnInit {
   }
 
   private loadUserFavorites(): void {
-    this.authService.currentUser$.subscribe(user => {
-      if (user && user.favoritos) {
-        this.favorites = new Set(user.favoritos.map(fav => fav.refId?.toString()));
-      }
+    // Suscribirse al observable de favoritos del servicio
+    this.favoritesService.favorites$.subscribe(favoritesSet => {
+      this.favorites = favoritesSet;
     });
   }
 
@@ -146,23 +146,32 @@ export class SearchPage implements OnInit {
 
   // Verificar si es favorito
   isFavorite(item: Product): boolean {
-    return this.favorites.has(item._id);
+    return this.favoritesService.isFavorite(item._id);
   }
 
   // Alternar favorito
   toggleFavorite(event: Event, item: Product): void {
     event.stopPropagation();
     
-    if (this.favorites.has(item._id)) {
-      this.favorites.delete(item._id);
-      this.presentToast('Eliminado de favoritos');
-    } else {
-      this.favorites.add(item._id);
-      this.presentToast('Añadido a favoritos');
-    }
+    // Usar el servicio de favoritos para toggle y guardar en backend
+    const loading = this.presentLoading('Actualizando favoritos...');
     
-    // TODO: Guardar favoritos en el backend
-    // this.saveFavorites();
+    this.favoritesService.toggleFavorite(item._id, 'product').subscribe({
+      next: (added) => {
+        loading.then(loader => loader.dismiss());
+        this.presentToast(added ? 'Añadido a favoritos' : 'Eliminado de favoritos');
+        
+        // Si estamos en la vista de favoritos, actualizar la lista
+        if (this.activeFilter === 'favorites') {
+          this.loadData(true);
+        }
+      },
+      error: (err) => {
+        loading.then(loader => loader.dismiss());
+        console.error('Error al actualizar favoritos:', err);
+        this.presentErrorToast('Error al actualizar favoritos');
+      }
+    });
   }
 
   // Importar producto de Open Food Facts
@@ -252,26 +261,58 @@ export class SearchPage implements OnInit {
   }
 
   private loadFavorites(reset: boolean) {
-    // Filtrar productos favoritos
-    this.productService.searchProducts(this.searchQuery, false, true).subscribe({
-      next: (response: Product[]) => {
-        this.loadingSearch = false;
+    // Obtener primero la lista de IDs favoritos
+    this.favoritesService.getFavorites().subscribe({
+      next: (favoriteItems) => {
+        // Filtrar solo productos favoritos
+        const productFavorites = favoriteItems.filter(fav => fav.tipo === 'product');
+        const productIds = productFavorites.map(fav => fav.refId);
         
-        // Filtrar solo favoritos
-        const favoriteProducts = response.filter(product => 
-          this.favorites.has(product._id)
-        );
+        if (productIds.length === 0) {
+          this.loadingSearch = false;
+          this.allProducts = [];
+          this.totalItems = 0;
+          this.paginateResults(reset);
+          return;
+        }
         
-        this.allProducts = favoriteProducts;
-        this.totalItems = favoriteProducts.length;
-        
-        // Paginar los resultados
-        this.paginateResults(reset);
+        // Cargar los productos favoritos
+        this.productService.getAll().subscribe({
+          next: (products) => {
+            this.loadingSearch = false;
+            
+            // Filtrar solo los productos que están en favoritos
+            const favoriteProducts = products.filter(product => 
+              productIds.includes(product._id)
+            );
+            
+            // Aplicar búsqueda si hay query
+            let filteredProducts = favoriteProducts;
+            if (this.searchQuery) {
+              const query = this.searchQuery.toLowerCase();
+              filteredProducts = favoriteProducts.filter(product => 
+                product.nombre.toLowerCase().includes(query) || 
+                (product.marca && product.marca.toLowerCase().includes(query))
+              );
+            }
+            
+            this.allProducts = filteredProducts;
+            this.totalItems = filteredProducts.length;
+            this.paginateResults(reset);
+          },
+          error: (err) => {
+            this.loadingSearch = false;
+            this.loading = false;
+            console.error('Error al cargar favoritos:', err);
+            this.error = 'No se pudieron cargar los favoritos';
+            this.presentErrorToast('Error al cargar favoritos');
+          }
+        });
       },
       error: (err) => {
         this.loadingSearch = false;
         this.loading = false;
-        console.error('Error al cargar favoritos:', err);
+        console.error('Error al obtener lista de favoritos:', err);
         this.error = 'No se pudieron cargar los favoritos';
         this.presentErrorToast('Error al cargar favoritos');
       }
@@ -323,6 +364,7 @@ export class SearchPage implements OnInit {
     }, 300); // 300ms de debounce
   }
 
+  // RESTO DE LOS MÉTODOS NO CAMBIAN...
   // Buscar en Open Food Facts
   searchOpenFoodFacts() {
     if (!navigator.onLine) {
@@ -435,6 +477,7 @@ export class SearchPage implements OnInit {
       event.target.disabled = true;
     }
   }
+  
   async prepareScanner() {
     try {
       // Verificar permisos de cámara
@@ -512,38 +555,67 @@ export class SearchPage implements OnInit {
 
   // Manejar resultado del código de barras
   async handleBarcodeResult(barcode: string) {
-    const loading = await this.presentLoading();
+  const loading = await this.presentLoading();
 
-    try {
-      // Buscar producto por código de barras
-      this.productService.getByBarcode(barcode).subscribe({
-        next: (product) => {
-          loading.dismiss();
-          // Si se encuentra el producto, navegar a su página de detalle
-          this.router.navigate(['/tabs/inicio/product', product._id], {
-            queryParams: {
-              date: this.dateParam,
-              meal: this.mealParam
+  try {
+    // 1. Buscar primero en la base de datos local
+    this.productService.getByBarcode(barcode).subscribe({
+      next: (product) => {
+        loading.dismiss();
+        // Si se encuentra el producto, navegar a su página de detalle
+        this.router.navigate(['/tabs/inicio/product', product._id], {
+          queryParams: {
+            date: this.dateParam,
+            meal: this.mealParam
+          }
+        });
+        this.presentToast('Producto encontrado');
+      },
+      error: (err) => {
+        // 2. Si no se encuentra en la base local (404), buscar en OpenFoodFacts
+        if (err.status === 404) {
+          // Verificar si hay conexión a internet
+          if (!navigator.onLine) {
+            loading.dismiss();
+            this.presentErrorToast('No hay conexión a internet para buscar en OpenFoodFacts');
+            this.presentNotFoundAlert(barcode);
+            return;
+          }
+
+          // Buscar en OpenFoodFacts
+          this.openFoodFactsService.searchByBarcode(barcode).subscribe({
+            next: (result) => {
+              loading.dismiss();
+              
+              if (result) {
+                // Si se encuentra en OpenFoodFacts, mostrar opciones al usuario
+                const productData = this.openFoodFactsService.convertToLocalProduct(result);
+                this.presentOpenFoodFactsProductAlert(productData, barcode);
+              } else {
+                // No se encontró en ninguna fuente
+                this.presentNotFoundAlertWithCreateOption(barcode);
+              }
+            },
+            error: (openFoodFactsError) => {
+              loading.dismiss();
+              console.error('Error buscando en OpenFoodFacts:', openFoodFactsError);
+              // Si hay error consultando OpenFoodFacts, ofrecer creación manual
+              this.presentNotFoundAlert(barcode);
             }
           });
-          this.presentToast('Producto encontrado');
-        },
-        error: (err) => {
+        } else {
           loading.dismiss();
-          if (err.status === 404) {
-            // Si no se encuentra, ofrecer crear un nuevo producto
-            this.presentNotFoundAlert(barcode);
-          } else {
-            this.presentErrorToast('Error al buscar el producto');
-          }
+          this.presentErrorToast('Error al buscar el producto');
         }
-      });
-    } catch (err) {
-      loading.dismiss();
-      console.error('Error procesando código de barras:', err);
-      this.presentErrorToast('Error al procesar el código de barras');
-    }
+      }
+    });
+  } catch (err) {
+    loading.dismiss();
+    console.error('Error procesando código de barras:', err);
+    this.presentErrorToast('Error al procesar el código de barras');
   }
+}
+  
   async presentNotFoundAlert(barcode: string) {
     const alert = await this.alertController.create({
       header: 'Producto no encontrado',
@@ -739,32 +811,32 @@ export class SearchPage implements OnInit {
     });
   }
 
-  async presentNotFoundAlertWithCreateOption(barcode: string) {
-    const alert = await this.alertController.create({
-      header: 'Producto no encontrado',
-      message: `No se encontró ningún producto con el código ${barcode} ni en tu base de datos ni en Open Food Facts. ¿Deseas crear uno nuevo?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Crear producto',
-          handler: () => {
-            this.router.navigate(['/tabs/inicio/create-product'], {
-              queryParams: {
-                date: this.dateParam,
-                meal: this.mealParam,
-                barcode: barcode
-              }
-            });
-          }
+ async presentNotFoundAlertWithCreateOption(barcode: string) {
+  const alert = await this.alertController.create({
+    header: 'Producto no encontrado',
+    message: `No se encontró ningún producto con el código ${barcode} ni en tu base de datos ni en OpenFoodFacts. ¿Deseas crear uno nuevo?`,
+    buttons: [
+      {
+        text: 'Cancelar',
+        role: 'cancel'
+      },
+      {
+        text: 'Crear producto',
+        handler: () => {
+          this.router.navigate(['/tabs/inicio/create-product'], {
+            queryParams: {
+              date: this.dateParam,
+              meal: this.mealParam,
+              barcode: barcode
+            }
+          });
         }
-      ]
-    });
+      }
+    ]
+  });
 
-    await alert.present();
-  }
+  await alert.present();
+}
 
   // Utilidades
   async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
@@ -821,7 +893,6 @@ export class SearchPage implements OnInit {
   trackByOpenFoodFacts(index: number, item: any): string {
     return item.codigoBarras || item._id || `off-${index}`;
   }
-
 
   goToCreateRecipe() {
     this.router.navigate(['/tabs/inicio/create-recipe'], {

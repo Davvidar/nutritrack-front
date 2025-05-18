@@ -299,9 +299,9 @@ ion-content.profile-content {
         }
 
         .weight-value {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
           font-weight: 700;
-          color: var(--ion-color-dark);
+          color: black;
           line-height: 1.2;
         }
 
@@ -324,13 +324,13 @@ ion-content.profile-content {
           margin-bottom: 5px;
 
           .weight-value {
-            font-size: 2.5rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--ion-color-primary);
           }
 
           .weight-unit {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--ion-color-primary-shade);
             font-weight: 500;
           }
@@ -365,7 +365,7 @@ ion-content.profile-content {
         }
 
         .weight-date-current {
-          font-size: 0.85rem;
+          font-size: 0.5rem;
           color: var(--ion-color-primary);
           font-weight: 500;
         }

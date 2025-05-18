@@ -1,6 +1,6 @@
 // src/app/services/recipe.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
@@ -33,14 +33,20 @@ export class RecipeService {
   private baseUrl = environment.API_URL + '/recipes';
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private authService: AuthService
-  ) {}
+  ) { }
 
   /** Obtiene todas las recetas (globales + propias) */
-  getAll(): Observable<Recipe[]> {
+  getAll(favoritos: boolean = false): Observable<Recipe[]> {
+    let params = new HttpParams();
+    if (favoritos) {
+      params = params.set('favoritos', 'true');
+    }
+
     return this.http.get<Recipe[]>(this.baseUrl, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getAuthHeaders(),
+      params
     });
   }
 
@@ -71,21 +77,23 @@ export class RecipeService {
       headers: this.authService.getAuthHeaders()
     });
   }
-  
+
   /** 
    * Busca recetas por nombre o ingredientes 
    * (método preparado para cuando el backend lo implemente)
    */
-  search(query: string = ''): Observable<Recipe[]> {
-    return this.getAll().pipe(
-      map(recipes => {
-        if (!query) return recipes;
-        
-        const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        return recipes.filter(recipe => 
-          recipe.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(normalizedQuery)
-        );
-      })
-    );
+  search(query: string = '', favoritos: boolean = false): Observable<Recipe[]> {
+    let params = new HttpParams();
+    if (query) {
+      params = params.set('query', query);
+    }
+    if (favoritos) {
+      params = params.set('favoritos', 'true');
+    }
+
+    return this.http.get<Recipe[]>(`${this.baseUrl}/search`, {
+      headers: this.authService.getAuthHeaders(),
+      params
+    });
   }
 }

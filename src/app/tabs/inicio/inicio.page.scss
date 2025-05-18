@@ -2,6 +2,7 @@ ion-header.nutri-header {
     margin: 0;
     box-shadow: 0;
     --border-width: 0;
+    
     &.ion-no-border {
       ion-toolbar {
           --border-width: 0;

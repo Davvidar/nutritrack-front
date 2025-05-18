@@ -1,4 +1,3 @@
-<!-- src/app/components/metrics-summary/metrics-summary.component.html -->
 <div class="nutrition-bar">
     <div class="nutrient-section">
       <div class="nutrient-header">
@@ -9,7 +8,9 @@
         </div>
       </div>
       <div class="progress-container">
-        <div class="progress-bar calories-bar" [style.width.%]="caloriesProgress"></div>
+        <div class="progress-bar calories-bar"
+             [style.width.%]="caloriesProgress"
+             [ngClass]="{'exceeded': caloriesExceeded}"></div>
       </div>
     </div>
     
@@ -22,7 +23,9 @@
         </div>
       </div>
       <div class="progress-container">
-        <div class="progress-bar protein-bar" [style.width.%]="proteinProgress"></div>
+        <div class="progress-bar protein-bar"
+             [style.width.%]="proteinProgress"
+             [ngClass]="{'exceeded': proteinExceeded}"></div>
       </div>
     </div>
     
@@ -35,7 +38,9 @@
         </div>
       </div>
       <div class="progress-container">
-        <div class="progress-bar carbs-bar" [style.width.%]="carbsProgress"></div>
+        <div class="progress-bar carbs-bar"
+             [style.width.%]="carbsProgress"
+             [ngClass]="{'exceeded': carbsExceeded}"></div>
       </div>
     </div>
     
@@ -48,7 +53,9 @@
         </div>
       </div>
       <div class="progress-container">
-        <div class="progress-bar fat-bar" [style.width.%]="fatProgress"></div>
+        <div class="progress-bar fat-bar"
+             [style.width.%]="fatProgress"
+             [ngClass]="{'exceeded': fatExceeded}"></div>
       </div>
     </div>
   </div>

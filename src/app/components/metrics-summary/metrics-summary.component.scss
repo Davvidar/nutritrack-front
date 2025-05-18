@@ -1,102 +1,123 @@
 // src/app/components/metrics-summary/metrics-summary.component.scss
 .nutrition-bar {
-    width: 100%;
-    background-color: var(--ion-color-primary);
-    border-radius: 0px 0px 9px 9px;
-    padding: 4px 16px;
-    display: flex;
-    justify-content: space-between;
-  }
+  width: 100%;
+  background-color: var(--ion-color-primary);
+  border-radius: 0px 0px 9px 9px;
+  padding: 4px 16px; //
+  display: flex;
+  justify-content: space-between;
+}
+
+.nutrient-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 22%; // Consider if this is too restrictive on small screens. For now, keeping as is.
+}
+
+.nutrient-header {
+  display: flex;
+  align-items: center; // Vertically aligns icon and values block
+  margin-bottom: 6px; //
+  width: 100%;
+}
+
+.nutrient-icon {
+  width: 21px; //
+  height: 21px; //
+  border-radius: 50%; //
+  color: white; //
+  display: flex; //
+  align-items: center; //
+  justify-content: center; //
+  font-weight: bold; //
+  font-size: 14px; // For text P, C, G. For ion-icon, this often sets the visual size.
+  margin-right: 8px; //
+  flex-shrink: 0; /* Prevents the icon container from shrinking */
+}
+
+.calories-icon {
+ background-color: #8c63d0; //
+ font-weight: bolder;
+  width: 14px; // Adjusted width for better fit
+  // If ion-icon needs specific size adjustment not covered by font-size:
+  // font-size: 16px; // Example if 14px looks too small/large for the flame icon
+}
+
+.protein-icon {
+  background-color: #5046c8; //
   
-  .nutrient-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 22%;
-  }
-  
-  .nutrient-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 6px;
-    width: 100%;
-  }
-  
-  .nutrient-icon {
-    width: 21px;
-    height: 21px;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-    margin-right: 8px;
-  }
-  
-  .calories-icon {
-    background-color: #8c63d0;
-   
-  }
-  
-  .protein-icon {
-    background-color: #5046c8;
-  }
-  
-  .carbs-icon {
-    background-color: #ff8c42;
-  }
-  
-  .fat-icon {
-    background-color: #d4ca3a;
-  }
-  
-  .nutrient-values {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    color: white;
-    font-size: 14px;
-  }
-  
-  .main-value {
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  
-  .target-value {
-    font-size: 13px;
-    white-space: nowrap;
-  }
-  
-  .progress-container {
-    width: 100%;
-    height: 6px;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 6px;
-  }
-  
-  .progress-bar {
-    height: 100%;
-    border-radius: 3px;
-  }
-  
-  .calories-bar {
-    background-color: #8c63d0;
-  }
-  
-  .protein-bar {
-    background-color: #5046c8;
-  }
-  
-  .carbs-bar {
-    background-color: #ff8c42;
-  }
-  
-  .fat-bar {
-    background-color: #d4ca3a;
-  }
+}
+
+.carbs-icon {
+  background-color: #ff8c42; //
+}
+
+.fat-icon {
+  background-color: #d4ca3a; //
+}
+
+.nutrient-values {
+  display: flex; //
+  flex-direction: column; //
+  align-items: flex-end; // Aligns text like "100/" and "200 kcal" to the right
+  color: white; //
+  font-size: 14px; //
+  flex-grow: 1; /* Allows this block to take available space */
+  min-width: 0; /* Allows this block to shrink correctly, crucial for long text + flex-grow */
+}
+
+.main-value,
+.target-value {
+  white-space: nowrap; //
+  overflow: hidden; /* If text is too long, hide the overflow */
+  text-overflow: ellipsis; /* Show '...' if text is hidden */
+  width: 100%; /* Ensure they can use the full width of .nutrient-values for ellipsis to work correctly */
+}
+
+.main-value {
+  font-weight: bold; //
+  font-size: 11px; //
+}
+
+.target-value {
+  font-size: 11px; //
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px; //
+  background-color: rgba(255, 255, 255, 0.3); //
+  border-radius: 3px; //
+  overflow: hidden; //
+  margin-top: 6px; //
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 3px;
+  // The nutrient-specific classes below will set the default background color.
+}
+
+.calories-bar {
+  background-color: #8c63d0;
+}
+
+.protein-bar {
+  background-color: #5046c8;
+}
+
+.carbs-bar {
+  background-color: #ff8c42;
+}
+
+.fat-bar {
+  background-color: #d4ca3a;
+}
+
+// Style for exceeded progress bars
+// This selector is more specific than just '.calories-bar', '.protein-bar', etc.,
+// so it will override their background-color when the 'exceeded' class is present.
+.progress-bar.exceeded {
+  background-color: var(--ion-color-danger, #eb445a); // Using Ionic's danger color variable with a fallback
+}

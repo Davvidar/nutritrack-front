@@ -1,60 +1,215 @@
-<ion-header>
-  <ion-toolbar color="success">
-    <ion-title>Regístrate</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="register-content">
+  <!-- Indicador de progreso -->
+  <div class="progress-bar">
+    <div class="progress-step" [ngClass]="{'active': currentStep >= 1, 'completed': currentStep > 1}"></div>
+    <div class="progress-step" [ngClass]="{'active': currentStep >= 2, 'completed': currentStep > 2}"></div>
+    <div class="progress-step" [ngClass]="{'active': currentStep >= 3, 'completed': currentStep > 3}"></div>
+    <div class="progress-step" [ngClass]="{'active': currentStep >= 4, 'completed': currentStep > 4}"></div>
+    <div class="progress-step" [ngClass]="{'active': currentStep >= 5, 'completed': currentStep > 5}"></div>
+  </div>
 
-<ion-content class="ion-padding" fullscreen>
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <ion-item>
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input formControlName="nombre"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Apellido</ion-label>
-      <ion-input formControlName="apellido"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Correo</ion-label>
-      <ion-input formControlName="correo" type="email"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Contraseña</ion-label>
-      <ion-input formControlName="password" type="password"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Peso (kg)</ion-label>
-      <ion-input formControlName="peso" type="number"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Altura (cm)</ion-label>
-      <ion-input formControlName="altura" type="number"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Sexo</ion-label>
-      <ion-select formControlName="sexo" placeholder="Selecciona">
-        <ion-select-option *ngFor="let s of sexos" [value]="s">{{ s }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Edad</ion-label>
-      <ion-input formControlName="edad" type="number"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Objetivo</ion-label>
-      <ion-select formControlName="objetivo" placeholder="Selecciona">
-        <ion-select-option *ngFor="let o of objetivos" [value]="o">{{ o }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
-      <ion-label>Nivel de actividad</ion-label>
-      <ion-select formControlName="actividad" placeholder="Selecciona">
-        <ion-select-option *ngFor="let a of actividades" [value]="a">{{ a }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+  <!-- Formulario de registro -->
+  <form [formGroup]="registerForm">
 
-    <ion-button expand="block" type="submit" [disabled]="registerForm.invalid">
-      Crear cuenta
-    </ion-button>
+    <!-- Paso 1: Datos personales -->
+    <div class="step-container" *ngIf="currentStep === 1">
+      <h1 class="page-title">Bienvenido a nutriTrack</h1>
+      <p class="subtitle">Queremos hacerte unas preguntas para conocerte!</p>
+
+      <div class="form-field">
+        <ion-label position="stacked">Nombre<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-input formControlName="nombre" placeholder="Tu nombre"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched" color="danger">
+          El nombre es obligatorio
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Apellidos<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input formControlName="apellido" placeholder="Tus apellidos"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('apellido')?.invalid && registerForm.get('apellido')?.touched" color="danger">
+          El apellido es obligatorio
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Fecha de nacimiento<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-input type="number" formControlName="edad" placeholder="Edad"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('edad')?.invalid && registerForm.get('edad')?.touched" color="danger">
+          La edad es obligatoria
+        </ion-note>
+      </div>
+    </div>
+
+    <!-- Paso 2: Características físicas -->
+    <div class="step-container" *ngIf="currentStep === 2">
+      <h1 class="page-title">Características físicas</h1>
+
+      <div class="form-field">
+        <ion-label position="stacked">Peso<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="barbell-outline" slot="start"></ion-icon>
+          <ion-input type="number" formControlName="peso" placeholder="KG"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('peso')?.invalid && registerForm.get('peso')?.touched" color="danger">
+          El peso es obligatorio y debe ser mayor que 0
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Altura<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="resize-outline" slot="start"></ion-icon>
+          <ion-input type="number" formControlName="altura" placeholder="Cm"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('altura')?.invalid && registerForm.get('altura')?.touched" color="danger">
+          La altura es obligatoria y debe ser mayor que 0
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Sexo<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-select">
+          <ion-select formControlName="sexo" placeholder="Seleccione su sexo">
+            <ion-select-option *ngFor="let s of sexos" [value]="s">{{ s | titlecase }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('sexo')?.invalid && registerForm.get('sexo')?.touched" color="danger">
+          Debe seleccionar su sexo
+        </ion-note>
+      </div>
+    </div>
+
+    <!-- Paso 3: Actividad y objetivo -->
+    <div class="step-container" *ngIf="currentStep === 3">
+      <h1 class="page-title">¿Cual es tu actividad diaria?</h1>
+
+      <div class="option-cards">
+        <div *ngFor="let a of actividades"
+             class="option-card" 
+             [ngClass]="{'selected': registerForm.get('actividad')?.value === a}"
+             (click)="registerForm.get('actividad')?.setValue(a)">
+          <div class="option-title">{{ a | titlecase }}</div>
+          <div class="option-description">{{ getActivityDescription(a) }}</div>
+          <ion-icon name="checkmark-circle" class="select-icon" *ngIf="registerForm.get('actividad')?.value === a"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+   <div class="step-container" *ngIf="currentStep === 4">
+
+      <h1 class="page-title mt-4">¿Cuál es tu objetivo?</h1>
+
+      <div class="option-cards">
+        <div *ngFor="let o of objetivos"
+             class="option-card" 
+             [ngClass]="{'selected': registerForm.get('objetivo')?.value === o}"
+             (click)="registerForm.get('objetivo')?.setValue(o)">
+          <div class="option-title">{{ o | titlecase }}</div>
+          <ion-icon name="checkmark-circle" class="select-icon" *ngIf="registerForm.get('objetivo')?.value === o"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 4: Datos de la cuenta -->
+    <div class="step-container" *ngIf="currentStep === 5">
+      <h1 class="page-title">Crear cuenta</h1>
+      <p class="subtitle">A continuación te mandaremos un <strong>email de activación</strong> de la cuenta</p>
+
+      <div class="form-field">
+        <ion-label position="stacked">Email<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          <ion-input formControlName="correo" type="email" placeholder="tu@email.com"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('correo')?.invalid && registerForm.get('correo')?.touched" color="danger">
+          Debe ingresar un correo válido
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Contraseña<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input 
+            formControlName="password" 
+            [type]="passwordVisible ? 'text' : 'password'" 
+            placeholder="********"></ion-input>
+          <ion-icon 
+            slot="end" 
+            [name]="passwordVisible ? 'eye-off-outline' : 'eye-outline'"
+            (click)="togglePasswordVisibility()"></ion-icon>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" color="danger">
+          La contraseña debe tener al menos 6 caracteres
+        </ion-note>
+      </div>
+
+      <div class="form-field">
+        <ion-label position="stacked">Confirmar contraseña<span class="required">*</span></ion-label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input 
+            formControlName="confirmPassword" 
+            [type]="confirmPasswordVisible ? 'text' : 'password'" 
+            placeholder="********"></ion-input>
+          <ion-icon 
+            slot="end" 
+            [name]="confirmPasswordVisible ? 'eye-off-outline' : 'eye-outline'"
+            (click)="toggleConfirmPasswordVisibility()"></ion-icon>
+        </ion-item>
+        <ion-note *ngIf="registerForm.get('confirmPassword')?.value !== registerForm.get('password')?.value 
+                       && registerForm.get('confirmPassword')?.touched" color="danger">
+          Las contraseñas no coinciden
+        </ion-note>
+      </div>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="navigation-buttons">
+      <!-- Botón 'Anterior' (oculto en el primer paso) -->
+      <ion-button 
+        *ngIf="currentStep > 1" 
+        fill="outline" 
+        (click)="previousStep()">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Anterior
+      </ion-button>
+
+      <!-- Botón 'Siguiente' (en pasos 1-3) -->
+      <ion-button 
+        *ngIf="currentStep < totalSteps" 
+        expand="block"
+        [disabled]="!isCurrentStepValid()"
+        (click)="nextStep()">
+        Siguiente
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+
+      <!-- Botón 'Registrar' (solo en el último paso) -->
+      <ion-button 
+        *ngIf="currentStep === totalSteps" 
+        expand="block"
+        class="register-button"
+        [disabled]="!isCurrentStepValid()"
+        (click)="onSubmit()">
+        Registrar
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Enlace al login (solo en el primer paso) -->
+    <div class="login-link" *ngIf="currentStep === 1">
+      <p>Ya tengo cuenta <a routerLink="/auth/login">iniciar sesión</a></p>
+    </div>
   </form>
 </ion-content>

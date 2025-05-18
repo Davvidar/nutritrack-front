@@ -18,11 +18,21 @@
   }
 }
 
+/* Style for sections to add space between groups of form fields */
+.form-section {
+  margin-bottom: 24px; /* Add space below each section */
+  background: var(--ion-color-light); /* Use the light background for the section */
+  padding: 16px; /* Add padding inside the section */
+  border-radius: 10px; /* Match the border-radius of the original ion-item */
+}
+
 ion-list-header {
-  margin-top: 16px;
+  // Removed default margin-top and margin-bottom to be controlled by .form-section padding
   font-size: 18px;
   letter-spacing: 0.1px;
   font-weight: 600;
+  margin-bottom: 12px; /* Add space below the header within the section */
+
 
   ion-label {
     color: var(--ion-color-primary);
@@ -30,11 +40,12 @@ ion-list-header {
 }
 
 ion-item {
-  --padding-start: 0;
-  --background: var(--ion-color-light);
-  border-radius: 10px;
-  margin-bottom: 12px;
-  --border-color: transparent;
+  // Removed --background, border-radius, margin-bottom, --border-color
+  // These are now handled by the .form-section
+  --padding-start: 0; // Keep padding start at 0 for label alignment
+  --inner-padding-end: 0; // Remove default inner padding
+  width: 100%; // Ensure ion-item takes full width of its container
+  --min-height: 48px; // Ensure a minimum height for touch targets
 
   ion-label {
     font-size: 14px;
@@ -49,12 +60,14 @@ ion-item {
     --padding-top: 12px;
     --padding-bottom: 12px;
     --border-radius: 8px;
-    --background: #f7f7f7;
+  /*   --background: #f7f7f7;  */// Keep the lighter background for the input itself
     font-size: 16px;
     color: var(--ion-color-dark);
     border: 1px solid var(--ion-color-light-shade);
     border-radius: 8px;
     height: 48px;
+    width: 100%; // Ensure input/select takes full width
+    box-sizing: border-box; // Include padding and border in the element's total width and height
   }
 
   ion-select {
@@ -63,19 +76,24 @@ ion-item {
 
   ion-note[slot="error"] {
     margin-top: 4px;
-    padding-left: 16px;
+    padding-left: 0; /* Align error message with the start of the input */
     font-size: 12px;
+    color: var(--ion-color-danger); // Ensure error color is explicitly set
   }
 }
 
 .form-actions {
-  margin-top: 24px;
+  margin-top: 32px; /* Increased top margin for more separation */
   margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Increased space between buttons */
 
   ion-button {
-    margin-bottom: 12px;
-    height: 48px;
+    margin-bottom: 0; // Remove individual margin if using gap
+    height: 52px; /* Slightly increased button height */
     --border-radius: 10px;
     font-weight: 600;
+    font-size: 18px; /* Slightly increased font size */
   }
 }

@@ -152,9 +152,9 @@
     </div>
 
     <!-- Botón Añadir -->
-    <ion-button expand="block" class="add-button" (click)="addToMeal()">
-      Añadir producto
-      <ion-icon name="add-outline" slot="end"></ion-icon>
-    </ion-button>
+  <ion-button expand="block" class="add-button" (click)="addToMeal()">
+  {{ editMode ? 'Actualizar' : 'Añadir' }} producto
+  <ion-icon [name]="editMode ? 'save-outline' : 'add-outline'" slot="end"></ion-icon>
+</ion-button>
   </div>
 </ion-content>

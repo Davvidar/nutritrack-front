@@ -460,4 +460,34 @@ export class DailyLogService {
       })
     );
   }
+   getWeeklyNutrition(startDate: Date): Observable<SummaryResponse[]> {
+    const dates: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
+      dates.push(d);
+    }
+    return forkJoin(dates.map(d => this.getSummary(d)));
+  }
+
+  /**
+   * Combina peso del día + resumen nutricional para una fecha dada.
+   */
+  getDailySummary(date: Date): Observable<{
+    pesoDelDia: number | null;
+    consumido: SummaryResponse['consumido'];
+    objetivo: SummaryResponse['objetivo'];
+  }> {
+    return forkJoin({
+      log: this.getByDate(date),
+      summary: this.getSummary(date)
+    }).pipe(
+      map(({ log, summary }) => ({
+        pesoDelDia: log.pesoDelDia ?? null,
+        consumido: summary.consumido,
+        objetivo: summary.objetivo
+      }))
+    );
+  }
+  
 }

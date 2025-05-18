@@ -1,10 +1,15 @@
-// src/app/services/auth.service.ts
+// Modificación a src/app/services/auth.service.ts para mejorar soporte de favoritos
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
 import { Router } from '@angular/router';
+
+export interface FavoriteItem {
+  tipo: 'product' | 'recipe';
+  refId: string;
+}
 
 export interface UserProfile {
   _id: string;
@@ -25,10 +30,7 @@ export interface UserProfile {
   };
   
   // Favoritos del usuario
-  favoritos?: Array<{
-    tipo: 'product' | 'recipe';
-    refId: string;
-  }>;
+  favoritos?: FavoriteItem[];
 
   // Campos opcionales/extendidos
   consumoActual?: {
@@ -90,6 +92,11 @@ export class AuthService {
       // Intentar cargar datos de usuario desde localStorage
       const userData = this.getUserData();
       if (userData) {
+        // Asegurar que favoritos está inicializado
+        if (!userData.favoritos) {
+          userData.favoritos = [];
+          this.saveUserData(userData);
+        }
         this.currentUserSubject.next(userData);
       } else {
         // Si no hay datos en localStorage, intentar obtener del perfil
@@ -116,6 +123,12 @@ export class AuthService {
     ).pipe(
       tap(res => {
         this.saveToken(res.token);
+        
+        // Asegurar que favoritos está inicializado
+        if (!res.user.favoritos) {
+          res.user.favoritos = [];
+        }
+        
         this.saveUserData(res.user);
         this.saveTokenExpiry(res.token); // Guardar la fecha de expiración del token
         this.authState.next(true);
@@ -141,8 +154,33 @@ export class AuthService {
       { headers: this.getAuthHeaders() }
     ).pipe(
       tap(user => {
+        // Asegurar que favoritos está inicializado
+        if (!user.favoritos) {
+          user.favoritos = [];
+        }
+        
         this.saveUserData(user);
         this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  // Actualizar específicamente los favoritos
+  updateFavorites(favoritos: FavoriteItem[]): Observable<UserProfile> {
+    return this.http.put<{message: string, user: UserProfile}>(
+      `${this.api}/favorites`,
+      { favoritos },
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      map(res => res.user),
+      tap(user => {
+        // Actualizar solo los favoritos en el usuario actual
+        const currentUser = this.getUserData();
+        if (currentUser) {
+          currentUser.favoritos = user.favoritos || [];
+          this.saveUserData(currentUser);
+          this.currentUserSubject.next(currentUser);
+        }
       })
     );
   }
@@ -168,8 +206,6 @@ export class AuthService {
     this.authState.next(false);
     this.currentUserSubject.next(null);
   }
-
-  
 
   saveToken(token: string) {
     localStorage.setItem(this.tokenKey, token);
@@ -261,6 +297,7 @@ export class AuthService {
     const now = Math.floor(Date.now() / 1000);
     return expiry < now;
   }
+  
   getCurrentUserId(): string | null {
     const userData = this.getUserData();
     return userData ? userData._id : null;
@@ -275,8 +312,17 @@ export class AuthService {
     ).pipe(
       map(res => res.user),
       tap(user => {
-        this.saveUserData({...this.getUserData(), ...user});
-        this.currentUserSubject.next({...this.getUserData(), ...user});
+        // Asegurar que favoritos está inicializado
+        if (!user.favoritos) {
+          user.favoritos = [];
+        }
+        
+        // Combinar datos existentes con los nuevos
+        const currentUser = this.getUserData();
+        const updatedUser = { ...currentUser, ...user };
+        
+        this.saveUserData(updatedUser);
+        this.currentUserSubject.next(updatedUser);
       })
     );
   }
