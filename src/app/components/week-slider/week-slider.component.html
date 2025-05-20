@@ -1,40 +1,30 @@
-<div class="week-container">
-  <div class="month-title">{{ monthTitle }}</div>
+<div class="week-slider-container" 
+     (touchstart)="onTouchStart($event)"
+     (touchmove)="onTouchMove($event)"
+     (touchend)="onTouchEnd($event)">
   
-  <swiper-container #swiperElement init="false">
-    <swiper-slide>
-      <div class="week-slider">
-        <div class="day adjacent-week" 
-             *ngFor="let day of prevWeek" 
-             [class.today]="datesAreOnSameDay(day.date, today)">
-          <div class="day-letter" >{{ day.letter }}</div>
-          <div class="day-number">{{ day.date | date:'d' }}</div>
-        </div>
-      </div>
-    </swiper-slide>
+  <div class="week-header">
+   <!--  <ion-button fill="clear" size="small" (click)="prevWeek()">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button> -->
     
-    <swiper-slide>
-      <div class="week-slider">
-        <div class="day" 
-             *ngFor="let day of week" 
-             [class.active]="day.active"
-             [class.today]="datesAreOnSameDay(day.date, today)"
-             (click)="selectDay(day)">
-          <div class="day-letter">{{ day.letter }}</div>
-          <div class="day-number">{{ day.date | date:'d' }}</div>
-        </div>
-      </div>
-    </swiper-slide>
+    <div class="week-title">
+      {{ formatWeekRange() }}
+    </div>
     
-    <swiper-slide>
-      <div class="week-slider">
-        <div class="day adjacent-week" 
-             *ngFor="let day of nextWeek" 
-             [class.today]="datesAreOnSameDay(day.date, today)">
-          <div class="day-letter">{{ day.letter }}</div>
-          <div class="day-number">{{ day.date | date:'d' }}</div>
-        </div>
-      </div>
-    </swiper-slide>
-  </swiper-container>
+  <!--   <ion-button fill="clear" size="small" (click)="nextWeek()">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </ion-button> -->
+  </div>
+  
+  <div class="week-days" [class]="animationClass">
+    <div class="week-day" 
+         *ngFor="let day of week" 
+         [class.active]="day.active"
+         [class.today]="isToday(day.date)"
+         (click)="onDayClick(day)">
+      <div class="day-letter">{{ day.letter }}</div>
+      <div class="day-number">{{ day.date.getDate() }}</div>
+    </div>
+  </div>
 </div>

@@ -4,8 +4,8 @@
     <h2>{{ title }}</h2>
     <span class="toggle-icon" [class.up]="expanded">&#9660;</span>
     <div class="add-button">
-      <button
-        ion-button
+      
+      <ion-icon name="add-outline" color="light"
         fill="clear"
         (click)="onAddClick($event)"
         [routerLink]="['/tabs/inicio/search']"
@@ -13,8 +13,8 @@
           date: (parentDate | date:'yyyy-MM-ddTHH:mm:ss.SSSZ'),
           meal: title.toLowerCase()
         }">
-        +
-      </button>
+      
+    </ion-icon>
     </div>
   </div>
   

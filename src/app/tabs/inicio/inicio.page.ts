@@ -18,6 +18,7 @@ import { Recipe, RecipeService } from 'src/app/services/recipe.service';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { NutritionData, NutritionSummaryComponent } from 'src/app/components/nutrition-summary/nutrition-summary.component';
 import { WeightTrackerComponent } from 'src/app/components/weight-tracker/weight-tracker.component';
+
 @Component({
   selector: 'app-inicio',
   standalone: true,
@@ -62,15 +63,16 @@ export class InicioPage implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private nutritionUpdateService: NutritionUpdateService
-
   ) { }
 
-   ngOnInit() {
+  ngOnInit() {
     this.buildWeek();
+    
+    // Al inicio, seleccionamos el día actual o el primer día de la semana
     const todayObject = this.week.find(d => this.datesAreOnSameDay(d.date, new Date()));
-    const dayToSelect = todayObject || (this.week.length > 0 ? this.week[0] : undefined);
- 
-       if (dayToSelect) {
+    
+    if (todayObject) {
+      // Si el día actual está en la semana, lo seleccionamos
       this.authService.getProfile().subscribe((user: UserProfile) => {
         const obj = user.objetivosNutricionales || {} as any;
         this.dailyGoals = {
@@ -79,13 +81,25 @@ export class InicioPage implements OnInit, OnDestroy {
           carbs: obj.carbohidratos || 0,
           fat: obj.grasas || 0
         };
-        this.onDaySelected(dayToSelect); // Llama a onDaySelected con el día correcto
+        this.onDaySelected(todayObject);
+      });
+    } else if (this.week.length > 0) {
+      // Si no, seleccionamos el primer día
+      this.authService.getProfile().subscribe((user: UserProfile) => {
+        const obj = user.objetivosNutricionales || {} as any;
+        this.dailyGoals = {
+          calories: obj.calorias || 0,
+          protein: obj.proteinas || 0,
+          carbs: obj.carbohidratos || 0,
+          fat: obj.grasas || 0
+        };
+        this.onDaySelected(this.week[0]);
       });
     } else {
-        console.warn("InicioPage: No se pudo determinar el día inicial a seleccionar.");
-        // Manejar el caso donde la semana no se pudo construir o está vacía
+      console.warn("InicioPage: No se pudo determinar el día inicial a seleccionar.");
     }
-  this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
+    
+    this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
       .subscribe({
         next: (dateStr: string) => {
           try {
@@ -104,42 +118,56 @@ export class InicioPage implements OnInit, OnDestroy {
           console.error('InicioPage: Error en suscripción a actualizaciones:', err);
         }
       });
-
   }
+  
   ngOnDestroy() {
     if (this.nutritionSubscription) {
       this.nutritionSubscription.unsubscribe();
     }
-    // Si tienes otras suscripciones, también aquí
   }
-
 
   ionViewWillEnter() {
     // Se ejecuta cada vez que la página está a punto de entrar en la vista.
-    // Ideal para recargar datos.
+    // Recargar datos para el día seleccionado actualmente
     const activeDay = this.week.find(d => d.active);
     if (activeDay) {
       console.log('InicioPage: ionViewWillEnter - Recargando datos para:', activeDay.date);
-      this.onDaySelected(activeDay); // Esto ya llama a loadDailyLog y loadSummary
+      // No cambiamos la selección, solo recargamos los datos
+      this.loadSummary(activeDay.date);
+      this.loadDailyLog(activeDay.date);
     }
   }
 
-
-
   private buildWeek() {
-    this.week = [];
+    // Crear un nuevo array en lugar de modificar el existente
+    const newWeek = [];
     for (let i = 0; i < 7; i++) {
       const date = addDays(this.baseMonday, i);
-      this.week.push({ date, letter: date.toLocaleString('es-ES', { weekday: 'narrow' }), active: false });
+      newWeek.push({ 
+        date: new Date(date), // Importante: crear nueva instancia de Date
+        letter: date.toLocaleString('es-ES', { weekday: 'narrow' }), 
+        active: false 
+      });
     }
+    // Asignar el nuevo array, no modificar el existente
+    this.week = newWeek;
   }
 
   onDaySelected(day: WeekDay) {
-  this.week.forEach(d => d.active = d.date.toDateString() === day.date.toDateString());
-  this.selectedDate = new Date(day.date); // << AÑADIR ESTA LÍNEA O ASEGURAR QUE SE ACTUALIZA
-  this.loadSummary(day.date);
-  this.loadDailyLog(day.date);
-}
+    // Crear un nuevo array con nuevos objetos para forzar detección de cambios
+    // Marcamos como activo solo el día seleccionado
+    this.week = this.week.map(d => {
+      const isActive = d.date.toDateString() === day.date.toDateString();
+      return {
+        ...d,
+        active: isActive
+      };
+    });
+    
+    this.selectedDate = new Date(day.date);
+    this.loadSummary(day.date);
+    this.loadDailyLog(day.date);
+  }
 
   private loadDailyLog(date: Date) {
     // Opcional: activar loading aquí también
@@ -174,7 +202,6 @@ export class InicioPage implements OnInit, OnDestroy {
       }
     });
   }
-
 
   // Método auxiliar para mostrar mensajes de error
   async presentErrorToast(message: string) {
@@ -253,11 +280,31 @@ export class InicioPage implements OnInit, OnDestroy {
     });
   }
 
+  // Actualizado para no cambiar el día seleccionado al cambiar de semana
   loadWeek(direction: 'prev' | 'next') {
-    // Aquí actualizas baseMonday según la dirección
+    // Determinar qué día de la semana está seleccionado actualmente
+    let selectedDayIndex = -1;
+    
+    // Guardar la referencia del día activo antes de cambiar la semana
+    const activeDay = this.week.find(d => d.active);
+    if (activeDay) {
+      // Determinar el índice del día activo (0-6, donde 0 es lunes)
+      const activeDayOfWeek = activeDay.date.getDay();
+      // Convertir de 0-6 (Do-Sa) a 0-6 (Lu-Do)
+      selectedDayIndex = (activeDayOfWeek === 0) ? 6 : activeDayOfWeek - 1;
+    }
+    
+    // Actualizar la semana base
     this.baseMonday = addDays(this.baseMonday, direction === 'next' ? 7 : -7);
     this.buildWeek();
-    this.onDaySelected(this.week[0]);
+    
+    // Si había un día seleccionado, seleccionar el mismo día de la semana
+    if (selectedDayIndex >= 0 && selectedDayIndex < this.week.length) {
+      this.onDaySelected(this.week[selectedDayIndex]);
+    } else {
+      // Si no había un día seleccionado, no hacer nada (no seleccionar nada)
+      // Esto permite que el usuario elija explícitamente qué día quiere ver
+    }
   }
 
   addMeal(meal: typeof this.meals[number]) {
@@ -271,6 +318,7 @@ export class InicioPage implements OnInit, OnDestroy {
       });
     }
   }
+  
   private datesAreOnSameDay(first: Date, second: Date): boolean {
     return first.getFullYear() === second.getFullYear() &&
       first.getMonth() === second.getMonth() &&
@@ -388,5 +436,4 @@ export class InicioPage implements OnInit, OnDestroy {
     });
     toast.present();
   }
-  
 }
