@@ -1,0 +1,106 @@
+// src/app/pages/settings/settings.page.scss
+:host {
+  --settings-card-border-radius: 16px;
+  --settings-section-margin: 20px;
+  --settings-item-min-height: 60px;
+}
+
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+.settings-content {
+  --background: #f4f5f8;
+}
+
+.settings-section {
+  margin-bottom: var(--settings-section-margin);
+  padding: 0 16px;
+  
+  &:first-child {
+    margin-top: 20px;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin: 0 0 12px 5px;
+  
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.3rem;
+    color: var(--ion-color-primary);
+  }
+  
+  &.danger-title {
+    ion-icon {
+      color: var(--ion-color-danger);
+    }
+  }
+}
+
+.settings-card {
+  border-radius: var(--settings-card-border-radius);
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  
+  ion-item {
+    --min-height: var(--settings-item-min-height);
+    --background: transparent;
+    --background-hover: rgba(0, 0, 0, 0.04);
+    --background-activated: rgba(0, 0, 0, 0.08);
+    
+    ion-icon {
+      font-size: 1.3rem;
+      margin-right: 16px;
+      color: var(--ion-color-primary);
+    }
+    
+    ion-label {
+      h3 {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--ion-color-dark);
+        margin: 0 0 4px 0;
+      }
+      
+      p {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+        margin: 0;
+      }
+    }
+  }
+  
+  .danger-item {
+    ion-icon {
+      color: var(--ion-color-danger);
+    }
+  }
+}
+
+.danger-card {
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.2);
+}
+
+.logout-button {
+  margin: 20px 16px 40px;
+  --border-radius: 10px;
+  height: 48px;
+}
+
+ion-toggle {
+  --background: #ddd;
+  --background-checked: var(--ion-color-primary-tint);
+  --handle-background: white;
+  --handle-background-checked: var(--ion-color-primary);
+}
+
+.danger-section {
+  margin-top: 30px;
+}

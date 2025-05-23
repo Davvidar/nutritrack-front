@@ -16,6 +16,13 @@ import { AuthInterceptor } from './app/interceptors/auth.interceptor';
 import { TokenRefreshInterceptor } from './app/interceptors/token-refresh.interceptor';
 
 
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import { LOCALE_ID } from '@angular/core';
+
+registerLocaleData(localeEs);
+
+
 if (environment.production) {
   enableProdMode();
 }
@@ -43,6 +50,10 @@ bootstrapApplication(AppComponent, {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenRefreshInterceptor,
       multi: true
+    },
+    {
+      provide: LOCALE_ID,
+      useValue: 'es'
     }
   ]
 }).catch(err => console.error(err));

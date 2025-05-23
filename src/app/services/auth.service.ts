@@ -28,7 +28,7 @@ export interface UserProfile {
     carbohidratos: number;
     grasas: number;
   };
-  
+
   // Favoritos del usuario
   favoritos?: FavoriteItem[];
 
@@ -64,31 +64,31 @@ export class AuthService {
   private tokenKey = 'nutritrack_token';
   private userKey = 'nutritrack_user';
   private tokenExpiryKey = 'nutritrack_token_expiry';
-  
+
   // Estado de autenticación observable
   private authState = new BehaviorSubject<boolean>(false);
   private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
-  
+
   // Exposición pública del estado de autenticación como Observable
   public authStatus$ = this.authState.asObservable();
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  
+
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
     this.checkAuth();
   }
-  
+
   // Verificar estado de autenticación al iniciar
   private checkAuth() {
     const token = this.getToken();
-    
+
     if (token && !this.isTokenExpired()) {
       // Token válido, actualizar estado y cargar datos de usuario
       this.authState.next(true);
-      
+
       // Intentar cargar datos de usuario desde localStorage
       const userData = this.getUserData();
       if (userData) {
@@ -123,12 +123,12 @@ export class AuthService {
     ).pipe(
       tap(res => {
         this.saveToken(res.token);
-        
+
         // Asegurar que favoritos está inicializado
         if (!res.user.favoritos) {
           res.user.favoritos = [];
         }
-        
+
         this.saveUserData(res.user);
         this.saveTokenExpiry(res.token); // Guardar la fecha de expiración del token
         this.authState.next(true);
@@ -147,7 +147,7 @@ export class AuthService {
     if (cachedUser) {
       this.currentUserSubject.next(cachedUser);
     }
-    
+
     // Siempre solicitar datos frescos del servidor
     return this.http.get<UserProfile>(
       `${this.api}/profile`,
@@ -158,7 +158,7 @@ export class AuthService {
         if (!user.favoritos) {
           user.favoritos = [];
         }
-        
+
         this.saveUserData(user);
         this.currentUserSubject.next(user);
       })
@@ -167,7 +167,7 @@ export class AuthService {
 
   // Actualizar específicamente los favoritos
   updateFavorites(favoritos: FavoriteItem[]): Observable<UserProfile> {
-    return this.http.put<{message: string, user: UserProfile}>(
+    return this.http.put<{ message: string, user: UserProfile }>(
       `${this.api}/favorites`,
       { favoritos },
       { headers: this.getAuthHeaders() }
@@ -189,7 +189,7 @@ export class AuthService {
     try {
       const parts = token.split('.');
       if (parts.length !== 3) return;
-      
+
       const payload = JSON.parse(atob(parts[1]));
       if (payload.exp) {
         localStorage.setItem(this.tokenExpiryKey, payload.exp.toString());
@@ -198,7 +198,7 @@ export class AuthService {
       console.error('Error guardando expiración del token:', error);
     }
   }
-  
+
   private clearAuthData() {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
@@ -214,11 +214,11 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
-  
+
   saveUserData(user: UserProfile) {
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
-  
+
   getUserData(): UserProfile | null {
     const userData = localStorage.getItem(this.userKey);
     return userData ? JSON.parse(userData) : null;
@@ -232,7 +232,7 @@ export class AuthService {
         'Content-Type': 'application/json'
       });
     }
-    
+
     console.log('Token disponible:', token ? 'Sí' : 'No');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
@@ -244,19 +244,16 @@ export class AuthService {
     // Limpiar almacenamiento local antes de la petición
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
-    
+
     // Actualizar estado de autenticación
     this.authState.next(false);
     this.currentUserSubject.next(null);
-    
+
     // Redirigir a login
     this.router.navigate(['/auth/login']);
-    
-    // La petición HTTP es opcional ya que los tokens JWT no se pueden invalidar en el servidor
-    // a menos que implementes un sistema de blacklisting
+
+  
     return this.http.post(`${this.api}/logout`, {}).pipe(
-      // En caso de error, asumimos que el logout es exitoso de todas formas
-      // ya que hemos limpiado localStorage
       tap({
         error: () => {
           console.log('Error en logout HTTP, pero los datos locales fueron limpiados');
@@ -270,7 +267,7 @@ export class AuthService {
     const token = this.getToken();
     return !!token;
   }
-  
+
   // Verificar si el token ha caducado
   isTokenExpired(): boolean {
     const expiryString = localStorage.getItem(this.tokenExpiryKey);
@@ -278,34 +275,34 @@ export class AuthService {
       // Si no tenemos fecha de expiración, verificamos directamente del token
       const token = this.getToken();
       if (!token) return true;
-      
+
       try {
         const parts = token.split('.');
         if (parts.length !== 3) return true;
-        
+
         const payload = JSON.parse(atob(parts[1]));
         const now = Math.floor(Date.now() / 1000);
-        
+
         return payload.exp && payload.exp < now;
       } catch (error) {
         console.error('Error verificando expiración del token:', error);
         return true;
       }
     }
-    
+
     const expiry = parseInt(expiryString, 10);
     const now = Math.floor(Date.now() / 1000);
     return expiry < now;
   }
-  
+
   getCurrentUserId(): string | null {
     const userData = this.getUserData();
     return userData ? userData._id : null;
   }
-  
+
   // Actualizar perfil de usuario
   updateProfile(data: Partial<UserProfile>): Observable<UserProfile> {
-    return this.http.put<{message: string, user: UserProfile}>(
+    return this.http.put<{ message: string, user: UserProfile }>(
       `${this.api}/profile`,
       data,
       { headers: this.getAuthHeaders() }
@@ -316,14 +313,48 @@ export class AuthService {
         if (!user.favoritos) {
           user.favoritos = [];
         }
-        
+
         // Combinar datos existentes con los nuevos
         const currentUser = this.getUserData();
         const updatedUser = { ...currentUser, ...user };
-        
+
         this.saveUserData(updatedUser);
         this.currentUserSubject.next(updatedUser);
       })
     );
+  }
+ changePassword(currentPassword: string, newPassword: string): Observable<any> {
+  return this.http.post(
+    `${this.api}/change-password`, 
+    { currentPassword, newPassword },
+    { headers: this.getAuthHeaders() }
+  ).pipe(
+    tap(() => {
+      console.log('Contraseña cambiada con éxito');
+    })
+  );
+}
+
+deleteAccount(password: string): Observable<any> {
+  return this.http.post(
+    `${this.api}/delete-account`, 
+    { password },
+    { headers: this.getAuthHeaders() }
+  ).pipe(
+    tap(() => {
+      this.clearAuthData();
+      console.log('Cuenta eliminada con éxito');
+    })
+  );
+}
+  
+  // Solicitar restablecimiento de contraseña
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post(`${this.api}/reset-password-request`, { correo: email });
+  }
+
+  // Establecer nueva contraseña
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.api}/reset-password/${token}`, { newPassword });
   }
 }

@@ -37,6 +37,11 @@
 
 // Estilos del header
 ion-header.nutri-header {
+   ion-toolbar.nutri-header {
+    --border-width: 0;
+    --background: var(--ion-color-primary);
+    text-align: center;
+  }
   img {
     display: block;
     margin: 0 auto;

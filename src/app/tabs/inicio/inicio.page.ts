@@ -54,7 +54,6 @@ export class InicioPage implements OnInit, OnDestroy {
   nutritionSummaryData: NutritionData | null = null;
   nutritionSubscription?: Subscription;
 
-
   constructor(
     private dailyLogService: DailyLogService,
     private productService: ProductService,
@@ -66,49 +65,61 @@ export class InicioPage implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    console.log('InicioPage: ngOnInit - Inicializando página');
     this.buildWeek();
-    
+    this.initializeNutritionSubscription();
+    this.loadInitialData();
+  }
+
+  ngOnDestroy() {
+    if (this.nutritionSubscription) {
+      this.nutritionSubscription.unsubscribe();
+    }
+  }
+
+  private loadInitialData(): void {
     // Al inicio, seleccionamos el día actual o el primer día de la semana
     const todayObject = this.week.find(d => this.datesAreOnSameDay(d.date, new Date()));
     
     if (todayObject) {
       // Si el día actual está en la semana, lo seleccionamos
       this.authService.getProfile().subscribe((user: UserProfile) => {
-        const obj = user.objetivosNutricionales || {} as any;
-        this.dailyGoals = {
-          calories: obj.calorias || 0,
-          protein: obj.proteinas || 0,
-          carbs: obj.carbohidratos || 0,
-          fat: obj.grasas || 0
-        };
+        this.loadGoalsFromProfile(user);
         this.onDaySelected(todayObject);
       });
     } else if (this.week.length > 0) {
       // Si no, seleccionamos el primer día
       this.authService.getProfile().subscribe((user: UserProfile) => {
-        const obj = user.objetivosNutricionales || {} as any;
-        this.dailyGoals = {
-          calories: obj.calorias || 0,
-          protein: obj.proteinas || 0,
-          carbs: obj.carbohidratos || 0,
-          fat: obj.grasas || 0
-        };
+        this.loadGoalsFromProfile(user);
         this.onDaySelected(this.week[0]);
       });
     } else {
       console.warn("InicioPage: No se pudo determinar el día inicial a seleccionar.");
     }
-    
+  }
+
+  private loadGoalsFromProfile(user: UserProfile): void {
+    const obj = user.objetivosNutricionales || {} as any;
+    this.dailyGoals = {
+      calories: obj.calorias || 0,
+      protein: obj.proteinas || 0,
+      carbs: obj.carbohidratos || 0,
+      fat: obj.grasas || 0
+    };
+    console.log('InicioPage: Objetivos cargados:', this.dailyGoals);
+  }
+
+  private initializeNutritionSubscription(): void {
     this.nutritionSubscription = this.nutritionUpdateService.nutritionUpdated$
       .subscribe({
         next: (dateStr: string) => {
           try {
-            console.log('InicioPage: Actualizando por cambio en:', dateStr);
+            console.log('InicioPage: *** RECIBIDA NOTIFICACIÓN DE ACTUALIZACIÓN ***', dateStr);
             const date = new Date(dateStr);
-            if (this.datesAreOnSameDay(this.selectedDate, date)) { // Compara con this.selectedDate
-              console.log('InicioPage: Recargando datos para fecha actual:', dateStr);
-              this.loadSummary(this.selectedDate);
-              this.loadDailyLog(this.selectedDate);
+            if (this.datesAreOnSameDay(this.selectedDate, date)) {
+              console.log('InicioPage: *** FECHA COINCIDE - RECARGANDO DATOS INMEDIATAMENTE ***');
+              // Recargar inmediatamente sin delay
+              this.reloadCurrentDateData();
             }
           } catch (err) {
             console.error('InicioPage: Error al procesar actualización:', err);
@@ -119,14 +130,15 @@ export class InicioPage implements OnInit, OnDestroy {
         }
       });
   }
-  
-  ngOnDestroy() {
-    if (this.nutritionSubscription) {
-      this.nutritionSubscription.unsubscribe();
-    }
+
+  private reloadCurrentDateData(): void {
+    console.log('InicioPage: Recargando datos para fecha seleccionada:', this.selectedDate);
+    this.loadSummary(this.selectedDate);
+    this.loadDailyLog(this.selectedDate);
   }
 
   ionViewWillEnter() {
+    console.log('InicioPage: ionViewWillEnter - Página a punto de entrar en vista');
     // Se ejecuta cada vez que la página está a punto de entrar en la vista.
     // Recargar datos para el día seleccionado actualmente
     const activeDay = this.week.find(d => d.active);
@@ -154,6 +166,8 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   onDaySelected(day: WeekDay) {
+    console.log('InicioPage: Día seleccionado:', day.date);
+    
     // Crear un nuevo array con nuevos objetos para forzar detección de cambios
     // Marcamos como activo solo el día seleccionado
     this.week = this.week.map(d => {
@@ -170,12 +184,12 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   private loadDailyLog(date: Date) {
-    // Opcional: activar loading aquí también
+    console.log('InicioPage: Cargando registro diario para:', date);
     this.loading = true;
     
     this.dailyLogService.getDailyLogWithDetails(date).subscribe({
       next: (data: any) => {
-        console.log('Datos de comidas actualizados:', data);
+        console.log('InicioPage: Datos de comidas actualizados:', data);
         
         // Asignar datos directamente
         if (data && data.comidas) {
@@ -192,35 +206,24 @@ export class InicioPage implements OnInit, OnDestroy {
           };
         }
         
-        // Desactivar loading
         this.loading = false;
       },
       error: (err: any) => {
-        console.error('Error al cargar el registro diario:', err);
+        console.error('InicioPage: Error al cargar el registro diario:', err);
         this.presentErrorToast('Error al cargar datos del día');
         this.loading = false;
       }
     });
   }
 
-  // Método auxiliar para mostrar mensajes de error
-  async presentErrorToast(message: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 3000,
-      position: 'bottom',
-      color: 'danger'
-    });
-    toast.present();
-  }
-
   private loadSummary(date: Date) {
+    console.log('InicioPage: Cargando resumen nutricional para:', date);
     // Establecer loading si no está ya activo
     if (!this.loading) this.loading = true;
     
     this.dailyLogService.getSummary(date).subscribe({
       next: (res: SummaryResponse) => {
-        console.log('Datos de resumen nutricional recibidos:', res);
+        console.log('InicioPage: Datos de resumen nutricional recibidos:', res);
         
         if (res) {
           // Crear un objeto completamente nuevo para la actualización
@@ -262,7 +265,7 @@ export class InicioPage implements OnInit, OnDestroy {
             }
           };
           
-          console.log('Nuevos datos de nutritionSummaryData:', this.nutritionSummaryData);
+          console.log('InicioPage: Nuevos datos de nutritionSummaryData:', this.nutritionSummaryData);
         } else {
           // Resetear completamente si no hay datos
           this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
@@ -272,7 +275,7 @@ export class InicioPage implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error al cargar resumen nutricional:', err);
+        console.error('InicioPage: Error al cargar resumen nutricional:', err);
         this.nutritionSummaryData = null;
         this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
         this.loading = false;
@@ -282,6 +285,8 @@ export class InicioPage implements OnInit, OnDestroy {
 
   // Actualizado para no cambiar el día seleccionado al cambiar de semana
   loadWeek(direction: 'prev' | 'next') {
+    console.log('InicioPage: Cambiando semana:', direction);
+    
     // Determinar qué día de la semana está seleccionado actualmente
     let selectedDayIndex = -1;
     
@@ -301,13 +306,11 @@ export class InicioPage implements OnInit, OnDestroy {
     // Si había un día seleccionado, seleccionar el mismo día de la semana
     if (selectedDayIndex >= 0 && selectedDayIndex < this.week.length) {
       this.onDaySelected(this.week[selectedDayIndex]);
-    } else {
-      // Si no había un día seleccionado, no hacer nada (no seleccionar nada)
-      // Esto permite que el usuario elija explícitamente qué día quiere ver
     }
   }
 
   addMeal(meal: typeof this.meals[number]) {
+    console.log('InicioPage: Añadiendo meal:', meal);
     const activeDay = this.week.find(d => d.active);
     if (activeDay) {
       this.router.navigate(['/tabs/inicio/search'], {
@@ -326,7 +329,7 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   onMealItemClick(itemm: MealItem, mealType: string): void {
-    console.log('Item clicked:', itemm, 'in meal:', mealType);
+    console.log('InicioPage: Item clicked:', itemm, 'in meal:', mealType);
 
     if (itemm.productId) {
       // Si es un producto, navegar a la página de detalle del producto
@@ -352,6 +355,8 @@ export class InicioPage implements OnInit, OnDestroy {
   }
 
   onRemoveMealItem(item: MealItem, mealType: string) {
+    console.log('InicioPage: Eliminando item:', item, 'de meal:', mealType);
+    
     // Confirmar eliminación
     if (!confirm(`¿Quieres eliminar ${item.name} de tu ${mealType}?`)) {
       return;
@@ -361,13 +366,10 @@ export class InicioPage implements OnInit, OnDestroy {
     
     const activeDay = this.week.find(d => d.active);
     if (!activeDay) {
+      console.error('InicioPage: No hay día activo para eliminar item');
       this.loading = false;
       return;
     }
-    
-    // Verificar si es el último elemento de la comida
-    const mealKey = mealType.toLowerCase() as keyof typeof this.mealItems;
-    const isLastItem = this.mealItems[mealKey]?.length === 1;
     
     // Usar el servicio dailyLogService para eliminar el item
     this.dailyLogService.removeItemFromMeal(
@@ -376,57 +378,35 @@ export class InicioPage implements OnInit, OnDestroy {
       item.productId || item.recipeId || '',
       !!item.recipeId
     ).subscribe({
-      next: () => {
-        console.log('Item eliminado correctamente');
+      next: (updatedLog) => {
+        console.log('InicioPage: Item eliminado correctamente, registro actualizado:', updatedLog);
         
-        // Caso especial: Si era el último elemento, hacemos una recarga completa
-        if (isLastItem) {
-          console.log('Era el último elemento - haciendo recarga completa');
-          
-          // 1. Resetear completamente los datos
-          this.currentConsumption = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-          
-          // 2. Forzar la recreación completa del objeto nutritionSummaryData
-          this.nutritionSummaryData = {
-            consumido: { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
-            objetivo: { 
-              calorias: this.dailyGoals.calories, 
-              proteinas: this.dailyGoals.protein,
-              carbohidratos: this.dailyGoals.carbs,
-              grasas: this.dailyGoals.fat
-            },
-            diferencia: {
-              calorias: this.dailyGoals.calories,
-              proteinas: this.dailyGoals.protein,
-              carbohidratos: this.dailyGoals.carbs,
-              grasas: this.dailyGoals.fat
-            }
-          };
-          
-          // 3. Actualizar la estructura de comidas
-          this.mealItems[mealKey] = [];
-        }
-        
-        // 4. Recargar datos con un pequeño delay para asegurar que el objeto anterior
-        // ya ha sido renderizado y el cambio será detectado
-        setTimeout(() => {
-          // Forzar recargas completas
-          this.loadDailyLog(activeDay.date);
-          this.loadSummary(activeDay.date);
-          this.loading = false;
-        }, 50);
+        // Los datos se actualizarán automáticamente a través de la suscripción a nutritionUpdateService
+        // pero también podemos forzar una actualización inmediata para mejor UX
+        this.reloadCurrentDateData();
         
         this.presentSuccessToast(`${item.name} eliminado de ${mealType}`);
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Error al eliminar item:', err);
+        console.error('InicioPage: Error al eliminar item:', err);
         this.presentErrorToast('No se pudo eliminar el elemento');
         this.loading = false;
       }
     });
   }
   
-  // Añadir este método para mostrar mensajes de éxito
+  // Métodos de UI
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom',
+      color: 'danger'
+    });
+    toast.present();
+  }
+
   async presentSuccessToast(message: string) {
     const toast = await this.toastController.create({
       message,

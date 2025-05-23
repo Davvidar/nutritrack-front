@@ -192,3 +192,18 @@ ion-content.login-content {
       }
     }
   }
+
+  .forgot-password-link {
+  text-align: center;
+  margin-top: 15px;
+  
+  a {
+    color: var(--nutri-green);
+    font-size: 0.9rem;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

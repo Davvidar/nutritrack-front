@@ -318,8 +318,10 @@ export class DailyLogService {
         logToSave,
         { headers: this.auth.getAuthHeaders() }
       ).pipe(
-        tap(() => {
-          // Notificar actualización
+        tap((response) => {
+          console.log('DailyLogService - Registro actualizado:', response);
+          // Notificar actualización inmediatamente
+          console.log('DailyLogService - *** NOTIFICANDO ACTUALIZACIÓN DESPUÉS DE PUT ***');
           this.nutritionUpdateService.notifyNutritionUpdated(originalDateObj);
         })
       );
@@ -330,8 +332,10 @@ export class DailyLogService {
       logToSave,
       { headers: this.auth.getAuthHeaders() }
     ).pipe(
-      tap(() => {
-        // Notificar actualización
+      tap((response) => {
+        console.log('DailyLogService - Registro creado:', response);
+        // Notificar actualización inmediatamente
+        console.log('DailyLogService - *** NOTIFICANDO ACTUALIZACIÓN DESPUÉS DE POST ***');
         this.nutritionUpdateService.notifyNutritionUpdated(originalDateObj);
       })
     );
@@ -417,27 +421,40 @@ export class DailyLogService {
   }
 
   getWeightWeeklyAverage(): Observable<{media: number | null, diasConDatos: number}> {
-  return this.http.get<{media: number | null, diasConDatos: number}>(
-    `${environment.API_URL}/weight/media-semanal`,
-    { headers: this.auth.getAuthHeaders() }
-  ).pipe(
-    catchError(error => {
-      console.error('Error obteniendo media semanal de peso:', error);
-      return of({ media: null, diasConDatos: 0 });
-    })
-  );
-}
+    return this.http.get<{media: number | null, diasConDatos: number}>(
+      `${environment.API_URL}/weight/media-semanal`,
+      { headers: this.auth.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        console.error('Error obteniendo media semanal de peso:', error);
+        return of({ media: null, diasConDatos: 0 });
+      })
+    );
+  }
+
+  /**
+   * Elimina un item específico de una comida
+   * @param date Fecha del registro
+   * @param mealType Tipo de comida (desayuno, almuerzo, etc.)
+   * @param itemId ID del producto o receta
+   * @param isRecipe Si es una receta o un producto
+   * @returns Observable con el DailyLog actualizado
+   */
   removeItemFromMeal(
     date: Date,
     mealType: string,
     itemId: string,
     isRecipe: boolean = false
   ): Observable<DailyLog> {
+    console.log(`DailyLogService - Eliminando item ${itemId} de ${mealType} en fecha ${date.toISOString()}`);
+    
     return this.getByDate(date).pipe(
       switchMap(dailyLog => {
         // Obtener la lista de items para el tipo de comida
         const mealKey = mealType.toLowerCase() as keyof typeof dailyLog.comidas;
         const items = dailyLog.comidas[mealKey] || [];
+        
+        console.log(`DailyLogService - Items antes de eliminar:`, items);
         
         // Encontrar y eliminar el item
         const itemIndex = items.findIndex(item => 
@@ -445,22 +462,31 @@ export class DailyLogService {
         );
         
         if (itemIndex === -1) {
+          console.error(`DailyLogService - Item ${itemId} no encontrado en ${mealType}`);
           return throwError(() => new Error(`Item ${itemId} no encontrado en ${mealType}`));
         }
         
-        // Eliminar el item
+        // Eliminar el item del array
         items.splice(itemIndex, 1);
+        console.log(`DailyLogService - Items después de eliminar:`, items);
         
         // Guardar el dailyLog actualizado
         return this.save(dailyLog);
       }),
-      tap(() => {
-        // Notificar que se ha actualizado la información nutricional
+      tap((updatedLog) => {
+        console.log(`DailyLogService - Item eliminado correctamente, registro actualizado:`, updatedLog);
+        // Notificar que se ha actualizado la información nutricional inmediatamente
+        console.log('DailyLogService - *** NOTIFICANDO ACTUALIZACIÓN DESPUÉS DE ELIMINAR ITEM ***');
         this.nutritionUpdateService.notifyNutritionUpdated(date);
+      }),
+      catchError(error => {
+        console.error(`DailyLogService - Error al eliminar item:`, error);
+        return throwError(() => error);
       })
     );
   }
-   getWeeklyNutrition(startDate: Date): Observable<SummaryResponse[]> {
+
+  getWeeklyNutrition(startDate: Date): Observable<SummaryResponse[]> {
     const dates: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(startDate);
@@ -489,5 +515,4 @@ export class DailyLogService {
       }))
     );
   }
-  
 }

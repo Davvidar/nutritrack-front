@@ -1,0 +1,141 @@
+<!-- src/app/tabs/settings/settings.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/perfil" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ajustes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="settings-content">
+  <!-- Cuenta -->
+  <div class="settings-section">
+    <h2 class="section-title">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      Cuenta
+    </h2>
+    
+    <ion-card class="settings-card">
+      <ion-item button detail (click)="changePassword()" lines="none">
+        <ion-icon name="key-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Cambiar contraseña</h3>
+          <p>Actualiza tu contraseña de acceso</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item button detail (click)="openProfileEditModal()" lines="none" class="modify-profile-item">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Editar perfil</h3>
+          <p>Modifica tus datos personales</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </div>
+  
+  <!-- Nutrición -->
+  <div class="settings-section">
+    <h2 class="section-title">
+      <ion-icon name="nutrition-outline"></ion-icon>
+      Nutrición
+    </h2>
+    
+    <ion-card class="settings-card">
+      <ion-item button detail (click)="openNutritionGoalsModal()" lines="none">
+        <ion-icon name="calculator-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Objetivos nutricionales</h3>
+          <p>Ajusta tus metas de calorías y macros</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </div>
+  
+  <!-- Aplicación -->
+  <div class="settings-section">
+    <h2 class="section-title">
+      <ion-icon name="settings-outline"></ion-icon>
+      Aplicación
+    </h2>
+    
+    <ion-card class="settings-card">
+      <ion-item lines="none">
+        <ion-icon name="moon-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Modo oscuro</h3>
+          <p>Cambia la apariencia de la app</p>
+        </ion-label>
+        <ion-toggle slot="end"></ion-toggle>
+      </ion-item>
+      
+  <!--     <ion-item lines="none">
+        <ion-icon name="notifications-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Notificaciones</h3>
+          <p>Configura recordatorios diarios</p>
+        </ion-label>
+        <ion-toggle slot="end" checked></ion-toggle>
+      </ion-item> -->
+    </ion-card>
+  </div>
+  
+  <!-- Acerca de -->
+  <div class="settings-section">
+    <h2 class="section-title">
+      <ion-icon name="information-circle-outline"></ion-icon>
+      Acerca de
+    </h2>
+    
+    <ion-card class="settings-card">
+      <ion-item detail lines="none">
+        <ion-icon name="help-circle-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Ayuda y soporte</h3>
+          <p>Preguntas frecuentes y contacto</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item detail lines="none">
+        <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Política de privacidad</h3>
+          <p>Cómo gestionamos tus datos</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item lines="none">
+        <ion-icon name="information-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>Versión</h3>
+          <p>NutriTrack 1.0.0</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </div>
+  
+  <!-- Zona de peligro -->
+  <div class="settings-section danger-section">
+    <h2 class="section-title danger-title">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      Zona de peligro
+    </h2>
+    
+    <ion-card class="settings-card danger-card">
+      <ion-item button (click)="deleteAccount()" lines="none" class="danger-item">
+        <ion-icon name="trash-outline" slot="start" color="danger"></ion-icon>
+        <ion-label color="danger">
+          <h3>Eliminar mi cuenta</h3>
+          <p>Esta acción eliminará permanentemente todos tus datos</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </div>
+  
+  <!-- Botón de cerrar sesión -->
+  <ion-button expand="block" color="medium" class="logout-button" (click)="logout()">
+    <ion-icon name="log-out-outline" slot="start"></ion-icon>
+    Cerrar sesión
+  </ion-button>
+</ion-content>

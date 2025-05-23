@@ -4,8 +4,8 @@ import { authGuard } from './guards/auth.guard';
 import { alreadyAuthGuard } from './guards/already-auth.guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage),
     canActivate: [alreadyAuthGuard] // Aplicar el guard a la ruta raíz
   },
@@ -13,8 +13,10 @@ export const routes: Routes = [
     path: 'auth',
     canActivate: [alreadyAuthGuard], // Aplicar el guard al módulo de autenticación
     children: [
-      { path: 'login',    loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage) },
+      { path: 'login', loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage) },
       { path: 'register', loadComponent: () => import('./auth/register/register.page').then(m => m.RegisterPage) },
+      { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage) },
+      { path: 'reset-password/:token', loadComponent: () => import('./auth/forgot-password/reset-password/reset-password.page').then(m => m.ResetPasswordPage) },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
@@ -42,7 +44,7 @@ export const routes: Routes = [
       {
         path: 'inicio/create-product',
         loadComponent: () => import('./tabs/inicio/create-product/create-product.page').then(m => m.CreateProductPage)
-      },{
+      }, {
         path: 'inicio/create-recipe',
         loadComponent: () => import('./tabs/inicio/create-recipe/create-recipe.page').then(m => m.CreateRecipePage)
       },
@@ -58,6 +60,10 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
+      },
+      {
+        path: 'perfil/settings',
+        loadComponent: () => import('./tabs/perfil/settingsPage/settings.page').then(m => m.SettingsPage)
       },
       {
         path: 'estadisticas',

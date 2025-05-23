@@ -3,15 +3,6 @@
     <ion-title>
       <div class="header-content">
         <img src="../../../assets/Nutritrack_letras.png" alt="">
-        <!--         <div class="header-actions">
-          <ion-button fill="clear" (click)="editProfile()">
-            <ion-icon slot="icon-only" name="create-outline" color="light"></ion-icon>
-          </ion-button>
-          
-          <ion-button fill="clear" (click)="logout()">
-            <ion-icon slot="icon-only" name="log-out-outline" color="light"></ion-icon>
-          </ion-button>
-        </div> -->
       </div>
     </ion-title>
   </ion-toolbar>
@@ -19,8 +10,8 @@
     <div class="ajustes">
       <h1 class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</h1>
       <ion-button fill="clear" (click)="openSettings()">
-            <ion-icon slot="icon-only" name="settings-outline" color="light" size="large"></ion-icon>
-          </ion-button>
+        <ion-icon slot="icon-only" name="settings-outline" color="light" size="large"></ion-icon>
+      </ion-button>
     </div>
     
     <div class="objective-badge">
@@ -54,18 +45,16 @@
           Nutrición de Hoy
         </h2>
         <ion-button fill="clear" (click)="openNutritionGoalsModal()" class="edit-button">
-          <ion-icon slot="icon-only" name="create-outline" ></ion-icon>
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
         </ion-button>
       </div>
 
-
-      <ng-container *ngIf="showNutritionSummary">
-        <app-nutrition-summary [nutritionData]="nutritionSummaryData" [date]="today">
-        </app-nutrition-summary>
-      </ng-container>
-
-      <!-- Micro estadísticas nutricionales -->
-
+      <!-- Componente de resumen nutricional con trigger de actualización -->
+      <app-nutrition-summary 
+        [nutritionData]="nutritionSummaryData" 
+        [date]="today"
+        [forceUpdateTrigger]="forceUpdateTrigger">
+      </app-nutrition-summary>
     </div>
 
     <!-- Progreso de Peso -->
