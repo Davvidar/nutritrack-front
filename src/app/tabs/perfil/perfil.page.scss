@@ -21,7 +21,9 @@ ion-header.profile-header {
   height: var(--header-height);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 30px 30px;
-
+img{
+  width: 40%;
+}
   .profile-info {
     display: flex;
     flex-direction: column;

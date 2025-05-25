@@ -98,3 +98,14 @@ ion-tab-button.tab-selected {
   
   
 } */
+ ion-header.nutri-header {
+   ion-toolbar.nutri-header {
+    --border-width: 0;
+    --background: var(--ion-color-primary);
+    text-align: center;
+  }
+  img {
+  
+    width: 40%;
+  }
+}
