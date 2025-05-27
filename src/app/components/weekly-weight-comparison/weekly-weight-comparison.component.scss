@@ -1,0 +1,190 @@
+// src/app/components/weekly-weight-comparison/weekly-weight-comparison.component.scss
+:host {
+  --card-border-radius: 16px;
+  --weight-card-width: 100px;
+  --hexagon-size: 36px;
+  
+  --color-previous: #7B1FA2;   // Púrpura
+  --color-current: #6ab04c;    // Verde principal
+  --color-today: #E65100;      // Naranja
+  --color-positive: #27ae60;   // Verde para subida
+  --color-negative: #e74c3c;   // Rojo para bajada
+}
+
+.weight-comparison {
+  width: 100%;
+  padding: 16px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  
+  ion-spinner {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.weight-cards {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.weight-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: white;
+  border-radius: var(--card-border-radius);
+  padding: 16px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-width: var(--weight-card-width);
+  
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .hexagon-shape {
+      width: var(--hexagon-size);
+      height: var(--hexagon-size);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      
+      ion-icon {
+        font-size: 18px;
+        color: white;
+      }
+    }
+    
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+  
+  .weight-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    line-height: 1.2;
+    margin-bottom: 4px;
+    
+    &.primary {
+      color: var(--color-current);
+      font-size: 1.6rem;
+    }
+  }
+  
+  .weight-change {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    
+    ion-icon {
+      font-size: 0.9rem;
+    }
+    
+    &.positive {
+      color: var(--color-positive);
+    }
+    
+    &.negative {
+      color: var(--color-negative);
+    }
+  }
+  
+  .weight-subtitle {
+    font-size: 0.7rem;
+    color: var(--ion-color-medium);
+    margin-top: 4px;
+  }
+}
+
+// Colores específicos para cada hexágono
+.purple-hexagon {
+  background-color: var(--color-previous);
+}
+
+.green-hexagon {
+  background-color: var(--color-current);
+}
+
+.orange-hexagon {
+  background-color: var(--color-today);
+}
+
+// Estilos específicos para cada tarjeta
+.weight-card.previous {
+  .card-header .card-title {
+    color: var(--color-previous);
+  }
+}
+
+.weight-card.current {
+  border: 2px solid var(--color-current);
+  
+  .card-header .card-title {
+    color: var(--color-current);
+  }
+}
+
+.weight-card.today {
+  .card-header .card-title {
+    color: var(--color-today);
+  }
+}
+
+// Responsive para pantallas pequeñas
+@media (max-width: 320px) {
+  .weight-cards {
+    gap: 8px;
+  }
+  
+  .weight-card {
+    padding: 12px 6px;
+    min-width: 90px;
+    
+    .weight-value {
+      font-size: 1.2rem;
+      
+      &.primary {
+        font-size: 1.4rem;
+      }
+    }
+    
+    .card-header {
+      margin-bottom: 8px;
+      
+      .hexagon-shape {
+        width: 30px;
+        height: 30px;
+        
+        ion-icon {
+          font-size: 16px;
+        }
+      }
+      
+      .card-title {
+        font-size: 0.7rem;
+      }
+    }
+  }
+}

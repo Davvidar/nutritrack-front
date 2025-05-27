@@ -1,7 +1,8 @@
+<!-- src/app/tabs/perfil/perfil.page.html -->
 <ion-header class="profile-header ion-no-border">
   <ion-toolbar>
     <ion-title>
- <!--      <div class="header-content">
+      <!-- <div class="header-content">
         <img src="../../../assets/NutriTrack.png" alt="">
       </div> -->
     </ion-title>
@@ -57,30 +58,15 @@
       </app-nutrition-summary>
     </div>
 
-    <!-- Progreso de Peso -->
+    <!-- Comparación de Peso Semanal -->
     <div class="weight-container">
       <h2 class="section-title">
         <ion-icon name="trending-down-outline"></ion-icon>
         Progresión de Peso
       </h2>
 
-      <app-weekly-weight-average [profile]="profile" [weightStartDate]="weightStartDate">
-      </app-weekly-weight-average>
-
-      <!-- Gráfico de peso simplificado -->
-      <div class="weight-chart-container">
-        <div class="weight-chart-placeholder">
-          <div class="chart-line"></div>
-          <div class="chart-dot start"></div>
-          <div class="chart-dot current"></div>
-          <div class="chart-dot target"></div>
-        </div>
-        <div class="chart-labels">
-          <span>Inicio</span>
-          <span>Hoy</span>
-          <span>Media</span>
-        </div>
-      </div>
+      <!-- Nuevo componente de comparación semanal -->
+      <app-weekly-weight-comparison></app-weekly-weight-comparison>
     </div>
 
     <!-- Información Personal -->

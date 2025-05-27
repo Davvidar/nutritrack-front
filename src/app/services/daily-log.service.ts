@@ -1,4 +1,4 @@
-// src/app/services/daily-log.service.ts
+// src/app/services/daily-log.service.ts - Versión completa actualizada
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
@@ -360,6 +360,17 @@ export class DailyLogService {
         const updatedLog: Partial<DailyLog> = { ...dailyLog, pesoDelDia: peso };
         return this.save(updatedLog);
       }),
+      tap((savedLog) => {
+        console.log('DailyLogService: *** PESO ACTUALIZADO EN BASE DE DATOS ***', {
+          fecha: date,
+          peso: peso,
+          log: savedLog
+        });
+        
+        // *** EMITIR notificación de peso actualizado ***
+        console.log('DailyLogService: *** EMITIENDO NOTIFICACIÓN DE PESO ***');
+        this.nutritionUpdateService.notifyWeightUpdated(date);
+      }),
       catchError((error: HttpErrorResponse) => {
         console.error('Error actualizando peso:', error);
         const currentUserId = this.auth.getCurrentUserId();
@@ -382,7 +393,20 @@ export class DailyLogService {
           },
           userId: currentUserId
         };
-        return this.save(newLog);
+        
+        return this.save(newLog).pipe(
+          tap((savedLog) => {
+            console.log('DailyLogService: *** NUEVO LOG DE PESO CREADO ***', {
+              fecha: date,
+              peso: peso,
+              log: savedLog
+            });
+            
+            // *** EMITIR notificación de peso para nuevo log también ***
+            console.log('DailyLogService: *** EMITIENDO NOTIFICACIÓN DE PESO (NUEVO LOG) ***');
+            this.nutritionUpdateService.notifyWeightUpdated(date);
+          })
+        );
       })
     );
   }
@@ -429,6 +453,86 @@ export class DailyLogService {
         console.error('Error obteniendo media semanal de peso:', error);
         return of({ media: null, diasConDatos: 0 });
       })
+    );
+  }
+
+  /**
+   * Obtiene la media de peso para una semana específica
+   * @param startDate Fecha de inicio de la semana (lunes)
+   * @returns Observable con la media de peso de esa semana
+   */
+  getWeeklyWeightAverage(startDate: Date): Observable<{media: number | null, diasConDatos: number}> {
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6); // Domingo de esa semana
+    
+    return this.http.get<{media: number | null, diasConDatos: number}>(
+      `${environment.API_URL}/weight/media-semanal`,
+      { 
+        headers: this.auth.getAuthHeaders(),
+        params: {
+          startDate: this.formatDateForBackend(startDate),
+          endDate: this.formatDateForBackend(endDate)
+        }
+      }
+    ).pipe(
+      catchError(error => {
+        console.error('Error obteniendo media semanal específica:', error);
+        return of({ media: null, diasConDatos: 0 });
+      })
+    );
+  }
+
+  /**
+   * Obtiene el peso de una fecha específica
+   * @param date Fecha para obtener el peso
+   * @returns Observable con el peso de esa fecha
+   */
+  getWeightForDate(date: Date): Observable<number | null> {
+    return this.getByDate(date).pipe(
+      map(dailyLog => dailyLog.pesoDelDia || null),
+      catchError(error => {
+        console.error('Error obteniendo peso para fecha específica:', error);
+        return of(null);
+      })
+    );
+  }
+
+  /**
+   * Obtiene las medias semanales comparativas
+   * @returns Observable con las medias de la semana anterior, actual y peso de hoy
+   */
+  getWeeklyWeightComparison(): Observable<{
+    previousWeekAverage: number | null;
+    currentWeekAverage: number | null;
+    todayWeight: number | null;
+    previousWeekDays: number;
+    currentWeekDays: number;
+  }> {
+    const today = new Date();
+    
+    // Calcular inicio de semana actual (lunes)
+    const currentWeekStart = new Date(today);
+    const dayOfWeek = currentWeekStart.getDay();
+    const daysFromMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Domingo = 0, queremos que sea 6
+    currentWeekStart.setDate(currentWeekStart.getDate() - daysFromMonday);
+    currentWeekStart.setHours(0, 0, 0, 0);
+    
+    // Calcular inicio de semana anterior
+    const previousWeekStart = new Date(currentWeekStart);
+    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+    
+    return forkJoin({
+      previousWeek: this.getWeeklyWeightAverage(previousWeekStart),
+      currentWeek: this.getWeeklyWeightAverage(currentWeekStart),
+      todayWeight: this.getWeightForDate(today)
+    }).pipe(
+      map(result => ({
+        previousWeekAverage: result.previousWeek.media,
+        currentWeekAverage: result.currentWeek.media,
+        todayWeight: result.todayWeight,
+        previousWeekDays: result.previousWeek.diasConDatos,
+        currentWeekDays: result.currentWeek.diasConDatos
+      }))
     );
   }
 

@@ -103,6 +103,9 @@ ion-tab-button.tab-selected {
     --border-width: 0;
     --background: var(--ion-color-primary);
     text-align: center;
+    height: 55px;
+    display: flex;
+    align-items: center;
   }
   img {
   

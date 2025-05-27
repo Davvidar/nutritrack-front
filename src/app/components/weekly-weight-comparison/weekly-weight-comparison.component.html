@@ -1,0 +1,68 @@
+<!-- src/app/components/weekly-weight-comparison/weekly-weight-comparison.component.html -->
+<div class="weight-comparison">
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="dots" color="primary"></ion-spinner>
+  </div>
+
+  <div *ngIf="!loading" class="weight-cards">
+    <!-- Semana Anterior -->
+    <div class="weight-card previous">
+      <div class="card-header">
+        <div class="hexagon-shape purple-hexagon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <div class="card-title">Sem. Anterior</div>
+      </div>
+      <div class="weight-value">{{ formatWeight(previousWeekAverage) }}kg</div>
+      <div class="weight-subtitle" *ngIf="previousWeekDays > 0">
+        {{ previousWeekDays }} día{{ previousWeekDays !== 1 ? 's' : '' }}
+      </div>
+      <div class="weight-subtitle" *ngIf="previousWeekDays === 0">
+        Sin datos
+      </div>
+    </div>
+
+    <!-- Semana Actual -->
+    <div class="weight-card current">
+      <div class="card-header">
+        <div class="hexagon-shape green-hexagon">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+        </div>
+        <div class="card-title">Esta Semana</div>
+      </div>
+      <div class="weight-value primary">{{ formatWeight(currentWeekAverage) }}kg</div>
+      <div class="weight-change" *ngIf="getWeeklyChange() as change" 
+           [class.positive]="change > 0"
+           [class.negative]="change < 0">
+        <ion-icon [name]="change > 0 ? 'trending-up' : 'trending-down'"></ion-icon>
+        {{ formatChange(change) }}kg
+      </div>
+      <div class="weight-subtitle" *ngIf="currentWeekDays > 0">
+        {{ currentWeekDays }} día{{ currentWeekDays !== 1 ? 's' : '' }}
+      </div>
+      <div class="weight-subtitle" *ngIf="currentWeekDays === 0">
+        Sin datos
+      </div>
+    </div>
+
+    <!-- Peso de Hoy -->
+    <div class="weight-card today">
+      <div class="card-header">
+        <div class="hexagon-shape orange-hexagon">
+          <ion-icon name="today-outline"></ion-icon>
+        </div>
+        <div class="card-title">Hoy</div>
+      </div>
+      <div class="weight-value">{{ formatWeight(todayWeight) }}kg</div>
+      <div class="weight-change" *ngIf="getTodayVsWeekChange() as change"
+           [class.positive]="change > 0"
+           [class.negative]="change < 0">
+        <ion-icon [name]="change > 0 ? 'arrow-up' : 'arrow-down'"></ion-icon>
+        {{ formatChange(change) }}kg vs media
+      </div>
+      <div class="weight-subtitle" *ngIf="!todayWeight">
+        No registrado
+      </div>
+    </div>
+  </div>
+</div>

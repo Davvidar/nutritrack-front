@@ -1,8 +1,10 @@
+// src/app/components/weight-tracker/weight-tracker.component.ts - Actualizado
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DailyLogService } from 'src/app/services/daily-log.service';
+import { NutritionUpdateService } from 'src/app/services/nutrition-update.service'; // Agregado
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
@@ -44,7 +46,8 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
 
   constructor(
     private dailyLogService: DailyLogService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private nutritionUpdateService: NutritionUpdateService // Agregado
   ) {}
 
   ngOnInit() {
@@ -151,11 +154,23 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
     this.loading = true;
     this.dailyLogService.updateWeight(this.selectedDate, weightValue).subscribe({
       next: () => {
+        console.log('WeightTracker: *** PESO ACTUALIZADO EXITOSAMENTE ***', {
+          fecha: this.selectedDate,
+          peso: weightValue
+        });
+        
+        // Actualizar estado local
         this.currentWeight = weightValue;
         this.editMode = false;
-        this.presentToast('Peso actualizado correctamente', 'success');
-        this.loadWeeklyHistory();
         this.loading = false;
+        
+        // *** NUEVO: Emitir notificación de actualización de peso ***
+        console.log('WeightTracker: *** EMITIENDO NOTIFICACIÓN DE PESO ***');
+        this.nutritionUpdateService.notifyWeightUpdated(this.selectedDate);
+        
+        // Recargar historial y mostrar mensaje de éxito
+        this.loadWeeklyHistory();
+        this.presentToast('Peso actualizado correctamente', 'success');
       },
       error: (err) => {
         console.error('Error guardando peso:', err);
@@ -209,6 +224,7 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
     const change = this.getChange(entry);
     return change !== null ? Math.abs(change) : 0;
   }
+  
   isSameDay(date1: Date, date2: Date): boolean {
     if (!this.isValidDate(date1) || !this.isValidDate(date2)) {
       return false;
@@ -227,5 +243,4 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
     });
     await toast.present();
   }
-  
 }

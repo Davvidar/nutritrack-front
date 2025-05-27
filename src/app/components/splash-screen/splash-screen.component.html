@@ -1,0 +1,29 @@
+<!-- src/app/components/splash-screen/splash-screen.component.html -->
+<div class="splash-container" [@fadeInOut]="animationState">
+  <div class="splash-content">
+    <!-- Logo principal -->
+    <div class="logo-container" [@logoAnimation]="animationState">
+      <div class="logo-circle">
+        <ion-icon name="nutrition-outline" class="logo-icon"></ion-icon>
+      </div>
+      <h1 class="app-name" [@textAnimation]="animationState">NutriTrack</h1>
+      <p class="app-tagline" [@textAnimation]="animationState">Tu compañero nutricional</p>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="progress-container" [@progressAnimation]="animationState">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <p class="loading-text">{{ loadingText }}</p>
+    </div>
+
+    <!-- Elementos decorativos -->
+    <div class="floating-elements">
+      <div class="floating-element" [@floatingAnimation]="'float1'">🥗</div>
+      <div class="floating-element" [@floatingAnimation]="'float2'">🍎</div>
+      <div class="floating-element" [@floatingAnimation]="'float3'">🥑</div>
+      <div class="floating-element" [@floatingAnimation]="'float4'">🥕</div>
+    </div>
+  </div>
+</div>

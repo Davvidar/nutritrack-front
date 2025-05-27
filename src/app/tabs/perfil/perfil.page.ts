@@ -9,14 +9,21 @@ import { MetricsSummaryComponent, Macros } from '../../components/metrics-summar
 import { Subscription } from 'rxjs';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { DailyLogService, SummaryResponse } from 'src/app/services/daily-log.service';
-import { WeeklyWeightAverageComponent } from 'src/app/components/weekly-weight-average/weekly-weight-average.component';
-import { NutritionGoalsModalComponent  } from 'src/app/components/nutrition-goals-edit/nutrition-goals-edit.modal';
+import { WeeklyWeightComparisonComponent } from 'src/app/components/weekly-weight-comparison/weekly-weight-comparison.component';
+import { NutritionGoalsModalComponent } from 'src/app/components/nutrition-goals-edit/nutrition-goals-edit.modal';
 import { ProfileEditModalComponent } from 'src/app/components/profile-edit-modal/profile-edit-modal.component';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterModule, NutritionSummaryComponent, MetricsSummaryComponent, WeeklyWeightAverageComponent],
+  imports: [
+    IonicModule, 
+    CommonModule, 
+    RouterModule, 
+    NutritionSummaryComponent, 
+    MetricsSummaryComponent, 
+    WeeklyWeightComparisonComponent
+  ],
   templateUrl: './perfil.page.html',
   styleUrls: ['./perfil.page.scss']
 })
@@ -41,8 +48,6 @@ export class PerfilPage implements OnInit, OnDestroy {
 
   // Trigger para forzar actualizaciones del componente hijo
   forceUpdateTrigger: number = 0;
-
-  weightStartDate = new Date(new Date().setMonth(new Date().getMonth() - 2));
 
   private nutritionSubscription?: Subscription;
   private profileSubscription?: Subscription;
@@ -90,7 +95,6 @@ export class PerfilPage implements OnInit, OnDestroy {
         this.profile = profileData;
         this.loadGoalsFromProfile(profileData);
         this.loadDailyNutritionSummary();
-        this.initializeWeightData();
       },
       error: (err: any) => {
         console.error('PerfilPage: Error cargando perfil', err);
@@ -109,17 +113,6 @@ export class PerfilPage implements OnInit, OnDestroy {
         fat: profileData.objetivosNutricionales.grasas || 0
       };
       console.log('PerfilPage: Objetivos cargados:', this.dailyGoals);
-    }
-  }
-
-  private initializeWeightData(): void {
-    if (this.profile && this.profile.peso) {
-      if (this.profile.pesoAnterior === undefined) {
-        this.profile.pesoAnterior = this.profile.peso - 0.4;
-      }
-      if (this.profile.pesoHoy === undefined) {
-        this.profile.pesoHoy = this.profile.peso - 0.1;
-      }
     }
   }
 
@@ -358,35 +351,6 @@ export class PerfilPage implements OnInit, OnDestroy {
     });
   }
 
-  // Métodos de peso
-  getWeightChange(): number | null {
-    if (!this.profile) return null;
-    const actual = this.profile.pesoHoy || this.profile.peso || 0;
-    const inicial = this.profile.pesoAnterior || this.profile.peso || 0;
-    return actual - inicial;
-  }
-
-  getTargetWeight(): number {
-    if (!this.profile) return 0;
-    const currentWeight = this.profile.peso || 0;
-
-    if (this.profile.objetivo === 'perder peso') {
-      return Math.round((currentWeight * 0.9) * 10) / 10;
-    } else if (this.profile.objetivo === 'ganar músculo') {
-      return Math.round((currentWeight * 1.05) * 10) / 10;
-    } else {
-      return currentWeight;
-    }
-  }
-
-  getWeightRemaining(): number | null {
-    if (!this.profile) return null;
-    const targetWeight = this.getTargetWeight();
-    const currentWeight = this.profile.pesoHoy || this.profile.peso || 0;
-    const remaining = targetWeight - currentWeight;
-    return Math.abs(Math.round(remaining * 10) / 10);
-  }
-
   // Métodos de navegación
   async editProfile(): Promise<void> {
     if (!this.profile) {
@@ -411,9 +375,10 @@ export class PerfilPage implements OnInit, OnDestroy {
     }
   }
 
- openSettings(): void {
-  this.router.navigate(['tabs/perfil/settings']);
-}
+  openSettings(): void {
+    this.router.navigate(['tabs/perfil/settings']);
+  }
+
   logout(): void {
     this.auth.logout().subscribe({
       next: () => {
