@@ -55,51 +55,82 @@
         [date]="selectedDate"
         *ngIf="!loading"> 
     </app-nutrition-stats-card>
-    </div>
+  </div>
   
   <div class="weight-chart-container">
-    <h3 class="section-title">
-      <ion-icon name="trending-up-outline"></ion-icon>
-      Evolución del Peso
-    </h3>
+    <!-- Header del gráfico con toggle -->
+    <div class="chart-header">
+      <h3 class="section-title">
+        <ion-icon name="trending-up-outline"></ion-icon>
+        {{ getChartTitle() }}
+      </h3>
+      
+      <!-- Toggle para cambiar tipo de datos -->
+      <div class="chart-toggle">
+        <ion-segment 
+          [(ngModel)]="showWeeklyData" 
+          (ionChange)="toggleWeightDataType()"
+          class="weight-data-toggle">
+          <ion-segment-button [value]="false">
+            <ion-label>Diario</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="true">
+            <ion-label>Semanal</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    </div>
     
-    <ion-card class="styled-card" *ngIf="!loading && weightData && weightData.length > 0">
+    <!-- Gráfico con datos dinámicos -->
+    <ion-card class="styled-card" *ngIf="!loading && getCurrentWeightData() && getCurrentWeightData().length > 0">
       <ion-card-content>
-        <app-weight-chart [weightData]="weightData"></app-weight-chart>
+        <app-weight-chart [weightData]="getCurrentWeightData()"></app-weight-chart>
       </ion-card-content>
     </ion-card>
     
-    <ion-card class="no-data-card styled-card" *ngIf="!loading && (!weightData || weightData.length === 0)">
+    <!-- Estado sin datos -->
+    <ion-card class="no-data-card styled-card" *ngIf="!loading && (!getCurrentWeightData() || getCurrentWeightData().length === 0)">
       <ion-card-content>
         <ion-icon name="scale-outline"></ion-icon>
-        <p>No hay suficientes datos para mostrar la evolución</p>
-        <ion-note>Registra tu peso diariamente para ver la evolución</ion-note>
+        <p>No hay suficientes datos para mostrar {{ showWeeklyData ? 'las medias semanales' : 'la evolución' }}</p>
+        <ion-note>
+          {{ showWeeklyData ? 
+             'Necesitas al menos una semana de datos para ver las medias semanales' : 
+             'Registra tu peso diariamente para ver la evolución' }}
+        </ion-note>
       </ion-card-content>
     </ion-card>
   </div>
   
-  <div class="stats-summary-container" *ngIf="!loading && weightData && weightData.length > 1">
+  <!-- Resumen estadístico actualizado -->
+  <div class="stats-summary-container" *ngIf="!loading && getCurrentWeightData() && getCurrentWeightData().length > 1">
     <ion-card class="styled-card">
       <ion-card-header>
-        <ion-card-title>Resumen</ion-card-title>
+        <ion-card-title>
+          Resumen {{ showWeeklyData ? '(Medias Semanales)' : '(Datos Diarios)' }}
+        </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <div class="summary-item">
-          <div class="summary-label">Peso inicial</div>
-          <div class="summary-value">{{ weightData[0].peso || '–' }} kg</div>
+          <div class="summary-label">
+            {{ showWeeklyData ? 'Primera semana' : 'Peso inicial' }}
+          </div>
+          <div class="summary-value">{{ getCurrentWeightData()[0].peso || '–' }} kg</div>
         </div>
         
         <div class="summary-item">
-          <div class="summary-label">Peso actual</div>
-          <div class="summary-value">{{ weightData[weightData.length - 1].peso || '–' }} kg</div>
+          <div class="summary-label">
+            {{ showWeeklyData ? 'Última semana' : 'Peso actual' }}
+          </div>
+          <div class="summary-value">{{ getCurrentWeightData()[getCurrentWeightData().length - 1].peso || '–' }} kg</div>
         </div>
         
-        <div class="summary-item" *ngIf="weightData.length > 1">
+        <div class="summary-item" *ngIf="getCurrentWeightData().length > 1">
           <div class="summary-label">Cambio total</div>
           <div class="summary-value" 
-               [class.weight-gain]="weightData[0] && weightData[weightData.length - 1] && (weightData[weightData.length - 1].peso - weightData[0].peso) > 0"
-               [class.weight-loss]="weightData[0] && weightData[weightData.length - 1] && (weightData[weightData.length - 1].peso - weightData[0].peso) < 0">
-            {{ weightData[0] && weightData[weightData.length - 1] ? (weightData[weightData.length - 1].peso - weightData[0].peso).toFixed(1) : '–' }} kg
+               [class.weight-gain]="getCurrentWeightData()[0] && getCurrentWeightData()[getCurrentWeightData().length - 1] && (getCurrentWeightData()[getCurrentWeightData().length - 1].peso - getCurrentWeightData()[0].peso) > 0"
+               [class.weight-loss]="getCurrentWeightData()[0] && getCurrentWeightData()[getCurrentWeightData().length - 1] && (getCurrentWeightData()[getCurrentWeightData().length - 1].peso - getCurrentWeightData()[0].peso) < 0">
+            {{ getCurrentWeightData()[0] && getCurrentWeightData()[getCurrentWeightData().length - 1] ? (getCurrentWeightData()[getCurrentWeightData().length - 1].peso - getCurrentWeightData()[0].peso).toFixed(1) : '–' }} kg
           </div>
         </div>
       </ion-card-content>

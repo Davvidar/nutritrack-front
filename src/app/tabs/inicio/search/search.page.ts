@@ -839,7 +839,7 @@ export class SearchPage implements OnInit {
 }
 
   // Utilidades
-  async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'warning' | 'danger' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,

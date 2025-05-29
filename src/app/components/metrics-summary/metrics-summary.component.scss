@@ -3,7 +3,7 @@
   width: 100%;
   background-color: var(--ion-color-primary);
   border-radius: 0px 0px 9px 9px;
-  padding: 4px 16px; //
+  padding: 4px 16px;
   display: flex;
   justify-content: space-between;
 }
@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 22%; // Consider if this is too restrictive on small screens. For now, keeping as is.
+  width: 22%;
 }
 
 .nutrient-header {
@@ -37,24 +37,21 @@
 }
 
 .calories-icon {
- background-color: #8c63d0; //
- font-weight: bolder;
-  width: 14px; // Adjusted width for better fit
-  // If ion-icon needs specific size adjustment not covered by font-size:
-  // font-size: 16px; // Example if 14px looks too small/large for the flame icon
+  background-color: #8c63d0;
+  font-weight: bolder;
+  width: 14px;
 }
 
 .protein-icon {
-  background-color: #5046c8; //
-  
+  background-color: #5046c8;
 }
 
 .carbs-icon {
-  background-color: #ff8c42; //
+  background-color: #ff8c42;
 }
 
 .fat-icon {
-  background-color: #d4ca3a; //
+  background-color: #d4ca3a;
 }
 
 .nutrient-values {

@@ -482,6 +482,15 @@ export class DailyLogService {
     );
   }
 
+  getWeeklyWeightData(): Observable<{fecha: string, peso: number}[]> {
+    return this.http.get<{fecha: string, peso: number}[]>(`${this.apiUrl}/weight/medias-semanales`).pipe(
+      catchError(error => {
+        console.error('Error obteniendo medias semanales:', error);
+        return of([]);
+      })
+    );
+  }
+
   /**
    * Obtiene el peso de una fecha específica
    * @param date Fecha para obtener el peso

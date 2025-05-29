@@ -1,10 +1,12 @@
 <!-- src/app/tabs/inicio/product-detail/product-detail.page.html -->
 <ion-header>
-  <ion-toolbar [color]="'success'">
+  <ion-toolbar [color]="'primary'">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
+      <ion-button (click)="goBack()" fill="clear">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title>
+    <ion-title color="light">
       <div *ngIf="product">{{ product.nombre }}</div>
     </ion-title>
     <!-- Botones de edición y eliminación solo para el propietario -->
@@ -83,7 +85,10 @@
         </div>
       </div>
     </div>
-
+  <ion-button expand="block" class="add-button" (click)="addToMeal()">
+  {{ editMode ? 'Actualizar' : 'Añadir' }} producto
+  <ion-icon [name]="editMode ? 'save-outline' : 'add-outline'" slot="end"></ion-icon>
+</ion-button>
     <!-- Información detallada nutricional -->
     <div class="nutrition-details">
       <h3 class="nutrition-title">Información nutricional cada 100g</h3>
@@ -152,9 +157,6 @@
     </div>
 
     <!-- Botón Añadir -->
-  <ion-button expand="block" class="add-button" (click)="addToMeal()">
-  {{ editMode ? 'Actualizar' : 'Añadir' }} producto
-  <ion-icon [name]="editMode ? 'save-outline' : 'add-outline'" slot="end"></ion-icon>
-</ion-button>
+
   </div>
 </ion-content>

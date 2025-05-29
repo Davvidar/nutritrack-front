@@ -1,12 +1,13 @@
 :host {
-  --recipe-bg-color: #fff;
-  --macro-protein-color: #5046c8; // Morado azulado
-  --macro-carbs-color: #ff8c42;   // Naranja
-  --macro-fat-color: #d4ca3a;     // Amarillo
-  --text-color: #333;
-  --text-light: #777;
-  --border-color: #ddd;
-  --success-color: #6dbd3c;       // Verde de la app
+  // Usar variables globales del sistema de temas
+  --recipe-bg-color: var(--nutri-card-background);
+  --macro-protein-color: var(--nutri-macro-protein);
+  --macro-carbs-color: var(--nutri-macro-carbs);
+  --macro-fat-color: var(--nutri-macro-fat);
+  --text-color: var(--nutri-text-primary);
+  --text-light: var(--nutri-text-secondary);
+  --border-color: var(--nutri-border-medium);
+  --success-color: var(--nutri-brand-primary);
 }
 
 ion-header ion-toolbar {

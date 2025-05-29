@@ -1,0 +1,324 @@
+// src/app/components/splash-screen/splash-screen.component.scss
+:host {
+  --splash-primary: #6ab04c;
+  --splash-secondary: #4a90e2;
+  --splash-accent: #f39c12;
+  --splash-background: #6ab04c /* linear-gradient(135deg, #667eea 0%, #764ba2 100%) */;
+  --splash-text-primary: #ffffff;
+  --splash-text-secondary: rgba(255, 255, 255, 0.8);
+}
+
+:host {
+  --splash-primary: #4CAF50;
+  --splash-primary-dark: #388E3C;
+  --splash-text-light: #FFFFFF;
+}
+
+.splash-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--splash-primary) 0%, var(--splash-primary-dark) 100%);
+  color: var(--splash-text-light);
+  text-align: center;
+  padding: 20px;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background-color: var(--splash-text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.splash-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--splash-text-light);
+}
+
+.splash-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  color: var(--splash-text-light);
+  opacity: 0.9;
+}
+
+.splash-branding {
+  position: absolute;
+  bottom: 20px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  color: var(--splash-text-light);
+}
+
+// Logo y branding
+.logo-container {
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.logo-circle {
+  width: 120px;
+  height: 120px;
+  background: var(--splash-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 0 0 10px rgba(255, 255, 255, 0.1),
+    0 0 0 20px rgba(255, 255, 255, 0.05);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    animation: rotate 8s linear infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -25px;
+    left: -25px;
+    right: -25px;
+    bottom: -25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: rotate 12s linear infinite reverse;
+  }
+}
+
+.logo-icon {
+  font-size: 4rem;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.app-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--splash-text-primary);
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.app-tagline {
+  font-size: 1.1rem;
+  color: var(--splash-text-secondary);
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+// Barra de progreso
+.progress-container {
+  margin-top: 50px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--splash-primary), var(--splash-accent));
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-20px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: var(--splash-text-secondary);
+  margin: 0;
+  font-weight: 400;
+  min-height: 24px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+// Elementos flotantes decorativos
+.floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-element {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.6;
+  animation: float 6s ease-in-out infinite;
+  
+  &:nth-child(1) {
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 6s;
+  }
+  
+  &:nth-child(2) {
+    top: 25%;
+    right: 15%;
+    animation-delay: 1.5s;
+    animation-duration: 8s;
+  }
+  
+  &:nth-child(3) {
+    bottom: 30%;
+    left: 15%;
+    animation-delay: 3s;
+    animation-duration: 7s;
+  }
+  
+  &:nth-child(4) {
+    bottom: 20%;
+    right: 10%;
+    animation-delay: 4.5s;
+    animation-duration: 9s;
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% { 
+    transform: translateY(-10px) rotate(5deg);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translateY(-20px) rotate(-5deg);
+    opacity: 1;
+  }
+  75% { 
+    transform: translateY(-15px) rotate(3deg);
+    opacity: 0.8;
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .splash-content {
+    max-width: 300px;
+    padding: 15px;
+  }
+  
+  .logo-circle {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 25px;
+  }
+  
+  .logo-icon {
+    font-size: 3rem;
+  }
+  
+  .app-name {
+    font-size: 2rem;
+  }
+  
+  .app-tagline {
+    font-size: 1rem;
+  }
+  
+  .floating-element {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .logo-container {
+    margin-bottom: 40px;
+  }
+  
+  .progress-container {
+    margin-top: 30px;
+  }
+  
+  .logo-circle {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .logo-icon {
+    font-size: 2.5rem;
+  }
+}
+
+// Modo oscuro
+/* @media (prefers-color-scheme: dark) {
+  :host {
+    --splash-background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  }
+} */
+
+// Animación de pulsación para el logo cuando se completa la carga
+.logo-circle.completed {
+  animation: pulse-success 0.6s ease-out;
+}
+
+@keyframes pulse-success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); background-color: #27ae60; }
+  100% { transform: scale(1); }
+}

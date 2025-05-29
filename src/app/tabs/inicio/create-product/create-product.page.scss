@@ -1,19 +1,20 @@
-// --- Variables de Color (Ajusta si es necesario) ---
+// --- Variables de Color (usando variables globales) ---
 :host {
-    --nutri-primary-green: #6ab04c; // Verde principal de la imagen
-    --nutri-background-page: #f4f5f8; // Fondo de la página (gris muy claro)
-    --nutri-card-background: #ffffff;
-    --nutri-text-light: #ffffff;
-    --nutri-text-dark: #333333;
-    --nutri-text-medium: #666666;
-    --nutri-text-placeholder: #b0b0b0; // Placeholder más claro
-    --nutri-input-border: #e0e0e0; // Borde sutil para inputs
+    // Usar variables globales del sistema de temas
+    --nutri-primary-green: var(--nutri-brand-primary);
+    --nutri-background-page: var(--nutri-background-secondary);
+    --nutri-card-background: var(--nutri-card-background);
+    --nutri-text-light: var(--nutri-text-inverse);
+    --nutri-text-dark: var(--nutri-text-primary);
+    --nutri-text-medium: var(--nutri-text-secondary);
+    --nutri-text-placeholder: var(--nutri-text-placeholder);
+    --nutri-input-border: var(--nutri-input-border);
   
-    // Colores de iconos de macros
-    --macro-calories-bg: #8c63d0; // Morado
-    --macro-protein-bg: #5046c8;  // Azul/Púrpura oscuro
-    --macro-carbs-bg: #ff8c42;    // Naranja
-    --macro-fat-bg: #d4ca3a;      // Amarillo
+    // Colores de iconos de macros usando variables globales
+    --macro-calories-bg: var(--nutri-macro-calories);
+    --macro-protein-bg: var(--nutri-macro-protein);
+    --macro-carbs-bg: var(--nutri-macro-carbs);
+    --macro-fat-bg: var(--nutri-macro-fat);
   }
   
   // --- Estilo General ---

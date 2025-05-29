@@ -2,23 +2,28 @@
 
 // --- Variables de Color y Estilo (Consistentes con la app) ---
 :host {
-  --nutri-primary-green: #6ab04c; // Verde principal de Nutritrack
-  --nutri-text-dark: #2c3e50;
+  --nutri-primary-green: #4CAF50;
+  --nutri-primary-dark: #388E3C;
+  --nutri-text-dark: #333333;
   --nutri-text-medium: #555f6b;
-  --nutri-text-light: #ffffff;
-  --nutri-background-light-input: #f7f8fa; // Fondo claro para inputs
-  --nutri-border-color: #e0e2e7; // Borde sutil
-  --nutri-card-background: #ffffff;
-  --nutri-card-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  --nutri-card-radius: 16px;
+  --nutri-text-light: #FFFFFF;
+  --nutri-background-light-input: #F5F5F5;
+  --nutri-border-color: #E0E0E0;
+  --nutri-card-background: #FFFFFF;
+  --nutri-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --nutri-card-radius: 12px;
+  // Colores de macros - Variables centralizadas
+  --nutri-macro-calories: #8c63d0;  // Morado para calorías
+  --nutri-macro-protein: #5046c8;   // Azul/Púrpura para proteína
+  --nutri-macro-carbs: #ff8c42;     // Naranja para carbohidratos
+  --nutri-macro-fat: #d4ca3a;       // Amarillo para grasas
 
-  // Colores de macros (ajustar para contraste y claridad)
-  --color-protein: #5046c8; // Azul/Púrpura
-  --color-carbs: #ff8c42;   // Naranja
-  --color-fat: #d4ca3a;     // Rojo/Coral
-
-
-  --ion-color-primary: var(--nutri-primary-green); // Usar el verde principal para el color primario de Ionic
+  // Alias para compatibilidad
+  --color-calories: var(--nutri-macro-calories);
+  --color-protein: var(--nutri-macro-protein);
+  --color-carbs: var(--nutri-macro-carbs);
+  --color-fat: var(--nutri-macro-fat);
+  --ion-color-primary: var(--nutri-primary-green);
 }
 
 // --- Estilos del Header del Modal ---

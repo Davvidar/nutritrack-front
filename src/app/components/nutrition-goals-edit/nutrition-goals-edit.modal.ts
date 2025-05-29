@@ -162,7 +162,7 @@ export class NutritionGoalsModalComponent implements OnInit {
       grasas: Math.round(fatCals / KCAL_PER_GRAM_FAT)
     });
     // this.updateMacroVisuals(); // Se llamará automáticamente por valueChanges
-    this.presentToast(successMessage, 'success');
+    this.presentToast(successMessage, 'primary');
   }
 
 
@@ -211,7 +211,7 @@ export class NutritionGoalsModalComponent implements OnInit {
   }
 
   // Helper para mostrar Toasts
-  async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success', duration: number = 2500) {
+  async presentToast(message: string, color: 'primary' | 'warning' | 'danger' = 'primary', duration: number = 2500) {
     const toast = await this.toastCtrl.create({
       message,
       duration: duration,

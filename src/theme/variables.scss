@@ -1,593 +1,359 @@
-// For information on how to create your own theme, please see:
+// src/theme/variables.scss - Sistema de Temas Refactorizado
+// =============================================================================
+// NUTRITRACK THEME SYSTEM
+// =============================================================================
+
+// Para más información sobre theming en Ionic:
 // http://ionicframework.com/docs/theming/
-// src/theme/variables.scss
 
+// =============================================================================
+// COLORES BASE DE LA APLICACIÓN
+// =============================================================================
 
-  // src/app/tabs/inicio/search/search.page.scss
+// Colores principales de NutriTrack
+:root {
+  // Marca NutriTrack
+  --nutri-brand-primary: #6ab04c;
+  --nutri-brand-primary-light: #7fc55e;
+  --nutri-brand-primary-dark: #5a9d3e;
+  --nutri-brand-primary-shade: #4a7a33;
+  --nutri-brand-primary-tint: #6b9a4d;
 
-// ===== VARIABLES Y COLORES =====
-:host {
-  // Colores principales de NutriTrack
-  --nutri-primary-green: #6ab04c;
-  --nutri-primary-green-light: #7fc55e;
-  --nutri-primary-green-dark: #5a9d3e;
-  
-  // Colores de texto
-  --nutri-text-light: #ffffff;
-  --nutri-text-dark: #333333;
-  --nutri-text-medium: #555555;
-  --nutri-text-muted: #777777;
-  --nutri-text-placeholder: #999999;
-  
-  // Colores de fondo
-  --nutri-background-page: #f4f5f7;
-  --nutri-card-background: #ffffff;
-  --nutri-background-accent: #f9f9f9;
-  
-  // Colores de macros (consistentes con el diseño)
-  --macro-kcal-color: #8a63d2;
-  --macro-protein-color: #5046c8;
-  --macro-carbs-color: #ff8c42;
-  --macro-fat-color: #d4ca3a;
-  
-  // Colores de estados
+  // Colores de macronutrientes (consistentes en ambos temas)
+  --nutri-macro-calories: #8c63d0;
+  --nutri-macro-protein: #5046c8;
+  --nutri-macro-carbs: #ff8c42;
+  --nutri-macro-fat: #d4ca3a;
+
+  // Estados de peso
+  --nutri-weight-loss: #27ae60;
+  --nutri-weight-gain: #e74c3c;
+  --nutri-weight-neutral: #95a5a6;
+
+  // Estados de aplicación
   --nutri-success: #28a745;
   --nutri-warning: #ffc107;
   --nutri-danger: #dc3545;
   --nutri-info: #17a2b8;
-  
-  // Bordes y sombras
-  --nutri-border-color: #e0e0e0;
+
+  // Bordes y sombras base
+  --nutri-border-radius-sm: 8px;
   --nutri-border-radius: 12px;
-  --nutri-shadow-soft: 0 3px 6px rgba(0, 0, 0, 0.08);
-  --nutri-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --nutri-shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.15);
-  
-  // Transiciones
-  --nutri-transition-fast: 0.2s ease-out;
-  --nutri-transition-normal: 0.3s ease-out;
-  --nutri-transition-slow: 0.5s ease-out;
-  
+  --nutri-border-radius-lg: 16px;
+  --nutri-border-radius-xl: 20px;
+
   // Espaciados
   --nutri-spacing-xs: 4px;
   --nutri-spacing-sm: 8px;
   --nutri-spacing-md: 16px;
   --nutri-spacing-lg: 24px;
   --nutri-spacing-xl: 32px;
+
+  // Transiciones
+  --nutri-transition-fast: 0.2s ease-out;
+  --nutri-transition-normal: 0.3s ease-out;
+  --nutri-transition-slow: 0.5s ease-out;
+
+  // Configuración de Ionic con tema de NutriTrack
+  --ion-color-primary: var(--nutri-brand-primary);
+  --ion-color-primary-rgb: 106, 176, 76;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: var(--nutri-brand-primary-shade);
+  --ion-color-primary-tint: var(--nutri-brand-primary-tint);
 }
 
-  ion-item.input-item {
-    --border-color: var(--nutri-border-color);
-    --border-radius: 17px;
-    --border-width: 1px;
-    --padding-start: 10px; // Espacio antes del icono
-    --inner-padding-end: 10px; // Espacio después del input/antes del icono final
-    --background: var(--nutri-background); // Fondo del input
-    --highlight-color-focused: var(--nutri-green); // Color del borde al enfocar (opcional)
-    --min-height: 50px; // Altura estándar
-    margin-bottom: 0; // Quitamos margen inferior si .form-field ya lo tiene
-  
-    ion-icon {
-      color: var(--nutri-text-light);
-      font-size: 1.2rem; // Tamaño de iconos
-      margin-right: 5px; // Espacio entre icono y texto
-    }
-  
-    ion-icon[slot="end"].toggle-pass {
-      margin-left: 5px;
-      margin-right: 0; // Sin margen extra a la derecha
-      cursor: pointer;
-    }
-  
-    ion-input {
-      --placeholder-color: var(--nutri-text-light);
-      --placeholder-opacity: 1;
-      --padding-start: 5px; // Padding interno del input
-      color: var(--nutri-text-dark);
-      font-size: 1rem;
-      font-weight: 500;
-    }
-  }
-
-  
-ion-header.profile-header {
-  // Asegura que no haya borde si ion-no-border no es suficiente por alguna razón.
-  &.ion-no-border {
-    ion-toolbar {
-      --border-width: 0;
-    }
-  }
-
-  ion-toolbar {
-    // Establece el color de fondo del toolbar.
-    --background: var(--ion-color-primary);
-
-    // Establece el color del texto y los iconos para que contrasten con el fondo.
-    color: var(--ion-color-primary-contrast);
-
-    ion-title {
-      color: var(--ion-color-primary-contrast); // Asegura que el título también tome el color.
-      div { // Para los divs dentro del ion-title
-        color: var(--ion-color-primary-contrast);
-      }
-    }
-  }
-}
+// =============================================================================
+// TEMA CLARO (por defecto)
+// =============================================================================
 
 :root {
-    /* …otras variables… */
-  
-    --ion-color-primary:    #538D38;
-    --ion-color-primary-rgb: 83,141,56;
-    --ion-color-primary-contrast:    #ffffff;
-    --ion-color-primary-contrast-rgb: 255,255,255;
-    --ion-color-primary-shade:       #4a7a33;
-    --ion-color-primary-tint:        #6b9a4d;
+  // Fondos
+  --nutri-background-primary: #ffffff;
+  --nutri-background-secondary: #f4f5f8;
+  --nutri-background-tertiary: #f9f9fb;
+  --nutri-background-accent: #f0f4f0;
+  --nutri-background-elevated: #ffffff;
+  --nutri-background-modal: #ffffff;
 
-    /* …resto del tema… */
-  }
-  /* src/global.scss - Añadir al final del archivo existente */
+  // Textos
+  --nutri-text-primary: #1a1a1a;
+  --nutri-text-secondary: #333333;
+  --nutri-text-tertiary: #555555;
+  --nutri-text-quaternary: #777777;
+  --nutri-text-muted: #999999;
+  --nutri-text-placeholder: #b0b0b0;
+  --nutri-text-inverse: #ffffff;
 
-/* Estilos para el scanner de código de barras */
-body.scanner-active {
-  --background: transparent;
-  --ion-background-color: transparent;
-  --ion-background-color-rgb: 0,0,0;
+  // Bordes
+  --nutri-border-light: #f0f0f0;
+  --nutri-border-medium: #e0e0e0;
+  --nutri-border-dark: #d0d0d0;
+
+  // Sombras
+  --nutri-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --nutri-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --nutri-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --nutri-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  // Estados interactivos
+  --nutri-hover-overlay: rgba(0, 0, 0, 0.04);
+  --nutri-active-overlay: rgba(0, 0, 0, 0.08);
+  --nutri-focus-overlay: rgba(106, 176, 76, 0.1);
+
+  // Inputs y formularios
+  --nutri-input-background: #f7f8fa;
+  --nutri-input-border: #e0e2e7;
+  --nutri-input-focus-border: var(--nutri-brand-primary);
+  --nutri-input-placeholder: #999999;
+
+  // Cards y contenedores
+  --nutri-card-background: #ffffff;
+  --nutri-card-border: #f0f0f0;
+  --nutri-card-shadow: var(--nutri-shadow-md);
+
+  // Navegación y headers
+  --nutri-header-background: var(--nutri-brand-primary);
+  --nutri-header-text: #ffffff;
+  --nutri-tab-background: #f8f9fa;
+  --nutri-tab-active: var(--nutri-brand-primary);
+  --nutri-tab-inactive: #6c757d;
+
+  // Overlays de peso
+  --nutri-weight-background: rgba(255, 255, 255, 0.95);
+  --nutri-weight-border: rgba(106, 176, 76, 0.2);
 }
 
-body.scanner-active {
-  /* Ocultar otros elementos mientras escanea */
-  ion-content {
-    --background: transparent;
+// =============================================================================
+// TEMA OSCURO
+// =============================================================================
+
+[data-theme="dark"] {
+  // Fondos
+  --nutri-background-primary: #121212;
+  --nutri-background-secondary: #1e1e1e;
+  --nutri-background-tertiary: #2d2d2d;
+  --nutri-background-accent: #1a2e1a;
+  --nutri-background-elevated: #242424;
+  --nutri-background-modal: #2d2d2d;
+
+  // Textos
+  --nutri-text-primary: #ffffff;
+  --nutri-text-secondary: #e0e0e0;
+  --nutri-text-tertiary: #b3b3b3;
+  --nutri-text-quaternary: #999999;
+  --nutri-text-muted: #777777;
+  --nutri-text-placeholder: #666666;
+  --nutri-text-inverse: #121212;
+
+  // Bordes
+  --nutri-border-light: #2d2d2d;
+  --nutri-border-medium: #404040;
+  --nutri-border-dark: #555555;
+
+  // Sombras
+  --nutri-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --nutri-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --nutri-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --nutri-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  // Estados interactivos
+  --nutri-hover-overlay: rgba(255, 255, 255, 0.08);
+  --nutri-active-overlay: rgba(255, 255, 255, 0.12);
+  --nutri-focus-overlay: rgba(106, 176, 76, 0.2);
+
+  // Inputs y formularios
+  --nutri-input-background: #2d2d2d;
+  --nutri-input-border: #404040;
+  --nutri-input-focus-border: var(--nutri-brand-primary);
+  --nutri-input-placeholder: #777777;
+
+  // Cards y contenedores
+  --nutri-card-background: #242424;
+  --nutri-card-border: #2d2d2d;
+  --nutri-card-shadow: var(--nutri-shadow-lg);
+
+  // Navegación y headers
+  --nutri-header-background: var(--nutri-brand-primary);
+  --nutri-header-text: #ffffff;
+  --nutri-tab-background: #1e1e1e;
+  --nutri-tab-active: var(--nutri-brand-primary);
+  --nutri-tab-inactive: #999999;
+
+  // Overlays de peso
+  --nutri-weight-background: rgba(36, 36, 36, 0.95);
+  --nutri-weight-border: rgba(106, 176, 76, 0.3);
+
+  // Ajustes específicos para macros en tema oscuro (más vibrantes)
+  --nutri-macro-calories: #a078dc;
+  --nutri-macro-protein: #6b5bd8;
+  --nutri-macro-carbs: #ff9d5c;
+  --nutri-macro-fat: #e6d85c;
+}
+
+// =============================================================================
+// MIXINS Y UTILIDADES DE TEMA
+// =============================================================================
+
+// Mixin para elementos que cambian con el tema
+@mixin themed-element {
+  background-color: var(--nutri-card-background);
+  color: var(--nutri-text-primary);
+  border: 1px solid var(--nutri-border-medium);
+  box-shadow: var(--nutri-card-shadow);
+  border-radius: var(--nutri-border-radius);
+}
+
+// Mixin para inputs
+@mixin themed-input {
+  background-color: var(--nutri-input-background);
+  border: 1px solid var(--nutri-input-border);
+  color: var(--nutri-text-primary);
+  border-radius: var(--nutri-border-radius-sm);
+
+  &::placeholder {
+    color: var(--nutri-input-placeholder);
   }
-  
-  ion-app {
-    background: transparent;
+
+  &:focus {
+    border-color: var(--nutri-input-focus-border);
+    background-color: var(--nutri-focus-overlay);
   }
 }
 
-/* Estilo adicional para el botón de escaneo en los campos de código de barras */
-.barcode-item {
-  position: relative;
+// Mixin para estados hover
+@mixin themed-hover {
+  &:hover {
+    background-color: var(--nutri-hover-overlay);
+  }
+
+  &:active {
+    background-color: var(--nutri-active-overlay);
+  }
+}
+
+// =============================================================================
+// SOBRESCRIBIR VARIABLES DE IONIC PARA TEMA OSCURO
+// =============================================================================
+
+[data-theme="dark"] {
+  --ion-background-color: var(--nutri-background-primary);
+  --ion-background-color-rgb: 18, 18, 18;
   
+  --ion-text-color: var(--nutri-text-primary);
+  --ion-text-color-rgb: 255, 255, 255;
+  
+  --ion-color-step-50: #1e1e1e;
+  --ion-color-step-100: #2d2d2d;
+  --ion-color-step-150: #3d3d3d;
+  --ion-color-step-200: #4d4d4d;
+  --ion-color-step-250: #5d5d5d;
+  --ion-color-step-300: #6d6d6d;
+  --ion-color-step-350: #7d7d7d;
+  --ion-color-step-400: #8d8d8d;
+  --ion-color-step-450: #9d9d9d;
+  --ion-color-step-500: #adadad;
+  --ion-color-step-550: #bdbdbd;
+  --ion-color-step-600: #cdcdcd;
+  --ion-color-step-650: #dddddd;
+  --ion-color-step-700: #ededed;
+  --ion-color-step-750: #f7f7f7;
+  --ion-color-step-800: #fcfcfc;
+  --ion-color-step-850: #fefefe;
+  --ion-color-step-900: #ffffff;
+  --ion-color-step-950: #ffffff;
+
+  --ion-item-background: var(--nutri-card-background);
+  --ion-card-background: var(--nutri-card-background);
+  --ion-popover-background: var(--nutri-background-modal);
+  --ion-modal-background: var(--nutri-background-modal);
+}
+
+// =============================================================================
+// CLASES DE UTILIDAD
+// =============================================================================
+
+.nutri-theme {
+  // Textos
+  &-text-primary { color: var(--nutri-text-primary) !important; }
+  &-text-secondary { color: var(--nutri-text-secondary) !important; }
+  &-text-muted { color: var(--nutri-text-muted) !important; }
+  &-text-inverse { color: var(--nutri-text-inverse) !important; }
+
+  // Fondos
+  &-bg-primary { background-color: var(--nutri-background-primary) !important; }
+  &-bg-secondary { background-color: var(--nutri-background-secondary) !important; }
+  &-bg-card { background-color: var(--nutri-card-background) !important; }
+
+  // Bordes
+  &-border { border: 1px solid var(--nutri-border-medium) !important; }
+  &-border-light { border: 1px solid var(--nutri-border-light) !important; }
+
+  // Macros
+  &-macro-calories { color: var(--nutri-macro-calories) !important; }
+  &-macro-protein { color: var(--nutri-macro-protein) !important; }
+  &-macro-carbs { color: var(--nutri-macro-carbs) !important; }
+  &-macro-fat { color: var(--nutri-macro-fat) !important; }
+}
+
+// =============================================================================
+// ESTILOS ESPECÍFICOS PARA COMPONENTES IONIC
+// =============================================================================
+
+// Elementos que necesitan ajuste manual en tema oscuro
+[data-theme="dark"] {
+  ion-item {
+    --background: var(--nutri-card-background);
+    --color: var(--nutri-text-primary);
+    --border-color: var(--nutri-border-light);
+  }
+
+  ion-card {
+    --background: var(--nutri-card-background);
+    --color: var(--nutri-text-primary);
+  }
+
+  ion-button {
+    &.button-fill-clear {
+      --color: var(--nutri-text-secondary);
+    }
+  }
+
   ion-input {
-    padding-right: 50px; // Espacio para el botón
+    --background: var(--nutri-input-background);
+    --color: var(--nutri-text-primary);
+    --placeholder-color: var(--nutri-input-placeholder);
   }
-  
-  ion-button[slot="end"] {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+
+  ion-select {
+    --background: var(--nutri-input-background);
+    --color: var(--nutri-text-primary);
   }
-}
 
-/* Animación para el scanner */
-/* src/global.scss - Añadir al final del archivo existente */
-
-/* Estilos para el scanner de código de barras */
-body.scanner-active {
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  background: transparent !important;
-}
-
-body.scanner-active ion-app {
-  background: transparent !important;
-}
-
-body.scanner-active ion-content {
-  --background: transparent !important;
-  background: transparent !important;
-}
-
-body.scanner-active ion-page {
-  display: none !important;
-}
-/* src/global.scss - Añadir al final del archivo existente */
-
-/* Estilos para el scanner de código de barras */
-body.scanner-active {
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Ocultar todos los elementos de la UI cuando el scanner está activo */
-body.scanner-active {
-  ion-app {
-    background: transparent !important;
+  ion-textarea {
+    --background: var(--nutri-input-background);
+    --color: var(--nutri-text-primary);
+    --placeholder-color: var(--nutri-input-placeholder);
   }
-  
-  ion-page {
-    opacity: 0 !important;
-    visibility: hidden !important;
+
+  ion-searchbar {
+    --background: var(--nutri-input-background);
+    --color: var(--nutri-text-primary);
+    --placeholder-color: var(--nutri-input-placeholder);
+    --border-radius: var(--nutri-border-radius);
   }
-  
-  ion-content {
-    --background: transparent !important;
-    background: transparent !important;
-    opacity: 0 !important;
-  }
-  
-  ion-content.scanner-hidden {
-    display: none !important;
-  }
-  
-  ion-header {
-    display: none !important;
-  }
-  
+
   ion-toolbar {
-    display: none !important;
+    --background: var(--nutri-header-background);
+    --color: var(--nutri-header-text);
   }
-  
+
   ion-tab-bar {
-    display: none !important;
+    --background: var(--nutri-tab-background);
+    --color: var(--nutri-tab-inactive);
   }
-  
-  ion-tabs {
-    background: transparent !important;
+
+  ion-tab-button.tab-selected {
+    --color: var(--nutri-tab-active);
   }
-  
-  .tabs-inner {
-    display: none !important;
-  }
-  
-  ion-router-outlet {
-    background: transparent !important;
-  }
-  
-  app-week-slider,
-  app-metrics-summary,
-  app-meal-accordion,
-  .meals-container {
-    display: none !important;
-  }
-  
-  /* Asegurar que cualquier spinner o loading también se oculte */
-  ion-spinner,
-  .loading-overlay {
-    display: none !important;
-  }
-}
-
-/* UI del escáner */
-.scanner-ui {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999999;
-  background-color: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.scanner-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.scanner-header {
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  padding-top: 40px; /* Espacio para la barra de estado */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
-}
-
-.scanner-title {
-  color: white;
-  font-size: 1.2rem;
-  flex: 1;
-  text-align: center;
-  margin-right: 48px; // Para compensar el botón de cerrar
-}
-
-.close-scanner {
-  --color: white;
-}
-
-.scanner-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: transparent;
-}
-
-.scanner-frame {
-  width: 280px;
-  height: 280px;
-  position: relative;
-  
-  /* Esquinas del marco */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 60px;
-    height: 60px;
-    border-top: 3px solid #6ab04c;
-    border-left: 3px solid #6ab04c;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 60px;
-    height: 60px;
-    border-bottom: 3px solid #6ab04c;
-    border-right: 3px solid #6ab04c;
-  }
-}
-
-/* Esquinas adicionales */
-/* src/global.scss - Añadir al final del archivo existente */
-
-/* Estilos para el scanner de código de barras */
-body.scanner-active {
-  --background: transparent !important;
-  --ion-background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Ocultar todos los elementos de la UI cuando el scanner está activo */
-body.scanner-active {
-  ion-app {
-    background: transparent !important;
-  }
-  
-  ion-page {
-    opacity: 0 !important;
-    visibility: hidden !important;
-  }
-  
-  ion-content {
-    --background: transparent !important;
-    background: transparent !important;
-    opacity: 0 !important;
-  }
-  
-  ion-content.scanner-hidden {
-    display: none !important;
-  }
-  
-  ion-header {
-    display: none !important;
-  }
-  
-  ion-toolbar {
-    display: none !important;
-  }
-  
-  ion-tab-bar {
-    display: none !important;
-  }
-  
-  ion-tabs {
-    background: transparent !important;
-  }
-  
-  .tabs-inner {
-    display: none !important;
-  }
-  
-  ion-router-outlet {
-    background: transparent !important;
-  }
-  
-  app-week-slider,
-  app-metrics-summary,
-  app-meal-accordion,
-  .meals-container {
-    display: none !important;
-  }
-  
-  /* Asegurar que cualquier spinner o loading también se oculte */
-  ion-spinner,
-  .loading-overlay {
-    display: none !important;
-  }
-}
-
-/* UI del escáner */
-.scanner-ui {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999999;
-  background-color: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.scanner-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.scanner-header {
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  padding-top: 40px; /* Espacio para la barra de estado */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
-}
-
-.scanner-title {
-  color: white;
-  font-size: 1.2rem;
-  flex: 1;
-  text-align: center;
-  margin-right: 48px; // Para compensar el botón de cerrar
-}
-
-.close-scanner {
-  --color: white;
-}
-
-.scanner-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: transparent;
-}
-
-.scanner-frame {
-  width: 280px;
-  height: 280px;
-  position: relative;
-  
-  /* Esquinas del marco */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 60px;
-    height: 60px;
-    border-top: 3px solid #6ab04c;
-    border-left: 3px solid #6ab04c;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 60px;
-    height: 60px;
-    border-bottom: 3px solid #6ab04c;
-    border-right: 3px solid #6ab04c;
-  }
-}
-
-/* Esquinas adicionales */
-.scanner-frame::before,
-.scanner-frame::after,
-.scanner-ui::before,
-.scanner-ui::after {
-  content: '';
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border: 3px solid #6ab04c;
-}
-
-.scanner-frame::before {
-  top: 0;
-  left: 0;
-  border-right: none;
-  border-bottom: none;
-}
-
-.scanner-frame::after {
-  bottom: 0;
-  right: 0;
-  border-left: none;
-  border-top: none;
-}
-
-.scanner-ui::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 280px;
-  height: 280px;
-  border: none;
-}
-
-.scanner-ui::before::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 60px;
-  border-top: 3px solid #6ab04c;
-  border-right: 3px solid #6ab04c;
-}
-
-.scanner-ui::before::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 60px;
-  border-bottom: 3px solid #6ab04c;
-  border-left: 3px solid #6ab04c;
-}
-
-.scanner-line {
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  background-color: #6ab04c;
-  animation: scan 2s linear infinite;
-  box-shadow: 0 0 10px #6ab04c;
-}
-
-@keyframes scan {
-  0% {
-    top: 0;
-  }
-  100% {
-    top: calc(100% - 2px);
-  }
-}
-
-.scanner-instructions {
-  color: white;
-  text-align: center;
-  margin-top: 30px;
-  font-size: 1rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 10px 20px;
-  border-radius: 8px;
-}
-
-/* Estilo adicional para el botón de escaneo en los campos de código de barras */
-.barcode-item {
-  position: relative;
-  
-  ion-input {
-    padding-right: 50px; // Espacio para el botón
-  }
-  
-  ion-button[slot="end"] {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
-
-/* Estilos para el botón de escaneo */
-.scan-button-custom,
-ion-button[slot="end"] ion-icon[name="barcode-outline"] {
-  color: var(--nutri-primary-green, #6ab04c);
-  font-size: 1.4rem;
 }

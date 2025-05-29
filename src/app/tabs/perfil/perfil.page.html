@@ -1,23 +1,39 @@
 <!-- src/app/tabs/perfil/perfil.page.html -->
-<ion-header class="profile-header ion-no-border">
-  <ion-toolbar>
-    <ion-title>
-      <!-- <div class="header-content">
-        <img src="../../../assets/NutriTrack.png" alt="">
-      </div> -->
-    </ion-title>
+<ion-header class="profile-header modern-header ion-no-border">
+  <ion-toolbar class="gradient-toolbar">
+    <div class="logo-container">
+      <img src="../../../assets/NutriTrack.png" alt="NutriTrack Logo" class="logo-image">
+    </div>
   </ion-toolbar>
-  <div class="profile-info">
-    <div class="ajustes">
-      <h1 class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</h1>
-      <ion-button fill="clear" (click)="openSettings()">
-        <ion-icon slot="icon-only" name="settings-outline" color="light" size="large"></ion-icon>
-      </ion-button>
+  <div class="profile-info enhanced-profile">
+    <div class="ajustes profile-header-content">
+      <div class="user-details">
+        <div class="avatar-placeholder">
+          <ion-icon name="person" class="avatar-icon"></ion-icon>
+        </div>
+        <div class="name-section">
+          <h1 class="profile-name">{{ profile?.nombre }} {{ profile?.apellido }}</h1>
+          <div class="welcome-text">¡Bienvenido de vuelta!</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <ion-button fill="clear" class="edit-profile-btn" (click)="editProfile()">
+          <ion-icon slot="icon-only" name="create-outline" color="light"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" (click)="openSettings()" class="settings-btn">
+          <ion-icon slot="icon-only" name="settings-outline" color="light"></ion-icon>
+        </ion-button>
+      </div>
     </div>
     
-    <div class="objective-badge">
-      <ion-icon name="flag"></ion-icon>
-      <span> Objetivo: {{ profile?.objetivo || 'Sin objetivo definido' }}</span>
+    <div class="objective-badge enhanced-badge">
+      <div class="badge-icon">
+        <ion-icon name="flag" class="flag-icon"></ion-icon>
+      </div>
+      <div class="badge-content">
+        <span class="badge-label">Objetivo</span>
+        <span class="badge-value">{{ profile?.objetivo || 'Sin objetivo definido' }}</span>
+      </div>
     </div>
   </div>
 </ion-header>
@@ -113,11 +129,5 @@
         </ion-item>
       </ion-list>
     </div>
-
-    <!-- Botón para cerrar sesión -->
-    <ion-button expand="block" fill="outline" class="logout-button" (click)="logout()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar sesión
-    </ion-button>
   </ng-container>
 </ion-content>

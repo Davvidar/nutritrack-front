@@ -49,56 +49,230 @@
 
 // src/app/tabs/inicio/search/search.page.scss
 
-// ===== VARIABLES Y COLORES =====
-:host {
-    // Colores principales de NutriTrack
-    --nutri-primary-green: #6ab04c;
-    --nutri-primary-green-light: #7fc55e;
-    --nutri-primary-green-dark: #5a9d3e;
-    
-    // Colores de texto
-    --nutri-text-light: #ffffff;
-    --nutri-text-dark: #333333;
-    --nutri-text-medium: #555555;
-    --nutri-text-muted: #777777;
-    --nutri-text-placeholder: #999999;
-    
-    // Colores de fondo
-    --nutri-background-page: #f4f5f7;
-    --nutri-card-background: #ffffff;
-    --nutri-background-accent: #f9f9f9;
-    
-    // Colores de macros
-    --macro-kcal-color: #8a63d2;
-    --macro-protein-color: #5046c8;
-    --macro-carbs-color: #ff8c42;
-    --macro-fat-color: #d4ca3a;
-    
-    // Colores de estados
-    --nutri-success: #28a745;
-    --nutri-warning: #ffc107;
-    --nutri-danger: #dc3545;
-    --nutri-info: #17a2b8;
-    
-    // Bordes y sombras
-    --nutri-border-color: #e0e0e0;
-    --nutri-border-radius: 12px;
-    --nutri-shadow-soft: 0 3px 6px rgba(0, 0, 0, 0.08);
-    --nutri-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --nutri-shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.15);
-    
-    // Transiciones
-    --nutri-transition-fast: 0.2s ease-out;
-    --nutri-transition-normal: 0.3s ease-out;
-    --nutri-transition-slow: 0.5s ease-out;
-    
-    // Espaciados
-    --nutri-spacing-xs: 4px;
-    --nutri-spacing-sm: 8px;
-    --nutri-spacing-md: 16px;
-    --nutri-spacing-lg: 24px;
-    --nutri-spacing-xl: 32px;
+// =============================================================================
+// VARIABLES GLOBALES DE NUTRITRACK
+// =============================================================================
+
+:root {
+  // Colores principales de NutriTrack
+  --nutri-primary: #6ab04c;
+  --nutri-primary-light: #7fc55e;
+  --nutri-primary-dark: #5a9d3e;
+  
+  // Colores de texto
+  --nutri-text-primary: #333333;
+  --nutri-text-secondary: #555555;
+  --nutri-text-tertiary: #777777;
+  --nutri-text-muted: #999999;
+  --nutri-text-light: #ffffff;
+  --nutri-text-dark: #2c3e50;
+  --nutri-text-medium: #555f6b;
+  
+  // Colores de fondo
+  --nutri-background-primary: #f4f5f7;
+  --nutri-background-secondary: #ffffff;
+  --nutri-card-background: #ffffff;
+  --nutri-background-accent: #f9f9f9;
+  --nutri-background-light-input: #f7f8fa;
+  
+  // Colores de macros
+  --nutri-macro-calories: #8c63d0;
+  --nutri-macro-protein: #5046c8;
+  --nutri-macro-carbs: #ff8c42;
+  --nutri-macro-fat: #d4ca3a;
+  
+  // Colores de estados
+  --nutri-success: #28a745;
+  --nutri-warning: #ffc107;
+  --nutri-danger: #dc3545;
+  --nutri-info: #17a2b8;
+  
+  // Bordes y sombras
+  --nutri-border-color: #e0e0e0;
+  --nutri-border-light: #e0e2e7;
+  --nutri-border-medium: #d0d0d0;
+  --nutri-border-radius: 12px;
+  --nutri-border-radius-sm: 8px;
+  --nutri-border-radius-lg: 16px;
+  
+  // Sombras
+  --nutri-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --nutri-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --nutri-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --nutri-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+  
+  // Transiciones
+  --nutri-transition-fast: 0.2s ease-out;
+  --nutri-transition-normal: 0.3s ease-out;
+  --nutri-transition-slow: 0.5s ease-out;
+  
+  // Espaciados
+  --nutri-spacing-xs: 4px;
+  --nutri-spacing-sm: 8px;
+  --nutri-spacing-md: 16px;
+  --nutri-spacing-lg: 24px;
+  --nutri-spacing-xl: 32px;
+  
+  // Inputs
+  --nutri-input-background: #f7f7f7;
+  --nutri-input-border: #e0e0e0;
+  --nutri-input-placeholder: #b0b0b0;
+}
+
+// =============================================================================
+// CLASES DE UTILIDAD
+// =============================================================================
+
+// Espaciado
+.nutri-spacing {
+  &-xs { margin: var(--nutri-spacing-xs) !important; }
+  &-sm { margin: var(--nutri-spacing-sm) !important; }
+  &-md { margin: var(--nutri-spacing-md) !important; }
+  &-lg { margin: var(--nutri-spacing-lg) !important; }
+  &-xl { margin: var(--nutri-spacing-xl) !important; }
+}
+
+.nutri-padding {
+  &-xs { padding: var(--nutri-spacing-xs) !important; }
+  &-sm { padding: var(--nutri-spacing-sm) !important; }
+  &-md { padding: var(--nutri-spacing-md) !important; }
+  &-lg { padding: var(--nutri-spacing-lg) !important; }
+  &-xl { padding: var(--nutri-spacing-xl) !important; }
+}
+
+// Texto
+.nutri-text {
+  &-primary { color: var(--nutri-text-primary) !important; }
+  &-secondary { color: var(--nutri-text-secondary) !important; }
+  &-tertiary { color: var(--nutri-text-tertiary) !important; }
+  &-muted { color: var(--nutri-text-muted) !important; }
+  &-light { color: var(--nutri-text-light) !important; }
+  &-dark { color: var(--nutri-text-dark) !important; }
+  &-medium { color: var(--nutri-text-medium) !important; }
+}
+
+// Fondos
+.nutri-bg {
+  &-primary { background-color: var(--nutri-background-primary) !important; }
+  &-secondary { background-color: var(--nutri-background-secondary) !important; }
+  &-card { background-color: var(--nutri-card-background) !important; }
+  &-accent { background-color: var(--nutri-background-accent) !important; }
+}
+
+// Bordes
+.nutri-border {
+  &-light { border: 1px solid var(--nutri-border-light) !important; }
+  &-medium { border: 1px solid var(--nutri-border-medium) !important; }
+  &-radius { border-radius: var(--nutri-border-radius) !important; }
+  &-radius-sm { border-radius: var(--nutri-border-radius-sm) !important; }
+  &-radius-lg { border-radius: var(--nutri-border-radius-lg) !important; }
+}
+
+// Sombras
+.nutri-shadow {
+  &-sm { box-shadow: var(--nutri-shadow-sm) !important; }
+  &-md { box-shadow: var(--nutri-shadow-md) !important; }
+  &-lg { box-shadow: var(--nutri-shadow-lg) !important; }
+  &-xl { box-shadow: var(--nutri-shadow-xl) !important; }
+}
+
+// Macros
+.nutri-macro {
+  &-calories { color: var(--nutri-macro-calories) !important; }
+  &-protein { color: var(--nutri-macro-protein) !important; }
+  &-carbs { color: var(--nutri-macro-carbs) !important; }
+  &-fat { color: var(--nutri-macro-fat) !important; }
+}
+
+// =============================================================================
+// COMPONENTES GLOBALES REUTILIZABLES
+// =============================================================================
+
+// Botones con estilo NutriTrack
+.nutri-button {
+  border: none;
+  border-radius: var(--nutri-border-radius);
+  padding: var(--nutri-spacing-sm) var(--nutri-spacing-md);
+  font-weight: 600;
+  transition: var(--nutri-transition-fast);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--nutri-shadow-md);
   }
+  
+  &.primary {
+    background-color: var(--nutri-primary);
+    color: var(--nutri-text-light);
+  }
+  
+  &.secondary {
+    background-color: var(--nutri-background-secondary);
+    color: var(--nutri-text-primary);
+    border: 1px solid var(--nutri-border-medium);
+  }
+}
+
+// Cards con estilo NutriTrack
+.nutri-card {
+  background-color: var(--nutri-card-background);
+  border-radius: var(--nutri-border-radius);
+  box-shadow: var(--nutri-shadow-sm);
+  padding: var(--nutri-spacing-md);
+  border: 1px solid var(--nutri-border-light);
+  transition: var(--nutri-transition-fast);
+  
+  &:hover {
+    box-shadow: var(--nutri-shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+// Inputs con estilo NutriTrack
+.nutri-input {
+  background-color: var(--nutri-input-background);
+  border: 1px solid var(--nutri-input-border);
+  border-radius: var(--nutri-border-radius-sm);
+  padding: var(--nutri-spacing-sm) var(--nutri-spacing-md);
+  color: var(--nutri-text-primary);
+  transition: var(--nutri-transition-fast);
+  
+  &::placeholder {
+    color: var(--nutri-input-placeholder);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--nutri-primary);
+    box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
+  }
+}
+
+// =============================================================================
+// ESTILOS BASE
+// =============================================================================
+
+// Configuración base del body
+body {
+  background-color: var(--nutri-background-primary);
+  color: var(--nutri-text-primary);
+}
+
+// Configuración de Ionic
+ion-app {
+  background: var(--nutri-background-primary);
+}
+
+// Configurar variables de Ionic para usar nuestros colores
+:root {
+  --ion-color-primary: var(--nutri-primary);
+  --ion-color-primary-rgb: 106, 176, 76;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: var(--nutri-primary-dark);
+  --ion-color-primary-tint: var(--nutri-primary-light);
+}
   
   .ingredient-selector-modal {
     --width: 90%;

@@ -1,106 +1,358 @@
-// src/app/pages/settings/settings.page.scss
+// src/app/tabs/perfil/settingsPage/settings.page.scss - Actualizado con sistema de temas
 :host {
-  --settings-card-border-radius: 16px;
-  --settings-section-margin: 20px;
+  --settings-card-border-radius: var(--nutri-border-radius-lg);
+  --settings-section-margin: var(--nutri-spacing-lg);
   --settings-item-min-height: 60px;
 }
 
+// =============================================================================
+// TOOLBAR Y HEADER
+// =============================================================================
+
 ion-toolbar {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
+  --background: var(--nutri-header-background);
+  --color: var(--nutri-header-text);
 }
 
+// =============================================================================
+// CONTENIDO PRINCIPAL
+// =============================================================================
+
 .settings-content {
-  --background: #f4f5f8;
+  --background: var(--nutri-background-secondary);
 }
 
 .settings-section {
   margin-bottom: var(--settings-section-margin);
-  padding: 0 16px;
+  padding: 0 var(--nutri-spacing-md);
   
   &:first-child {
-    margin-top: 20px;
+    margin-top: var(--nutri-spacing-lg);
   }
 }
+
+// =============================================================================
+// TÍTULOS DE SECCIÓN
+// =============================================================================
 
 .section-title {
   display: flex;
   align-items: center;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ion-color-dark);
+  color: var(--nutri-text-primary);
   margin: 0 0 12px 5px;
   
   ion-icon {
-    margin-right: 8px;
+    margin-right: var(--nutri-spacing-sm);
     font-size: 1.3rem;
-    color: var(--ion-color-primary);
+    color: var(--nutri-brand-primary);
   }
   
   &.danger-title {
     ion-icon {
-      color: var(--ion-color-danger);
+      color: var(--nutri-danger);
     }
   }
 }
 
+// =============================================================================
+// TARJETAS DE CONFIGURACIÓN
+// =============================================================================
+
 .settings-card {
   border-radius: var(--settings-card-border-radius);
   margin: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--nutri-card-shadow);
+  background: var(--nutri-card-background);
+  border: 1px solid var(--nutri-card-border);
   
   ion-item {
     --min-height: var(--settings-item-min-height);
     --background: transparent;
-    --background-hover: rgba(0, 0, 0, 0.04);
-    --background-activated: rgba(0, 0, 0, 0.08);
+    --background-hover: var(--nutri-hover-overlay);
+    --background-activated: var(--nutri-active-overlay);
+    --color: var(--nutri-text-primary);
+    --border-color: var(--nutri-border-light);
     
     ion-icon {
       font-size: 1.3rem;
-      margin-right: 16px;
-      color: var(--ion-color-primary);
+      margin-right: var(--nutri-spacing-md);
+      color: var(--nutri-brand-primary);
     }
     
     ion-label {
       h3 {
         font-size: 1rem;
         font-weight: 500;
-        color: var(--ion-color-dark);
+        color: var(--nutri-text-primary);
         margin: 0 0 4px 0;
       }
       
       p {
         font-size: 0.8rem;
-        color: var(--ion-color-medium);
+        color: var(--nutri-text-tertiary);
         margin: 0;
+      }
+    }
+    
+    // Estados hover mejorados
+    &:hover {
+      --background: var(--nutri-hover-overlay);
+    }
+    
+    &:active {
+      --background: var(--nutri-active-overlay);
+    }
+  }
+  
+  // Items de peligro
+  .danger-item {
+    ion-icon {
+      color: var(--nutri-danger);
+    }
+    
+    ion-label {
+      h3, p {
+        color: var(--nutri-danger);
       }
     }
   }
   
-  .danger-item {
+  // Item de debug (solo visible en desarrollo)
+  .debug-item {
+    opacity: 0.7;
+    
     ion-icon {
-      color: var(--ion-color-danger);
+      color: var(--nutri-text-muted);
+    }
+    
+    ion-label {
+      h3 {
+        color: var(--nutri-text-secondary);
+        font-size: 0.9rem;
+      }
+      
+      p {
+        color: var(--nutri-text-muted);
+        font-size: 0.75rem;
+        font-style: italic;
+      }
+    }
+    
+    &:hover {
+      opacity: 1;
     }
   }
 }
 
+// =============================================================================
+// TARJETAS ESPECIALES
+// =============================================================================
+
 .danger-card {
-  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  background: var(--nutri-card-background);
 }
+
+// =============================================================================
+// CONTROLES DE TEMA
+// =============================================================================
+
+// Toggle personalizado para modo oscuro
+ion-toggle {
+  --background: var(--nutri-border-medium);
+  --background-checked: var(--nutri-brand-primary);
+  --handle-background: var(--nutri-background-primary);
+  --handle-background-checked: var(--nutri-text-inverse);
+  
+  // Estados específicos del tema
+  &[aria-checked="true"] {
+    --background-checked: var(--nutri-brand-primary);
+  }
+  
+  // Cuando está deshabilitado (modo auto)
+  &[disabled] {
+    opacity: 0.5;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      pointer-events: none;
+    }
+  }
+}
+
+// Indicador visual para tema automático
+ion-item:has(ion-toggle[disabled]) {
+  ion-label p {
+    &::after {
+      content: ' (Automático activo)';
+      color: var(--nutri-brand-primary);
+      font-weight: 500;
+    }
+  }
+}
+
+// =============================================================================
+// BOTÓN DE CERRAR SESIÓN
+// =============================================================================
 
 .logout-button {
-  margin: 20px 16px 40px;
-  --border-radius: 10px;
+  margin: var(--nutri-spacing-lg) var(--nutri-spacing-md) 40px;
+  --border-radius: var(--nutri-border-radius);
   height: 48px;
+  --color: var(--nutri-text-secondary);
+  --border-color: var(--nutri-border-medium);
+  
+  &:hover {
+    --background: var(--nutri-hover-overlay);
+  }
 }
 
-ion-toggle {
-  --background: #ddd;
-  --background-checked: var(--ion-color-primary-tint);
-  --handle-background: white;
-  --handle-background-checked: var(--ion-color-primary);
-}
+// =============================================================================
+// SECCIÓN DE PELIGRO
+// =============================================================================
 
 .danger-section {
   margin-top: 30px;
+  
+  .section-title {
+    color: var(--nutri-danger);
+  }
+}
+
+// =============================================================================
+// ANIMACIONES Y TRANSICIONES
+// =============================================================================
+
+.settings-card {
+  transition: box-shadow var(--nutri-transition-fast), 
+              border-color var(--nutri-transition-fast),
+              background-color var(--nutri-transition-normal);
+  
+  &:hover {
+    box-shadow: var(--nutri-shadow-lg);
+  }
+}
+
+ion-item {
+  transition: background-color var(--nutri-transition-fast);
+}
+
+// Animación para el toggle del modo oscuro
+ion-toggle {
+  transition: all var(--nutri-transition-normal);
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN
+// =============================================================================
+
+@media (max-width: 320px) {
+  .settings-section {
+    padding: 0 var(--nutri-spacing-sm);
+  }
+  
+  .section-title {
+    font-size: 1rem;
+    
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+  
+  .settings-card ion-item {
+    --min-height: 55px;
+    
+    ion-label {
+      h3 {
+        font-size: 0.9rem;
+      }
+      
+      p {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// MEJORAS DE ACCESIBILIDAD
+// =============================================================================
+
+// Mejorar el contraste para elementos de foco
+ion-item:focus-within {
+  outline: 2px solid var(--nutri-brand-primary);
+  outline-offset: 2px;
+}
+
+ion-toggle:focus {
+  outline: 2px solid var(--nutri-brand-primary);
+  outline-offset: 2px;
+}
+
+// Estados de alto contraste
+@media (prefers-contrast: high) {
+  .settings-card {
+    border-width: 2px;
+  }
+  
+  ion-item {
+    --border-width: 1px;
+  }
+  
+  .section-title {
+    font-weight: 700;
+  }
+}
+
+// =============================================================================
+// INDICADORES VISUALES PARA DEBUG
+// =============================================================================
+
+// En modo desarrollo, mostrar indicadores visuales del tema actual
+.debug-theme-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  pointer-events: none;
+  
+  &.light-theme {
+    background: #000;
+    color: #fff;
+  }
+  
+  &.dark-theme {
+    background: #fff;
+    color: #000;
+  }
+  
+  &.auto-theme {
+    background: var(--nutri-brand-primary);
+    color: white;
+  }
+}
+
+// Solo mostrar en desarrollo
+body:not(.production) {
+  .debug-item {
+    display: block;
+  }
+}
+
+body.production {
+  .debug-item {
+    display: none;
+  }
 }

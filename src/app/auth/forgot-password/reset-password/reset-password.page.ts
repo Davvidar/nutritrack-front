@@ -76,7 +76,7 @@ export class ResetPasswordPage implements OnInit {
         loading.dismiss();
         this.loading = false;
         this.resetSuccess = true;
-        this.presentToast('Contraseña restablecida correctamente. Ya puedes iniciar sesión.', 'success');
+        this.presentToast('Contraseña restablecida correctamente. Ya puedes iniciar sesión.', 'primary');
       },
       error: (err) => {
         loading.dismiss();
@@ -94,7 +94,7 @@ export class ResetPasswordPage implements OnInit {
     });
   }
 
-  async presentToast(message: string, color: 'success' | 'danger' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'danger' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 3000,

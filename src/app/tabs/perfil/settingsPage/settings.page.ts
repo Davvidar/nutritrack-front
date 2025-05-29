@@ -1,10 +1,14 @@
-// src/app/tabs/settings/settings.page.ts
-import { Component } from '@angular/core';
+// src/app/tabs/perfil/settingsPage/settings.page.ts - Actualizado con gestión de temas
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule, AlertController, LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+
+// Servicios
 import { AuthService, UserProfile } from '../../../services/auth.service';
+import { ThemeService, Theme } from '../../../services/theme.service';
 
 // Importar los componentes de modales existentes
 import { ProfileEditModalComponent } from '../../../components/profile-edit-modal/profile-edit-modal.component';
@@ -21,21 +25,61 @@ import { NutritionGoalsModalComponent } from '../../../components/nutrition-goal
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss']
 })
-export class SettingsPage {
+export class SettingsPage implements OnInit, OnDestroy {
   profile: UserProfile | null = null;
+  
+  // Propiedades para el tema
+  currentTheme: Theme = 'light';
+  isDarkMode: boolean = false;
+  themeOptions = [
+    { value: 'light', label: 'Claro', icon: 'sunny-outline' },
+    { value: 'dark', label: 'Oscuro', icon: 'moon-outline' },
+    { value: 'auto', label: 'Automático', icon: 'phone-portrait-outline' }
+  ];
+  
+  private themeSubscription?: Subscription;
+  private darkModeSubscription?: Subscription;
   
   constructor(
     private authService: AuthService,
+    private themeService: ThemeService,
     private alertController: AlertController,
     private loadingController: LoadingController,
     private toastController: ToastController,
     private modalController: ModalController,
-    private router: Router,
-    
+    private router: Router
   ) {}
+
+  ngOnInit() {
+    this.setupThemeSubscriptions();
+  }
+
+  ngOnDestroy() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+    if (this.darkModeSubscription) {
+      this.darkModeSubscription.unsubscribe();
+    }
+  }
 
   ionViewWillEnter() {
     this.loadProfile();
+  }
+
+  /**
+   * Configura las suscripciones para cambios de tema
+   */
+  private setupThemeSubscriptions(): void {
+    this.themeSubscription = this.themeService.currentTheme$.subscribe(theme => {
+      this.currentTheme = theme;
+      console.log('Settings: Tema actualizado a:', theme);
+    });
+
+    this.darkModeSubscription = this.themeService.isDarkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+      console.log('Settings: Modo oscuro:', isDark);
+    });
   }
 
   loadProfile() {
@@ -50,7 +94,99 @@ export class SettingsPage {
     });
   }
 
-  // Reutilizamos el modal existente para editar perfil
+  // =============================================================================
+  // MÉTODOS PARA GESTIÓN DE TEMA
+  // =============================================================================
+
+  /**
+   * Alterna el modo oscuro on/off
+   */
+  toggleDarkMode(event: any): void {
+    const isEnabled = event.detail.checked;
+    console.log('Settings: Toggle modo oscuro:', isEnabled);
+    
+    // Si el usuario activa/desactiva manualmente, salir del modo auto
+    if (this.currentTheme === 'auto') {
+      this.themeService.setTheme(isEnabled ? 'dark' : 'light');
+    } else {
+      this.themeService.toggleTheme();
+    }
+    
+    this.presentToast(
+      `Modo ${isEnabled ? 'oscuro' : 'claro'} activado`, 
+      'primary'
+    );
+  }
+
+  /**
+   * Abre selector de tema con opciones completas
+   */
+  async openThemeSelector(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Seleccionar tema',
+      message: 'Elige cómo quieres que se vea la aplicación',
+      inputs: this.themeOptions.map(option => ({
+        type: 'radio',
+        label: option.label,
+        value: option.value,
+        checked: this.currentTheme === option.value
+      })),
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Aplicar',
+          handler: (selectedTheme: Theme) => {
+            if (selectedTheme && selectedTheme !== this.currentTheme) {
+              this.themeService.setTheme(selectedTheme);
+              this.presentToast(`Tema ${this.getThemeLabel(selectedTheme)} aplicado`, 'primary');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Obtiene la etiqueta amigable del tema
+   */
+  private getThemeLabel(theme: Theme): string {
+    const option = this.themeOptions.find(opt => opt.value === theme);
+    return option ? option.label.toLowerCase() : theme;
+  }
+
+  /**
+   * Obtiene el icono del tema actual
+   */
+  getCurrentThemeIcon(): string {
+    if (this.currentTheme === 'auto') {
+      return this.isDarkMode ? 'moon-outline' : 'sunny-outline';
+    }
+    
+    const option = this.themeOptions.find(opt => opt.value === this.currentTheme);
+    return option ? option.icon : 'contrast-outline';
+  }
+
+  /**
+   * Obtiene la descripción del tema actual
+   */
+  getCurrentThemeDescription(): string {
+    if (this.currentTheme === 'auto') {
+      return `Automático (${this.isDarkMode ? 'oscuro' : 'claro'} actualmente)`;
+    }
+    
+    const option = this.themeOptions.find(opt => opt.value === this.currentTheme);
+    return option ? option.label : 'Personalizado';
+  }
+
+  // =============================================================================
+  // MÉTODOS EXISTENTES (sin cambios)
+  // =============================================================================
+
   async openProfileEditModal() {
     if (!this.profile) {
       this.presentToast('No se pudo cargar la información del perfil', 'warning');
@@ -73,7 +209,6 @@ export class SettingsPage {
     }
   }
 
-  // Reutilizamos el modal existente para objetivos nutricionales
   async openNutritionGoalsModal() {
     if (!this.profile || !this.profile.objetivosNutricionales) {
       this.presentToast('No se pudieron cargar los objetivos nutricionales', 'warning');
@@ -99,7 +234,7 @@ export class SettingsPage {
       this.authService.updateProfile({ objetivosNutricionales: data }).subscribe({
         next: (updatedProfile) => {
           this.profile = updatedProfile;
-          this.presentToast('Objetivos nutricionales actualizados', 'success');
+          this.presentToast('Objetivos nutricionales actualizados', 'primary');
         },
         error: (err) => {
           console.error('Error actualizando objetivos', err);
@@ -165,7 +300,7 @@ export class SettingsPage {
               .subscribe({
                 next: () => {
                   loading.dismiss();
-                  this.presentToast('Contraseña cambiada correctamente', 'success');
+                  this.presentToast('Contraseña cambiada correctamente', 'primary');
                 },
                 error: (err) => {
                   loading.dismiss();
@@ -232,7 +367,7 @@ export class SettingsPage {
                       .subscribe({
                         next: () => {
                           loading.dismiss();
-                          this.presentToast('Cuenta eliminada correctamente', 'success');
+                          this.presentToast('Cuenta eliminada correctamente', 'primary');
                           this.router.navigate(['/auth/login']);
                         },
                         error: (err) => {
@@ -278,7 +413,7 @@ export class SettingsPage {
     });
   }
 
-  async presentToast(message: string, color: 'success' | 'warning' | 'danger' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'warning' | 'danger' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
@@ -286,5 +421,16 @@ export class SettingsPage {
       color
     });
     await toast.present();
+  }
+
+  /**
+   * Método para debug - mostrar información del tema
+   */
+  debugTheme(): void {
+    console.log('=== DEBUG TEMA ===');
+    this.themeService.debugThemeState();
+    console.log('Componente - currentTheme:', this.currentTheme);
+    console.log('Componente - isDarkMode:', this.isDarkMode);
+    console.log('==================');
   }
 }

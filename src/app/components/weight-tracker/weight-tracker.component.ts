@@ -170,7 +170,7 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
         
         // Recargar historial y mostrar mensaje de éxito
         this.loadWeeklyHistory();
-        this.presentToast('Peso actualizado correctamente', 'success');
+        this.presentToast('Peso actualizado correctamente', 'primary');
       },
       error: (err) => {
         console.error('Error guardando peso:', err);
@@ -234,7 +234,7 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
            date1.getDate() === date2.getDate();
   }
 
-  async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'danger' | 'warning' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,

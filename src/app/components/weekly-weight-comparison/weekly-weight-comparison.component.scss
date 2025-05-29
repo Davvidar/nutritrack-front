@@ -30,7 +30,7 @@
 
 .weight-cards {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   gap: 12px;
 }
@@ -118,7 +118,6 @@
   }
 }
 
-// Colores específicos para cada hexágono
 .purple-hexagon {
   background-color: var(--color-previous);
 }
@@ -131,7 +130,7 @@
   background-color: var(--color-today);
 }
 
-// Estilos específicos para cada tarjeta
+
 .weight-card.previous {
   .card-header .card-title {
     color: var(--color-previous);

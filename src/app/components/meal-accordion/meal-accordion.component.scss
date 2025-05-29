@@ -2,14 +2,11 @@
 .food-tracker {
   margin: auto;
   width: 90%;
-  border-radius: 12px;
   background-color: white;
+  border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   margin-bottom: 12px;
-
-
-
 }
 
 .food-tracker-header {
@@ -17,8 +14,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
+  background-color: white;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
+  transition: background-color 0.2s ease;
   font-weight: bolder;
 }
 
@@ -34,7 +33,6 @@
   justify-content: space-between;
   padding: 10px 20px;
   background-color: #ffffff;
-
 }
 
 .food-tracker-summary span {

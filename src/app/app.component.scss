@@ -9,8 +9,40 @@
     --nutri-background-accent-muted-dark: #c0c0c0;
     --nutri-background-accent-muted-lighter: #f2f2f2;
     --nutri-background-accent-muted-darker: #b0b0b0;
+    height: 100%;
 }
+    
+    ion-app {
+        transition: opacity 0.3s ease-in-out;
+        background:#f4f5f7
+    }
 
-ion-app {
-    background:#f4f5f7
-}
+    .app-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-exit {
+      animation: fadeOut 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    /* Asegurar que el splash screen esté por encima de todo */
+    app-splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10000;
+    }

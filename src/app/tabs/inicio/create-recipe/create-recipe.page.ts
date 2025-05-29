@@ -278,7 +278,7 @@ export class CreateRecipePage implements OnInit {
         saveOperation.subscribe({
             next: (savedRecipe) => {
                 loading.dismiss();
-                this.presentToast(this.isEditMode ? 'Receta actualizada correctamente' : 'Receta creada correctamente', 'success');
+                this.presentToast(this.isEditMode ? 'Receta actualizada correctamente' : 'Receta creada correctamente', 'primary');
                 
                 // Si hay parámetros de fecha y comida, navegar a la página de detalle
                 if (this.dateParam && this.mealParam) {
@@ -301,7 +301,7 @@ export class CreateRecipePage implements OnInit {
         });
     }
     
-    async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
+    async presentToast(message: string, color: 'primary' | 'danger' | 'warning' = 'primary') {
         const toast = await this.toastController.create({
             message,
             duration: 2000,

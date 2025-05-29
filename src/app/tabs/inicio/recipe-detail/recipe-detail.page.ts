@@ -303,7 +303,7 @@ export class RecipeDetailPage implements OnInit {
       message,
       duration: 2000,
       position: 'bottom',
-      color: 'success'
+      color: 'primary'
     });
     await toast.present();
   }

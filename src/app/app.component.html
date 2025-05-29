@@ -1,3 +1,10 @@
-<ion-app>
-  <ion-router-outlet></ion-router-outlet>
-</ion-app>
+ <!-- Splash Screen -->
+    <app-splash-screen 
+      *ngIf="splashState.isVisible"
+      [class.splash-exit]="!splashState.isLoading && splashState.progress >= 100">
+    </app-splash-screen>
+
+    <!-- Aplicación principal -->
+    <ion-app [class.app-hidden]="splashState.isVisible">
+      <ion-router-outlet></ion-router-outlet>
+    </ion-app>

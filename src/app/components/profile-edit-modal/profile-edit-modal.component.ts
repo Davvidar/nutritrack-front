@@ -118,7 +118,7 @@ export class ProfileEditModalComponent implements OnInit {
     this.authService.updateProfile(updateData).subscribe({
       next: (updatedProfile) => {
         this.loading = false;
-        this.presentToast('Perfil actualizado correctamente', 'success');
+        this.presentToast('Perfil actualizado correctamente', 'primary');
         this.modalController.dismiss(updatedProfile);
       },
       error: (err) => {
@@ -150,7 +150,7 @@ export class ProfileEditModalComponent implements OnInit {
     });
   }
   
-  async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'danger' | 'warning' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,

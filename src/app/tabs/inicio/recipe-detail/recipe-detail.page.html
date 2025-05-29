@@ -1,7 +1,9 @@
 <ion-header>
-  <ion-toolbar [color]="'success'">
+  <ion-toolbar [color]="'primary'">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/inicio/search"></ion-back-button>
+      <ion-button (click)="goBack()" fill="clear">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>
       <div *ngIf="recipe">{{ recipe.nombre }}</div>
@@ -46,12 +48,7 @@
     <div class="cantidad-container">
       <h3>Cantidad a consumir</h3>
       <ion-item class="cantidad-input">
-        <ion-input 
-          type="number" 
-          inputmode="numeric" 
-          [(ngModel)]="cantidad" 
-          min="1" 
-          placeholder="100">
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="cantidad" min="1" placeholder="100">
         </ion-input>
         <div class="cantidad-suffix">g</div>
       </ion-item>
@@ -60,7 +57,7 @@
     <!-- Información nutricional por cantidad seleccionada -->
     <div class="nutrition-card">
       <h3 class="nutrition-title">Información nutricional para {{ cantidad }}g</h3>
-      
+
       <!-- Círculo de calorías -->
       <div class="calories-circle-container">
         <div class="calories-circle">
@@ -82,47 +79,50 @@
         </div>
       </div>
     </div>
-
+    <ion-button expand="block" class="add-button" (click)="addToMeal()">
+      Añadir receta
+      <ion-icon name="add-outline" slot="end"></ion-icon>
+    </ion-button>
     <!-- Información detallada nutricional -->
     <div class="nutrition-details">
       <h3 class="nutrition-title">Información nutricional completa</h3>
-      
+
       <div class="nutrient-row">
         <div class="nutrient-icon calories-icon">C</div>
         <div class="nutrient-name">Calorías</div>
         <div class="nutrient-value">{{ recipe.calorias | number:'1.0-0' }} kcal</div>
       </div>
-      
+
       <div class="nutrient-row">
         <div class="nutrient-icon fat-icon">G</div>
         <div class="nutrient-name">Grasas</div>
         <div class="nutrient-value">{{ recipe.grasas | number:'1.0-0' }}g</div>
       </div>
-      
+
       <div class="nutrient-row" *ngIf="recipe.grasasSaturadas !== undefined">
         <div class="nutrient-icon"></div>
         <div class="nutrient-name indent">saturadas</div>
         <div class="nutrient-value">{{ recipe.grasasSaturadas | number:'1.0-0' }}g</div>
       </div>
-      
+
       <div class="nutrient-row">
         <div class="nutrient-icon carbs-icon">H</div>
         <div class="nutrient-name">H. de carbono</div>
         <div class="nutrient-value">{{ recipe.carbohidratos | number:'1.0-0' }}g</div>
       </div>
-      
+
       <div class="nutrient-row" *ngIf="recipe.azucares !== undefined">
         <div class="nutrient-icon"></div>
         <div class="nutrient-name indent">Azúcares</div>
         <div class="nutrient-value">{{ recipe.azucares | number:'1.0-0' }}g</div>
       </div>
-      
+
       <div class="nutrient-row">
         <div class="nutrient-icon protein-icon">P</div>
         <div class="nutrient-name">Proteínas</div>
         <div class="nutrient-value">{{ recipe.proteinas | number:'1.0-0' }}g</div>
       </div>
-      
+
       <div class="nutrient-row" *ngIf="recipe.fibra !== undefined">
         <div class="nutrient-icon"></div>
         <div class="nutrient-name">Fibra</div>
@@ -136,26 +136,24 @@
         <h3 class="ingredients-title">Ingredientes</h3>
         <ion-icon [name]="showIngredients ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
       </div>
-      
+
       <div class="ingredients-list" *ngIf="showIngredients">
         <div class="ingredient-item" *ngFor="let ingredient of enrichedIngredients">
           <div class="ingredient-info">
             <div class="ingredient-name">{{ ingredient.product?.nombre || 'Producto no encontrado' }}</div>
-            <div class="ingredient-brand" *ngIf="ingredient.product?.marca">{{ ingredient.product?.marca ?? 'Marca no disponible' }}</div>
+            <div class="ingredient-brand" *ngIf="ingredient.product?.marca">{{ ingredient.product?.marca ?? 'Marca no
+              disponible' }}</div>
           </div>
           <div class="ingredient-quantity">{{ ingredient.cantidad }}g</div>
         </div>
-        
+
         <div class="no-ingredients" *ngIf="enrichedIngredients.length === 0">
           <p>No hay ingredientes disponibles para mostrar</p>
         </div>
       </div>
     </div>
 
-    <!-- Botón Añadir -->
-    <ion-button expand="block" class="add-button" (click)="addToMeal()">
-      Añadir receta
-      <ion-icon name="add-outline" slot="end"></ion-icon>
-    </ion-button>
+
+
   </div>
 </ion-content>

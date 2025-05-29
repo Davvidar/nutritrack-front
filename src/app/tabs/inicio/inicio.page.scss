@@ -1,24 +1,17 @@
-ion-header.nutri-header {
-    margin: 0;
-    box-shadow: 0;
+ ion-header.nutri-header {
+   ion-toolbar.nutri-header {
     --border-width: 0;
-    &.ion-no-border {
-      ion-toolbar {
-        img{
-          width: 40%
-        }
-          --border-width: 0;
-          
-        }
-      }
-    ion-toolbar.nutri-header {
-        --border-width: 0;
-        --background: var(--ion-color-primary);
-        text-align: center;
-       
-    }
+    --background: var(--ion-color-primary);
+    text-align: center;
+    height: 55px;
+    display: flex;
+    align-items: center;
+  }
+  img {
+  
+    width: 40%;
+  }
 }
-
 
 .global-spinner {
     position: fixed;

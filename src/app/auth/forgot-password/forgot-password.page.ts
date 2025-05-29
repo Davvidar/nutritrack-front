@@ -45,7 +45,7 @@ export class ForgotPasswordPage {
         loading.dismiss();
         this.loading = false;
         this.requestSent = true;
-        this.presentToast('Se ha enviado un email con instrucciones para restablecer tu contraseña.', 'success');
+        this.presentToast('Se ha enviado un email con instrucciones para restablecer tu contraseña.', 'primary');
       },
       error: (err) => {
         loading.dismiss();
@@ -56,7 +56,7 @@ export class ForgotPasswordPage {
     });
   }
 
-  async presentToast(message: string, color: 'success' | 'danger' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'danger' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 3000,

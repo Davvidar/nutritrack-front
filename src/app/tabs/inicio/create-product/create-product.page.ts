@@ -90,7 +90,7 @@ export class CreateProductPage implements OnInit {
           codigoBarras: barcode
         });
         
-        await this.presentToast('Código de barras capturado correctamente', 'success');
+        await this.presentToast('Código de barras capturado correctamente', 'primary');
         
         // Opcional: Verificar si el producto ya existe
         await this.checkExistingProduct(barcode);
@@ -234,7 +234,7 @@ export class CreateProductPage implements OnInit {
     this.productService.create(productData).subscribe({
       next: (createdProduct) => {
         loading.dismiss();
-        this.presentToast('Producto creado correctamente', 'success');
+        this.presentToast('Producto creado correctamente', 'primary');
         
         // Si hay parámetros de fecha y comida, navegar a la página de detalle del producto
         if (this.dateParam && this.mealParam) {
@@ -263,7 +263,7 @@ export class CreateProductPage implements OnInit {
     });
   }
 
-  async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
+  async presentToast(message: string, color: 'primary' | 'danger' | 'warning' = 'primary') {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
