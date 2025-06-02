@@ -1,4 +1,4 @@
-// src/app/services/daily-log.service.ts - Versión completa actualizada
+// src/app/services/daily-log.service.ts - Versión completa actualizada con medias semanales
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
@@ -66,6 +66,7 @@ export interface SummaryResponse {
 @Injectable({ providedIn: 'root' })
 export class DailyLogService {
   private readonly API = environment.API_URL + '/dailylogs';
+  private readonly apiUrl = environment.API_URL; // Para las rutas de weight
   
   constructor(
     private http: HttpClient,
@@ -417,7 +418,7 @@ export class DailyLogService {
    */
   getWeightHistory(): Observable<{fecha: string, peso: number}[]> {
     return this.http.get<{fecha: string, peso: number}[]>(
-      `${environment.API_URL}/weight/historial`,
+      `${this.apiUrl}/weight/historial`,
       { headers: this.auth.getAuthHeaders() }
     ).pipe(
       catchError(error => {
@@ -446,7 +447,7 @@ export class DailyLogService {
 
   getWeightWeeklyAverage(): Observable<{media: number | null, diasConDatos: number}> {
     return this.http.get<{media: number | null, diasConDatos: number}>(
-      `${environment.API_URL}/weight/media-semanal`,
+      `${this.apiUrl}/weight/media-semanal`,
       { headers: this.auth.getAuthHeaders() }
     ).pipe(
       catchError(error => {
@@ -466,7 +467,7 @@ export class DailyLogService {
     endDate.setDate(endDate.getDate() + 6); // Domingo de esa semana
     
     return this.http.get<{media: number | null, diasConDatos: number}>(
-      `${environment.API_URL}/weight/media-semanal`,
+      `${this.apiUrl}/weight/media-semanal`,
       { 
         headers: this.auth.getAuthHeaders(),
         params: {
@@ -482,8 +483,15 @@ export class DailyLogService {
     );
   }
 
+  /**
+   * NUEVO: Obtiene las medias semanales de peso para el gráfico
+   * Retorna un array con la fecha (lunes de cada semana) y el peso promedio
+   */
   getWeeklyWeightData(): Observable<{fecha: string, peso: number}[]> {
-    return this.http.get<{fecha: string, peso: number}[]>(`${this.apiUrl}/weight/medias-semanales`).pipe(
+    return this.http.get<{fecha: string, peso: number}[]>(
+      `${this.apiUrl}/weight/medias-semanales`,
+      { headers: this.auth.getAuthHeaders() }
+    ).pipe(
       catchError(error => {
         console.error('Error obteniendo medias semanales:', error);
         return of([]);
@@ -507,10 +515,37 @@ export class DailyLogService {
   }
 
   /**
-   * Obtiene las medias semanales comparativas
+   * ACTUALIZADO: Obtiene las medias semanales comparativas con más detalles
    * @returns Observable con las medias de la semana anterior, actual y peso de hoy
    */
   getWeeklyWeightComparison(): Observable<{
+    previousWeekAverage: number | null;
+    currentWeekAverage: number | null;
+    todayWeight: number | null;
+    previousWeekDays: number;
+    currentWeekDays: number;
+    currentWeekStart?: string;
+    previousWeekStart?: string;
+  }> {
+    // OPCIÓN 1: Usar el nuevo endpoint del backend (recomendado)
+    return this.http.get<any>(
+      `${this.apiUrl}/weight/comparacion-semanal`,
+      { headers: this.auth.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        console.error('Error obteniendo comparación semanal del backend:', error);
+        
+        // OPCIÓN 2: Fallback - calcular en el frontend (como antes)
+        return this.calculateWeeklyComparisonFallback();
+      })
+    );
+  }
+
+  /**
+   * NUEVO: Método de fallback para calcular comparación semanal en el frontend
+   * Se usa si el endpoint del backend no está disponible
+   */
+  private calculateWeeklyComparisonFallback(): Observable<{
     previousWeekAverage: number | null;
     currentWeekAverage: number | null;
     todayWeight: number | null;

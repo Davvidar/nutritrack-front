@@ -108,24 +108,42 @@
   
   
   // --- Código de Barras ---
-  ion-item.barcode-item-custom {
-    position: relative; // Para posicionar el botón de scan
+   .barcode-item-fixed {
+    --padding-end: 8px; // Espacio para el botón
+    
     ion-input {
-      padding-right: 50px !important; // Espacio para el botón
+      --padding-end: 8px; // Espacio interno para que no se solape con el botón
+      
     }
-  }
-  
-  .scan-button-custom {
-    position: absolute;
-    right: 8px; // Posición a la derecha
-    top: 58%; // Ajustar verticalmente (considera altura del input + label)
-    transform: translateY(-50%);
-    --color: var(--nutri-primary-green); // Color del icono
-    font-size: 1.6rem; // Tamaño del icono
-    --padding-start: 6px;
-    --padding-end: 6px;
-    height: 38px; // Para que no sea muy grande
-    margin: 0;
+    
+    .scan-button-fixed {
+      // NO usar position absolute - dejar que Ionic lo maneje automáticamente
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --color: var(--nutri-primary-green);
+      margin: 0;
+      height: 40px;
+      width: 80px;
+      
+      // CRÍTICO: Asegurar que es clickeable
+      pointer-events: auto !important;
+      touch-action: manipulation !important;
+      z-index: 10;
+      
+      ion-icon {
+        font-size: 1.4rem;
+      }
+      
+      // Feedback visual para confirmar que es clickeable
+      &:hover {
+        --background: rgba(106, 176, 76, 0.1);
+      }
+      
+      &:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+      }
+    }
   }
   
   // --- Título de Sección ---
@@ -234,9 +252,7 @@
   }
   .more-info-content { // Contenedor de los campos extra
     padding-bottom: 10px; // Espacio si hay campos
-    ion-item.transparent-item {
-      // Reutilizar estilos de los items de arriba
-    }
+    
   }
   
   // --- Botón "Crear producto" ---

@@ -11,7 +11,7 @@
       <div class="form-fields-container">
         <ion-item lines="none" class="transparent-item first-item">
           <ion-label position="stacked">Nombre*</ion-label>
-          <ion-input formControlName="nombre" type="text" placeholder="Ej: Manzana Fuji"></ion-input>
+          <ion-input formControlName="nombre" type="text" placeholder="Nombre"></ion-input>
           <ion-note slot="error" *ngIf="productForm.get('nombre')?.touched && productForm.get('nombre')?.errors?.['required']">
             El nombre es obligatorio
           </ion-note>
@@ -19,16 +19,20 @@
   
         <ion-item lines="none" class="transparent-item">
           <ion-label position="stacked">Marca</ion-label>
-          <ion-input formControlName="marca" type="text" placeholder="Ej: Golden"></ion-input>
+          <ion-input formControlName="marca" type="text" placeholder="Marca"></ion-input>
         </ion-item>
   
-        <ion-item lines="none" class="transparent-item barcode-item-custom">
-          <ion-label position="stacked">Código de barras</ion-label>
-          <ion-input formControlName="codigoBarras" type="text" placeholder="Escanear o introducir"></ion-input>
-          <ion-button slot="end" fill="clear" (click)="onScanBarcode()" class="scan-button-custom">
-            <ion-icon name="barcode-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-item>
+     <ion-item lines="none" class="transparent-item barcode-item-fixed">
+        <ion-label position="stacked">Código de barras</ion-label>
+        <ion-input formControlName="codigoBarras" type="text" placeholder="Escanear o introducir"></ion-input>
+        <ion-button 
+          slot="end" 
+          fill="clear" 
+          (click)="onScanBarcode()" 
+          class="scan-button-fixed">
+          <ion-icon name="barcode-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
   
         <div class="section-title-custom">
           Información nutricional cada 100g

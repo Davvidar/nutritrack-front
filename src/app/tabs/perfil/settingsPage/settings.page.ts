@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 
 // Servicios
 import { AuthService, UserProfile } from '../../../services/auth.service';
-import { ThemeService, Theme } from '../../../services/theme.service';
+
 
 // Importar los componentes de modales existentes
 import { ProfileEditModalComponent } from '../../../components/profile-edit-modal/profile-edit-modal.component';
@@ -28,21 +28,11 @@ import { NutritionGoalsModalComponent } from '../../../components/nutrition-goal
 export class SettingsPage implements OnInit, OnDestroy {
   profile: UserProfile | null = null;
   
-  // Propiedades para el tema
-  currentTheme: Theme = 'light';
-  isDarkMode: boolean = false;
-  themeOptions = [
-    { value: 'light', label: 'Claro', icon: 'sunny-outline' },
-    { value: 'dark', label: 'Oscuro', icon: 'moon-outline' },
-    { value: 'auto', label: 'Automático', icon: 'phone-portrait-outline' }
-  ];
-  
-  private themeSubscription?: Subscription;
-  private darkModeSubscription?: Subscription;
+
   
   constructor(
     private authService: AuthService,
-    private themeService: ThemeService,
+
     private alertController: AlertController,
     private loadingController: LoadingController,
     private toastController: ToastController,
@@ -51,36 +41,16 @@ export class SettingsPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.setupThemeSubscriptions();
   }
 
   ngOnDestroy() {
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
-    }
-    if (this.darkModeSubscription) {
-      this.darkModeSubscription.unsubscribe();
-    }
   }
 
   ionViewWillEnter() {
     this.loadProfile();
   }
 
-  /**
-   * Configura las suscripciones para cambios de tema
-   */
-  private setupThemeSubscriptions(): void {
-    this.themeSubscription = this.themeService.currentTheme$.subscribe(theme => {
-      this.currentTheme = theme;
-      console.log('Settings: Tema actualizado a:', theme);
-    });
 
-    this.darkModeSubscription = this.themeService.isDarkMode$.subscribe(isDark => {
-      this.isDarkMode = isDark;
-      console.log('Settings: Modo oscuro:', isDark);
-    });
-  }
 
   loadProfile() {
     this.authService.getProfile().subscribe({
@@ -92,96 +62,9 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.presentToast('No se pudo cargar tu perfil', 'danger');
       }
     });
-  }
+  } 
 
-  // =============================================================================
-  // MÉTODOS PARA GESTIÓN DE TEMA
-  // =============================================================================
 
-  /**
-   * Alterna el modo oscuro on/off
-   */
-  toggleDarkMode(event: any): void {
-    const isEnabled = event.detail.checked;
-    console.log('Settings: Toggle modo oscuro:', isEnabled);
-    
-    // Si el usuario activa/desactiva manualmente, salir del modo auto
-    if (this.currentTheme === 'auto') {
-      this.themeService.setTheme(isEnabled ? 'dark' : 'light');
-    } else {
-      this.themeService.toggleTheme();
-    }
-    
-    this.presentToast(
-      `Modo ${isEnabled ? 'oscuro' : 'claro'} activado`, 
-      'primary'
-    );
-  }
-
-  /**
-   * Abre selector de tema con opciones completas
-   */
-  async openThemeSelector(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Seleccionar tema',
-      message: 'Elige cómo quieres que se vea la aplicación',
-      inputs: this.themeOptions.map(option => ({
-        type: 'radio',
-        label: option.label,
-        value: option.value,
-        checked: this.currentTheme === option.value
-      })),
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Aplicar',
-          handler: (selectedTheme: Theme) => {
-            if (selectedTheme && selectedTheme !== this.currentTheme) {
-              this.themeService.setTheme(selectedTheme);
-              this.presentToast(`Tema ${this.getThemeLabel(selectedTheme)} aplicado`, 'primary');
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  /**
-   * Obtiene la etiqueta amigable del tema
-   */
-  private getThemeLabel(theme: Theme): string {
-    const option = this.themeOptions.find(opt => opt.value === theme);
-    return option ? option.label.toLowerCase() : theme;
-  }
-
-  /**
-   * Obtiene el icono del tema actual
-   */
-  getCurrentThemeIcon(): string {
-    if (this.currentTheme === 'auto') {
-      return this.isDarkMode ? 'moon-outline' : 'sunny-outline';
-    }
-    
-    const option = this.themeOptions.find(opt => opt.value === this.currentTheme);
-    return option ? option.icon : 'contrast-outline';
-  }
-
-  /**
-   * Obtiene la descripción del tema actual
-   */
-  getCurrentThemeDescription(): string {
-    if (this.currentTheme === 'auto') {
-      return `Automático (${this.isDarkMode ? 'oscuro' : 'claro'} actualmente)`;
-    }
-    
-    const option = this.themeOptions.find(opt => opt.value === this.currentTheme);
-    return option ? option.label : 'Personalizado';
-  }
 
   // =============================================================================
   // MÉTODOS EXISTENTES (sin cambios)
@@ -423,14 +306,5 @@ export class SettingsPage implements OnInit, OnDestroy {
     await toast.present();
   }
 
-  /**
-   * Método para debug - mostrar información del tema
-   */
-  debugTheme(): void {
-    console.log('=== DEBUG TEMA ===');
-    this.themeService.debugThemeState();
-    console.log('Componente - currentTheme:', this.currentTheme);
-    console.log('Componente - isDarkMode:', this.isDarkMode);
-    console.log('==================');
-  }
+
 }

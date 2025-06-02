@@ -2,6 +2,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { alreadyAuthGuard } from './guards/already-auth.guard';
+import { ConnectionGuard } from './guards/connection.guard';
 export const routes: Routes = [
   {
     path: '',
@@ -14,7 +15,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    canActivate: [alreadyAuthGuard], // Aplicar el guard al módulo de autenticación
+    canActivate: [alreadyAuthGuard, ConnectionGuard], // Aplicar el guard al módulo de autenticación
     children: [
       { 
         path: 'login', 
@@ -40,8 +41,12 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'no-connection',
+    loadComponent: () => import('./no-connection/no-connection.page').then(m => m.NoConnectionPage)
+  },
+  {
     path: 'tabs',
-    canActivate: [authGuard],
+    canActivate: [authGuard, ConnectionGuard],
     loadComponent: () => import('./tabs/tabs.page').then(m => m.TabsPage),
     children: [
       // Rutas de Inicio

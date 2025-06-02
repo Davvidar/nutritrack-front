@@ -2,13 +2,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule, Platform } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+/* import { RouterOutlet } from '@angular/router'; */
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 // Servicios
 import { SplashScreenService, SplashState } from './services/splash-screen.service';
 import { AuthService } from './services/auth.service';
+import { ConnectionService } from './services/connection.service';
 
 // Componentes
 import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
@@ -22,7 +23,7 @@ StatusBar.setOverlaysWebView({ overlay: false });
   imports: [
     IonicModule, 
     CommonModule, 
-    RouterOutlet, 
+
     SplashScreenComponent
   ],
   templateUrl: './app.component.html',
@@ -42,7 +43,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private platform: Platform,
     private splashScreenService: SplashScreenService,
-    private authService: AuthService
+    private authService: AuthService,
+    private connectionService: ConnectionService
   ) {
     this.initializeApp();
   }
@@ -79,6 +81,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
       // Pequeño delay para asegurar que la UI esté lista
       await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Inicializar el servicio de conexión
+      console.log('AppComponent: Inicializando servicio de conexión...');
+      this.connectionService.initialize();
 
       // Iniciar el proceso de splash screen
       this.splashScreenService.startSplashScreen()

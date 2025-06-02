@@ -72,36 +72,32 @@ export class CreateProductPage implements OnInit {
   }
 
   async onScanBarcode() {
-    try {
-      // Verificar si estamos en una plataforma nativa
-      if (!this.platform.is('capacitor')) {
-        await this.presentToast('El escáner solo funciona en dispositivos móviles', 'warning');
-        return;
-      }
-
-      // Usar el servicio para escanear
-      const barcode = await this.barcodeScannerService.startScan();
-      
-      if (barcode) {
-        console.log('Código escaneado:', barcode);
-        
-        // Actualizar el formulario con el código escaneado
-        this.productForm.patchValue({
-          codigoBarras: barcode
-        });
-        
-        await this.presentToast('Código de barras capturado correctamente', 'primary');
-        
-        // Opcional: Verificar si el producto ya existe
-        await this.checkExistingProduct(barcode);
-      } else {
-        console.log('Escaneo cancelado o sin resultado');
-      }
-    } catch (err) {
-      console.error('Error durante el escaneo:', err);
-      this.presentToast('Error al escanear el código de barras', 'danger');
+  try {
+    // 1. Verifica que esté en dispositivo móvil
+    if (!this.platform.is('capacitor')) {
+      await this.presentToast('El escáner solo funciona en dispositivos móviles', 'warning');
+      return;
     }
+
+    // 2. Abre el escáner
+    const barcode = await this.barcodeScannerService.startScan();
+    
+    if (barcode) {
+      // 3. Rellena el input automáticamente
+      this.productForm.patchValue({
+        codigoBarras: barcode
+      });
+      
+      // 4. Confirma al usuario
+      await this.presentToast('Código de barras capturado correctamente', 'primary');
+      
+      // 5. Verifica si el producto ya existe
+      await this.checkExistingProduct(barcode);
+    }
+  } catch (err) {
+    this.presentToast('Error al escanear el código de barras', 'danger');
   }
+}
 
   // Verificar permisos de cámara
   async checkPermission(): Promise<boolean> {

@@ -125,71 +125,10 @@
 }
 
 // =============================================================================
-// TEMA OSCURO
+
 // =============================================================================
 
-[data-theme="dark"] {
-  // Fondos
-  --nutri-background-primary: #121212;
-  --nutri-background-secondary: #1e1e1e;
-  --nutri-background-tertiary: #2d2d2d;
-  --nutri-background-accent: #1a2e1a;
-  --nutri-background-elevated: #242424;
-  --nutri-background-modal: #2d2d2d;
 
-  // Textos
-  --nutri-text-primary: #ffffff;
-  --nutri-text-secondary: #e0e0e0;
-  --nutri-text-tertiary: #b3b3b3;
-  --nutri-text-quaternary: #999999;
-  --nutri-text-muted: #777777;
-  --nutri-text-placeholder: #666666;
-  --nutri-text-inverse: #121212;
-
-  // Bordes
-  --nutri-border-light: #2d2d2d;
-  --nutri-border-medium: #404040;
-  --nutri-border-dark: #555555;
-
-  // Sombras
-  --nutri-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --nutri-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --nutri-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --nutri-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.6);
-
-  // Estados interactivos
-  --nutri-hover-overlay: rgba(255, 255, 255, 0.08);
-  --nutri-active-overlay: rgba(255, 255, 255, 0.12);
-  --nutri-focus-overlay: rgba(106, 176, 76, 0.2);
-
-  // Inputs y formularios
-  --nutri-input-background: #2d2d2d;
-  --nutri-input-border: #404040;
-  --nutri-input-focus-border: var(--nutri-brand-primary);
-  --nutri-input-placeholder: #777777;
-
-  // Cards y contenedores
-  --nutri-card-background: #242424;
-  --nutri-card-border: #2d2d2d;
-  --nutri-card-shadow: var(--nutri-shadow-lg);
-
-  // Navegación y headers
-  --nutri-header-background: var(--nutri-brand-primary);
-  --nutri-header-text: #ffffff;
-  --nutri-tab-background: #1e1e1e;
-  --nutri-tab-active: var(--nutri-brand-primary);
-  --nutri-tab-inactive: #999999;
-
-  // Overlays de peso
-  --nutri-weight-background: rgba(36, 36, 36, 0.95);
-  --nutri-weight-border: rgba(106, 176, 76, 0.3);
-
-  // Ajustes específicos para macros en tema oscuro (más vibrantes)
-  --nutri-macro-calories: #a078dc;
-  --nutri-macro-protein: #6b5bd8;
-  --nutri-macro-carbs: #ff9d5c;
-  --nutri-macro-fat: #e6d85c;
-}
 
 // =============================================================================
 // MIXINS Y UTILIDADES DE TEMA
@@ -232,42 +171,7 @@
   }
 }
 
-// =============================================================================
-// SOBRESCRIBIR VARIABLES DE IONIC PARA TEMA OSCURO
-// =============================================================================
 
-[data-theme="dark"] {
-  --ion-background-color: var(--nutri-background-primary);
-  --ion-background-color-rgb: 18, 18, 18;
-  
-  --ion-text-color: var(--nutri-text-primary);
-  --ion-text-color-rgb: 255, 255, 255;
-  
-  --ion-color-step-50: #1e1e1e;
-  --ion-color-step-100: #2d2d2d;
-  --ion-color-step-150: #3d3d3d;
-  --ion-color-step-200: #4d4d4d;
-  --ion-color-step-250: #5d5d5d;
-  --ion-color-step-300: #6d6d6d;
-  --ion-color-step-350: #7d7d7d;
-  --ion-color-step-400: #8d8d8d;
-  --ion-color-step-450: #9d9d9d;
-  --ion-color-step-500: #adadad;
-  --ion-color-step-550: #bdbdbd;
-  --ion-color-step-600: #cdcdcd;
-  --ion-color-step-650: #dddddd;
-  --ion-color-step-700: #ededed;
-  --ion-color-step-750: #f7f7f7;
-  --ion-color-step-800: #fcfcfc;
-  --ion-color-step-850: #fefefe;
-  --ion-color-step-900: #ffffff;
-  --ion-color-step-950: #ffffff;
-
-  --ion-item-background: var(--nutri-card-background);
-  --ion-card-background: var(--nutri-card-background);
-  --ion-popover-background: var(--nutri-background-modal);
-  --ion-modal-background: var(--nutri-background-modal);
-}
 
 // =============================================================================
 // CLASES DE UTILIDAD
@@ -294,66 +198,4 @@
   &-macro-protein { color: var(--nutri-macro-protein) !important; }
   &-macro-carbs { color: var(--nutri-macro-carbs) !important; }
   &-macro-fat { color: var(--nutri-macro-fat) !important; }
-}
-
-// =============================================================================
-// ESTILOS ESPECÍFICOS PARA COMPONENTES IONIC
-// =============================================================================
-
-// Elementos que necesitan ajuste manual en tema oscuro
-[data-theme="dark"] {
-  ion-item {
-    --background: var(--nutri-card-background);
-    --color: var(--nutri-text-primary);
-    --border-color: var(--nutri-border-light);
-  }
-
-  ion-card {
-    --background: var(--nutri-card-background);
-    --color: var(--nutri-text-primary);
-  }
-
-  ion-button {
-    &.button-fill-clear {
-      --color: var(--nutri-text-secondary);
-    }
-  }
-
-  ion-input {
-    --background: var(--nutri-input-background);
-    --color: var(--nutri-text-primary);
-    --placeholder-color: var(--nutri-input-placeholder);
-  }
-
-  ion-select {
-    --background: var(--nutri-input-background);
-    --color: var(--nutri-text-primary);
-  }
-
-  ion-textarea {
-    --background: var(--nutri-input-background);
-    --color: var(--nutri-text-primary);
-    --placeholder-color: var(--nutri-input-placeholder);
-  }
-
-  ion-searchbar {
-    --background: var(--nutri-input-background);
-    --color: var(--nutri-text-primary);
-    --placeholder-color: var(--nutri-input-placeholder);
-    --border-radius: var(--nutri-border-radius);
-  }
-
-  ion-toolbar {
-    --background: var(--nutri-header-background);
-    --color: var(--nutri-header-text);
-  }
-
-  ion-tab-bar {
-    --background: var(--nutri-tab-background);
-    --color: var(--nutri-tab-inactive);
-  }
-
-  ion-tab-button.tab-selected {
-    --color: var(--nutri-tab-active);
-  }
 }

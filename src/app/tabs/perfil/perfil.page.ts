@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { NutritionSummaryComponent, NutritionData } from '../../components/nutrition-summary/nutrition-summary.component';
-import { MetricsSummaryComponent, Macros } from '../../components/metrics-summary/metrics-summary.component';
+import { Macros } from '../../components/metrics-summary/metrics-summary.component';
 import { Subscription } from 'rxjs';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { DailyLogService, SummaryResponse } from 'src/app/services/daily-log.service';
@@ -21,7 +21,6 @@ import { ProfileEditModalComponent } from 'src/app/components/profile-edit-modal
     CommonModule, 
     RouterModule, 
     NutritionSummaryComponent, 
-    MetricsSummaryComponent, 
     WeeklyWeightComparisonComponent
   ],
   templateUrl: './perfil.page.html',

@@ -1,4 +1,4 @@
-// src/app/tabs/estadisticas/estadisticas.page.ts
+// src/app/tabs/estadisticas/estadisticas.page.ts - Versión completa actualizada con toggle
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -39,11 +39,15 @@ export class EstadisticasPage implements OnInit {
   // Variables para estadísticas
   userProfile: UserProfile | null = null;
   weightData: {fecha: string, peso: number}[] = [];
+  weeklyWeightData: {fecha: string, peso: number}[] = []; // Nueva: datos semanales
   nutritionData: any = null;
   
   // Variables de estado
   loading: boolean = false;
   error: string | null = null;
+  
+  // Nueva variable para el toggle
+  showWeeklyData: boolean = false;
   
   // Referencia a los gráficos
   @ViewChild('weightChart', { static: false }) weightChartRef!: ElementRef;
@@ -58,6 +62,7 @@ export class EstadisticasPage implements OnInit {
     this.loadUserProfile();
     this.initCalendar();
     this.loadWeightHistory();
+    this.loadWeeklyWeightData(); // Nueva: cargar datos semanales
     this.loadNutritionData(this.selectedDate);
   }
   
@@ -143,9 +148,6 @@ export class EstadisticasPage implements OnInit {
    * Marca los días que tienen datos registrados
    */
   markDaysWithData() {
-    // Aquí deberíamos consultar al servicio para saber qué días tienen datos
-    // Por simplicidad, asumimos que solo hay datos para algunos días
-    
     // Esta lógica debe reemplazarse con datos reales de tu API
     this.dailyLogService.getWeightHistory().subscribe({
       next: (history) => {
@@ -194,7 +196,7 @@ export class EstadisticasPage implements OnInit {
   }
   
   /**
-   * Carga el historial de peso
+   * Carga el historial de peso diario
    */
   loadWeightHistory() {
     this.loading = true;
@@ -212,6 +214,56 @@ export class EstadisticasPage implements OnInit {
         this.presentToast('Error al cargar historial de peso');
       }
     });
+  }
+
+  /**
+   * Nueva función: Carga los datos de medias semanales
+   */
+  loadWeeklyWeightData() {
+    this.dailyLogService.getWeeklyWeightData().subscribe({
+      next: (weeklyData) => {
+        this.weeklyWeightData = weeklyData.sort((a, b) => 
+          new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        );
+        console.log('Medias semanales cargadas:', this.weeklyWeightData);
+      },
+      error: (err) => {
+        console.error('Error al cargar medias semanales:', err);
+        this.presentToast('Error al cargar medias semanales');
+      }
+    });
+  }
+
+  /**
+   * Nueva función: Cambia entre datos diarios y semanales
+   */
+  toggleWeightDataType() {
+    console.log('Cambiando tipo de datos a:', this.showWeeklyData ? 'semanal' : 'diario');
+    
+    // Si se selecciona semanal y no hay datos, cargarlos
+    if (this.showWeeklyData && this.weeklyWeightData.length === 0) {
+      this.loadWeeklyWeightData();
+    }
+  }
+
+  /**
+   * Nueva función: Obtiene los datos actuales según el toggle
+   */
+  getCurrentWeightData(): {fecha: string, peso: number}[] {
+    const currentData = this.showWeeklyData ? this.weeklyWeightData : this.weightData;
+    console.log('Datos actuales para gráfico:', {
+      tipo: this.showWeeklyData ? 'semanal' : 'diario',
+      cantidad: currentData.length,
+      datos: currentData
+    });
+    return currentData;
+  }
+
+  /**
+   * Nueva función: Obtiene el título del gráfico según el tipo
+   */
+  getChartTitle(): string {
+    return this.showWeeklyData ? 'Medias Semanales' : 'Evolución del Peso';
   }
   
   /**

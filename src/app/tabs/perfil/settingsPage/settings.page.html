@@ -53,71 +53,8 @@
     </ion-card>
   </div>
   
-  <!-- Apariencia -->
-  <div class="settings-section">
-    <h2 class="section-title">
-      <ion-icon name="color-palette-outline"></ion-icon>
-      Apariencia
-    </h2>
+
     
-    <ion-card class="settings-card">
-      <!-- Toggle simple para modo oscuro -->
-      <ion-item lines="none">
-        <ion-icon name="moon-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Modo oscuro</h3>
-          <p>Cambia la apariencia de la app</p>
-        </ion-label>
-        <ion-toggle 
-          slot="end" 
-          [checked]="isDarkMode" 
-          (ionChange)="toggleDarkMode($event)"
-          [disabled]="currentTheme === 'auto'">
-        </ion-toggle>
-      </ion-item>
-      
-      <!-- Selector avanzado de tema -->
-      <ion-item button detail (click)="openThemeSelector()" lines="none">
-        <ion-icon [name]="getCurrentThemeIcon()" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Tema de la aplicación</h3>
-          <p>{{ getCurrentThemeDescription() }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-card>
-  </div>
-  
-  <!-- Aplicación -->
-  <div class="settings-section">
-    <h2 class="section-title">
-      <ion-icon name="settings-outline"></ion-icon>
-      Aplicación
-    </h2>
-    
-    <ion-card class="settings-card">
-      <!-- Elemento comentado - notificaciones para futuras versiones -->
-      <!--
-      <ion-item lines="none">
-        <ion-icon name="notifications-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Notificaciones</h3>
-          <p>Configura recordatorios diarios</p>
-        </ion-label>
-        <ion-toggle slot="end" checked></ion-toggle>
-      </ion-item>
-      -->
-      
-      <!-- Debug del tema (solo en desarrollo) -->
-      <ion-item button (click)="debugTheme()" lines="none" class="debug-item">
-        <ion-icon name="bug-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>Debug tema</h3>
-          <p>Información técnica del tema actual</p>
-        </ion-label>
-      </ion-item>
-    </ion-card>
-  </div>
-  
   <!-- Acerca de -->
   <div class="settings-section">
     <h2 class="section-title">
@@ -146,7 +83,7 @@
         <ion-icon name="information-outline" slot="start"></ion-icon>
         <ion-label>
           <h3>Versión</h3>
-          <p>NutriTrack 1.0.0 - Con soporte de tema oscuro</p>
+          <p>NutriTrack 1.0.0</p>
         </ion-label>
       </ion-item>
     </ion-card>

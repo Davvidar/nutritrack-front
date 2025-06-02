@@ -159,7 +159,7 @@ ion-toolbar {
 // CONTROLES DE TEMA
 // =============================================================================
 
-// Toggle personalizado para modo oscuro
+// Toggle personalizado
 ion-toggle {
   --background: var(--nutri-border-medium);
   --background-checked: var(--nutri-brand-primary);
@@ -245,7 +245,7 @@ ion-item {
   transition: background-color var(--nutri-transition-fast);
 }
 
-// Animación para el toggle del modo oscuro
+// Animación para el toggle
 ion-toggle {
   transition: all var(--nutri-transition-normal);
 }
@@ -312,37 +312,7 @@ ion-toggle:focus {
   }
 }
 
-// =============================================================================
-// INDICADORES VISUALES PARA DEBUG
-// =============================================================================
 
-// En modo desarrollo, mostrar indicadores visuales del tema actual
-.debug-theme-indicator {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 1000;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  pointer-events: none;
-  
-  &.light-theme {
-    background: #000;
-    color: #fff;
-  }
-  
-  &.dark-theme {
-    background: #fff;
-    color: #000;
-  }
-  
-  &.auto-theme {
-    background: var(--nutri-brand-primary);
-    color: white;
-  }
-}
 
 // Solo mostrar en desarrollo
 body:not(.production) {

@@ -1,0 +1,82 @@
+<ion-content class="no-connection-content">
+  <div class="no-connection-container">
+    <!-- Logo de la aplicación -->
+    <div class="app-logo">
+      <img src="assets/Nutritrack_letras.png" alt="NutriTrack" class="logo-image">
+    </div>
+
+    <!-- Icono de sin conexión -->
+    <div class="connection-icon">
+      <ion-icon name="wifi-outline" class="wifi-icon"></ion-icon>
+      <div class="no-signal-line"></div>
+    </div>
+
+    <!-- Título principal -->
+    <h1 class="no-connection-title">Sin Conexión a Internet</h1>
+
+    <!-- Mensaje descriptivo -->
+    <p class="no-connection-message">
+      NutriTrack necesita conexión a internet para funcionar correctamente.
+      Por favor, verifica tu conexión e inténtalo de nuevo.
+    </p>
+
+    <!-- Lista de sugerencias -->
+    <div class="suggestions-container">
+      <h3 class="suggestions-title">Verifica lo siguiente:</h3>
+      <ul class="suggestions-list">
+        <li>
+          <ion-icon name="wifi" class="suggestion-icon"></ion-icon>
+          <span>Tu conexión WiFi está activa</span>
+        </li>
+        <li>
+          <ion-icon name="cellular" class="suggestion-icon"></ion-icon>
+          <span>Tienes datos móviles disponibles</span>
+        </li>
+        <li>
+          <ion-icon name="refresh" class="suggestion-icon"></ion-icon>
+          <span>Reinicia tu router o dispositivo</span>
+        </li>
+        <li>
+          <ion-icon name="airplane" class="suggestion-icon"></ion-icon>
+          <span>Desactiva el modo avión si está activado</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Botón de reintentar -->
+    <ion-button 
+      expand="block" 
+      class="retry-button"
+      [disabled]="!canRetry"
+      (click)="retryConnection()">
+      <ion-icon 
+        [name]="isRetrying ? 'hourglass-outline' : 'refresh-outline'" 
+        slot="start"
+        [class.spinning]="isRetrying">
+      </ion-icon>
+      {{ retryButtonText }}
+    </ion-button>
+
+    <!-- Información adicional -->
+    <div class="info-section">
+      <ion-icon name="information-circle-outline" class="info-icon"></ion-icon>
+      <div class="info-content">
+        <p class="info-text">
+          Esta aplicación requiere conexión a internet para:
+        </p>
+        <ul class="info-list">
+          <li>Sincronizar tus datos nutricionales</li>
+          <li>Acceder a la base de datos de alimentos</li>
+          <li>Guardar tu progreso en la nube</li>
+          <li>Obtener información nutricional actualizada</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Estado de conexión para debugging (solo en desarrollo) -->
+    <!-- <div class="debug-info" *ngIf="false">
+      <p>Estado: {{ connectionService.isOnline ? 'Conectado' : 'Desconectado' }}</p>
+      <p>Intentos: {{ retryAttempts }}</p>
+    </div> -->
+  </div>
+</ion-content>
