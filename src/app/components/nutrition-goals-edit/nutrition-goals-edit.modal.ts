@@ -100,9 +100,8 @@ export class NutritionGoalsModalComponent implements OnInit {
       this.carbsPercentage = Math.round((carbsCals / calorias) * 100);
       this.fatPercentage = Math.round((fatCals / calorias) * 100);
 
-      // Ajuste para que la suma de porcentajes sea lo más cercana a 100% posible
-      // debido al redondeo. Esto es opcional y puede ser complejo.
-      // Por ahora, se dejan los valores redondeados.
+      /*  Ajuste para que la suma de porcentajes sea lo más cercana a 100% posible
+          debido al redondeo. */
 
     } else {
       this.proteinPercentage = 0;
@@ -121,7 +120,7 @@ export class NutritionGoalsModalComponent implements OnInit {
       this.presentToast('Establece un objetivo de calorías válido primero (mín. 800 kcal).', 'warning');
       return;
     }
-    // Usar una distribución balanceada por defecto (ej: 30P/45C/25F)
+    // Usar una distribución balanceada por defecto
     this.updateMacrosFromDistribution(30, 45, 25, 'Macros distribuidos automáticamente.');
   }
 

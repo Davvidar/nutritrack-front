@@ -1,6 +1,6 @@
 // Variables de color (usando variables globales)
 :host {
-    // Usar variables globales del sistema de temas
+    
     --nutri-primary-green: var(--nutri-brand-primary);
     --nutri-background-page: var(--nutri-background-secondary);
     --nutri-card-background: var(--nutri-card-background);
@@ -10,14 +10,14 @@
     --nutri-text-placeholder: var(--nutri-text-placeholder);
     --nutri-input-border: var(--nutri-input-border);
     
-    // Colores de macros usando variables globales
+    
     --macro-calories-bg: var(--nutri-macro-calories);
     --macro-protein-bg: var(--nutri-macro-protein);
     --macro-carbs-bg: var(--nutri-macro-carbs);
     --macro-fat-bg: var(--nutri-macro-fat);
   }
   
-  // Estilos generales
+  
   ion-content.create-recipe-content {
     --background: var(--nutri-background-page);
     position: relative;

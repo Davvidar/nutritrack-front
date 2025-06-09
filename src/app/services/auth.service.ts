@@ -52,7 +52,7 @@ export interface RegisterData {
   password: string;
   peso: number;
   altura: number;
-  sexo: 'masculino' | 'femenino' | 'otro';
+  sexo: 'masculino' | 'femenino' ;
   edad: number;
   objetivo: 'perder peso' | 'mantenerse' | 'ganar músculo';
   actividad: 'sedentario' | 'ligero' | 'moderado' | 'activo' | 'muy activo';

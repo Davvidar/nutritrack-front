@@ -1,6 +1,5 @@
 // src/app/tabs/estadisticas/estadisticas.page.scss
 
-// Variables para colores y estilos consistentes
 :host {
   --calendar-bg-color: var(--ion-color-light);
   --calendar-border: #e0e0e0;
@@ -11,13 +10,13 @@
   --day-today-border: var(--ion-color-primary);
   --day-has-data-indicator: var(--ion-color-primary);
   
-  // Colores para nutricionales (ahora principalmente en nutrition-stats-card)
+
   --color-calories: #8c63d0;
   --color-protein: #5046c8;
   --color-carbs: #ff8c42;
   --color-fat: #d4ca3a;
   
-  // Colores para peso
+
   --color-weight-gain: #e74c3c;
   --color-weight-loss: #27ae60;
 }
@@ -25,9 +24,8 @@
 
 
 
-// Estilo base para las tarjetas en esta página para consistencia
 .styled-card {
-  margin-left: 0; // Containers (like .weight-chart-container) already have margin
+  margin-left: 0;
   margin-right: 0;
   margin-bottom: 16px;
   border-radius: 12px;
@@ -38,34 +36,35 @@
   }
 }
 
-// Estilos del header
 ion-header.nutri-header {
   ion-toolbar.nutri-header {
     --border-width: 0;
     --background: var(--ion-color-primary);
-    --min-height: 55px;
+    --min-height: 45px;
     
     .logo-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 8px 0;
+      padding: 4px 0;
       
       .logo-image {
-        width: 40%;
-        max-width: 160px;
+        width: 35%;
+        max-width: 140px;
+        object-fit: contain;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
       }
     }
   }
 }
 
-// Contenedor del calendario
 .calendar-container {
   background: white;
-  border-radius: 10px; // Manteniendo su estilo distintivo
+  border-radius: 10px;
   margin: 16px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Manteniendo su sombra distintiva
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
   .month-navigation {
     display: flex;
@@ -134,7 +133,7 @@ ion-header.nutri-header {
       
       &.selected {
         background-color: var(--day-selected-bg);
-        .day-number, .day-weight { // Ensure weight text is also visible
+        .day-number, .day-weight {
           color: var(--day-selected-color);
         }
       }
@@ -143,15 +142,15 @@ ion-header.nutri-header {
         &::after {
           content: '';
           position: absolute;
-          bottom: 2px; // Ligeramente más visible
-          width: 20px;  // Ligeramente más visible
-          height: 2px; // Ligeramente más visible
+          bottom: 2px;
+          width: 20px; 
+          height: 2px;
           border-radius: 40%;
           background-color: var(--day-has-data-indicator);
         }
-        // Cambiar color del punto si el día está seleccionado para asegurar visibilidad
+      
         &.selected::after {
-            background-color: var(--day-selected-color); // e.g., white
+            background-color: var(--day-selected-color);
         }
       }
       
@@ -161,13 +160,12 @@ ion-header.nutri-header {
       
       .day-weight {
         font-size: 0.7rem;
-        color: var(--ion-color-medium); // Se cambiará a blanco si está seleccionado (ver arriba)
+        color: var(--ion-color-medium);
       }
     }
   }
 }
 
-// Estilos para la sección de estadísticas del día
 .day-stats-container {
   margin: 16px;
   
@@ -177,7 +175,7 @@ ion-header.nutri-header {
     gap: 8px;
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 16px; // Aumentado para más espacio antes de la card
+    margin-bottom: 16px;
     color: var(--ion-color-dark);
     
     ion-icon {
@@ -192,13 +190,13 @@ ion-header.nutri-header {
     --color: var(--ion-color-primary);
   }
 
-  // Los estilos de .nutrition-summary, .nutrition-item, .nutrition-row, etc.,
-  // han sido eliminados porque app-nutrition-stats-card ahora los maneja.
+
+
   
-  .no-data-card { // Este es el general, si app-nutrition-stats-card no se muestra
+  .no-data-card {
     text-align: center;
     padding: 24px 16px;
-    // .styled-card se aplicará desde HTML para border-radius y box-shadow
+  
 
     ion-icon {
       font-size: 48px;
@@ -211,14 +209,13 @@ ion-header.nutri-header {
       font-size: 1rem; 
       color: var(--ion-color-dark);
     }
-    ion-note { // Específico para el empty state del gráfico de peso
+    ion-note {
         font-size: 0.8rem;
         color: var(--ion-color-medium);
     }
   }
 }
 
-// Estilos para el gráfico de peso
 .weight-chart-container {
   margin: 16px;
   
@@ -237,22 +234,21 @@ ion-header.nutri-header {
     }
   }
   
-  // Eliminar estilos de canvas aquí, ya que WeightChartComponent los maneja
-  // canvas {
-  //   width: 100% !important;
-  //   height: 200px !important; // Conflictuaba con el componente
-  // }
 
-  // Aplicar .styled-card a ion-card directamente en el HTML
+
+
+
+
+
+
 }
 
-// Estilos para el resumen estadístico
 .stats-summary-container {
   margin: 16px;
   
-  // Aplicar .styled-card a ion-card directamente en el HTML
 
-  ion-card-title { // Estilo ya presente en el componente, aquí para el resumen
+
+  ion-card-title {
     font-size: 1.1rem;
     font-weight: 600;
   }
@@ -261,7 +257,7 @@ ion-header.nutri-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0; // Ajustar padding si es dentro de ion-card-content
+    padding: 12px 0;
     border-bottom: 1px solid var(--ion-color-light-shade);
     
     &:last-child {
@@ -287,7 +283,3 @@ ion-header.nutri-header {
     }
   }
 }
-
-// Responsive: La responsividad de la nutrición ahora es manejada por NutritionStatsCardComponent
-// El media query anterior que solo afectaba a .nutrition-summary puede ser eliminado si no hay otras reglas.
-// El @media (min-width: 576px) block original solo contenía .nutrition-summary .nutrition-row

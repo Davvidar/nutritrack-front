@@ -1,5 +1,5 @@
 <ion-content [fullscreen]="true" class="register-content">
-  <!-- Indicador de progreso -->
+ 
   <div class="progress-bar">
     <div class="progress-step" [ngClass]="{'active': currentStep >= 1, 'completed': currentStep > 1}"></div>
     <div class="progress-step" [ngClass]="{'active': currentStep >= 2, 'completed': currentStep > 2}"></div>
@@ -8,10 +8,10 @@
     <div class="progress-step" [ngClass]="{'active': currentStep >= 5, 'completed': currentStep > 5}"></div>
   </div>
 
-  <!-- Formulario de registro -->
+ 
   <form [formGroup]="registerForm">
 
-    <!-- Paso 1: Datos personales -->
+   
     <div class="step-container" *ngIf="currentStep === 1">
       <h1 class="page-title">Bienvenido a nutriTrack</h1>
       <p class="subtitle">Queremos hacerte unas preguntas para conocerte!</p>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="form-field">
-        <ion-label position="stacked">Fecha de nacimiento<span class="required">*</span></ion-label>
+        <ion-label position="stacked">Edad<span class="required">*</span></ion-label>
         <ion-item lines="none" class="custom-input">
           <ion-icon name="calendar-outline" slot="start"></ion-icon>
           <ion-input type="number" formControlName="edad" placeholder="Edad"></ion-input>
@@ -50,12 +50,12 @@
       </div>
     </div>
 
-    <!-- Paso 2: Características físicas -->
+   
     <div class="step-container" *ngIf="currentStep === 2">
       <h1 class="page-title">Características físicas</h1>
 
       <div class="form-field">
-        <ion-label position="stacked">Peso<span class="required">*</span></ion-label>
+        <ion-label position="stacked">Peso corporal en Kg<span class="required">*</span></ion-label>
         <ion-item lines="none" class="custom-input">
           <ion-icon name="barbell-outline" slot="start"></ion-icon>
           <ion-input type="number" formControlName="peso" placeholder="KG"></ion-input>
@@ -66,7 +66,7 @@
       </div>
 
       <div class="form-field">
-        <ion-label position="stacked">Altura<span class="required">*</span></ion-label>
+        <ion-label position="stacked">Altura en cm<span class="required">*</span></ion-label>
         <ion-item lines="none" class="custom-input">
           <ion-icon name="resize-outline" slot="start"></ion-icon>
           <ion-input type="number" formControlName="altura" placeholder="Cm"></ion-input>
@@ -89,7 +89,7 @@
       </div>
     </div>
 
-    <!-- Paso 3: Actividad y objetivo -->
+   
     <div class="step-container" *ngIf="currentStep === 3">
       <h1 class="page-title">¿Cual es tu actividad diaria?</h1>
 
@@ -120,7 +120,7 @@
       </div>
     </div>
 
-    <!-- Paso 4: Datos de la cuenta -->
+   
     <div class="step-container" *ngIf="currentStep === 5">
       <h1 class="page-title">Crear cuenta</h1>
       <p class="subtitle">A continuación te mandaremos un <strong>email de activación</strong> de la cuenta</p>
@@ -174,9 +174,9 @@
       </div>
     </div>
 
-    <!-- Botones de navegación -->
+   
     <div class="navigation-buttons">
-      <!-- Botón 'Anterior' (oculto en el primer paso) -->
+     
       <ion-button 
         *ngIf="currentStep > 1" 
         fill="outline" 
@@ -185,7 +185,7 @@
         Anterior
       </ion-button>
 
-      <!-- Botón 'Siguiente' (en pasos 1-3) -->
+     
       <ion-button 
         *ngIf="currentStep < totalSteps" 
         expand="block"
@@ -195,7 +195,7 @@
         <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
       </ion-button>
 
-      <!-- Botón 'Registrar' (solo en el último paso) -->
+     
       <ion-button 
         *ngIf="currentStep === totalSteps" 
         expand="block"
@@ -207,7 +207,7 @@
       </ion-button>
     </div>
 
-    <!-- Enlace al login (solo en el primer paso) -->
+   
     <div class="login-link" *ngIf="currentStep === 1">
       <p>Ya tengo cuenta <a routerLink="/auth/login">iniciar sesión</a></p>
     </div>

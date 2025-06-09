@@ -1,4 +1,4 @@
-// src/app/services/barcode-scanner.service.ts
+// src/app/services/barcode-scanner.service.ts - VERSIÓN CORREGIDA
 import { Injectable } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Platform } from '@ionic/angular';
@@ -8,6 +8,8 @@ import { Platform } from '@ionic/angular';
 })
 export class BarcodeScannerService {
   private scannerElement: HTMLElement | null = null;
+  private originalBodyBackground: string = '';
+  private originalAppBackground: string = '';
 
   constructor(private platform: Platform) {}
 
@@ -24,6 +26,10 @@ export class BarcodeScannerService {
       if (!allowed) {
         return null;
       }
+
+      // **NUEVO: Guardar y quitar fondos antes de iniciar**
+      this.saveOriginalBackgrounds();
+      this.makeBackgroundsTransparent();
 
       // Hacer el background transparente
       await BarcodeScanner.hideBackground();
@@ -43,13 +49,7 @@ export class BarcodeScannerService {
       const result = await BarcodeScanner.startScan();
 
       // Limpiar UI
-      this.removeScannerUI();
-      document.querySelector('body')?.classList.remove('scanner-active');
-      document.querySelector('ion-app')?.classList.remove('scanner-active');
-      
-      ionContents.forEach(content => content.classList.remove('scanner-hidden'));
-      
-      await BarcodeScanner.showBackground();
+      this.cleanup();
 
       if (result.hasContent) {
         return result.content;
@@ -75,6 +75,8 @@ export class BarcodeScannerService {
 
   private cleanup(): void {
     this.removeScannerUI();
+    
+    // Remover clases CSS
     document.querySelector('body')?.classList.remove('scanner-active');
     document.querySelector('ion-app')?.classList.remove('scanner-active');
     
@@ -83,6 +85,72 @@ export class BarcodeScannerService {
     
     // Restaurar elementos ocultos
     this.showAllPageElements();
+    
+    // **NUEVO: Restaurar fondos originales**
+    this.restoreOriginalBackgrounds();
+  }
+
+  /**
+   * **NUEVO MÉTODO: Guarda los fondos originales**
+   */
+  private saveOriginalBackgrounds(): void {
+    const body = document.querySelector('body') as HTMLElement;
+    const app = document.querySelector('ion-app') as HTMLElement;
+    
+    if (body) {
+      this.originalBodyBackground = body.style.backgroundColor || 
+        getComputedStyle(body).backgroundColor;
+    }
+    
+    if (app) {
+      this.originalAppBackground = app.style.backgroundColor || 
+        getComputedStyle(app).backgroundColor;
+    }
+    
+    console.log('Fondos originales guardados:', {
+      body: this.originalBodyBackground,
+      app: this.originalAppBackground
+    });
+  }
+
+  /**
+   * **NUEVO MÉTODO: Hace los fondos transparentes para mostrar la cámara**
+   */
+  private makeBackgroundsTransparent(): void {
+    const body = document.querySelector('body') as HTMLElement;
+    const app = document.querySelector('ion-app') as HTMLElement;
+    
+    if (body) {
+      body.style.setProperty('background-color', 'transparent', 'important');
+      body.style.setProperty('background', 'transparent', 'important');
+    }
+    
+    if (app) {
+      app.style.setProperty('background-color', 'transparent', 'important');
+      app.style.setProperty('background', 'transparent', 'important');
+    }
+    
+    console.log('Fondos configurados como transparentes');
+  }
+
+  /**
+   * **NUEVO MÉTODO: Restaura los fondos originales**
+   */
+  private restoreOriginalBackgrounds(): void {
+    const body = document.querySelector('body') as HTMLElement;
+    const app = document.querySelector('ion-app') as HTMLElement;
+    
+    if (body) {
+      body.style.removeProperty('background-color');
+      body.style.removeProperty('background');
+    }
+    
+    if (app) {
+      app.style.removeProperty('background-color');
+      app.style.removeProperty('background');
+    }
+    
+    console.log('Fondos originales restaurados');
   }
 
   private async checkPermission(): Promise<boolean> {

@@ -124,7 +124,7 @@ export class WeekSliderComponent implements OnInit {
     this.isDragging = false;
   }
   
-  // Método para formatear la fecha para mostrar rangos en formato "2-8 Mayo"
+  // Método para formatear la fecha para mostrar rangos en formato"
   formatWeekRange(): string {
     if (!this.week || this.week.length === 0) return '';
     

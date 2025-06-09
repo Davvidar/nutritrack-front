@@ -1,4 +1,4 @@
-// src/app/components/metrics-summary/metrics-summary.component.scss
+//src/app/components/metrics-summary/metrics-summary.component.scss
 .nutrition-bar {
   width: 100%;
   background-color: var(--ion-color-primary);
@@ -17,23 +17,23 @@
 
 .nutrient-header {
   display: flex;
-  align-items: center; // Vertically aligns icon and values block
-  margin-bottom: 6px; //
+  align-items: center; 
+  margin-bottom: 6px; 
   width: 100%;
 }
 
 .nutrient-icon {
-  width: 21px; //
-  height: 21px; //
-  border-radius: 50%; //
-  color: white; //
-  display: flex; //
-  align-items: center; //
-  justify-content: center; //
-  font-weight: bold; //
-  font-size: 14px; // For text P, C, G. For ion-icon, this often sets the visual size.
-  margin-right: 8px; //
-  flex-shrink: 0; /* Prevents the icon container from shrinking */
+  width: 21px; 
+  height: 21px; 
+  border-radius: 50%; 
+  color: white; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: bold; 
+  font-size: 14px; 
+  margin-right: 8px; 
+  flex-shrink: 0; 
 }
 
 .calories-icon {
@@ -55,45 +55,45 @@
 }
 
 .nutrient-values {
-  display: flex; //
-  flex-direction: column; //
-  align-items: flex-end; // Aligns text like "100/" and "200 kcal" to the right
-  color: white; //
-  font-size: 14px; //
-  flex-grow: 1; /* Allows this block to take available space */
-  min-width: 0; /* Allows this block to shrink correctly, crucial for long text + flex-grow */
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-end; 
+  color: white; 
+  font-size: 14px; 
+  flex-grow: 1; 
+  min-width: 0; 
 }
 
 .main-value,
 .target-value {
-  white-space: nowrap; //
-  overflow: hidden; /* If text is too long, hide the overflow */
-  text-overflow: ellipsis; /* Show '...' if text is hidden */
-  width: 100%; /* Ensure they can use the full width of .nutrient-values for ellipsis to work correctly */
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  width: 100%; 
 }
 
 .main-value {
-  font-weight: bold; //
-  font-size: 11px; //
+  font-weight: bold; 
+  font-size: 11px; 
 }
 
 .target-value {
-  font-size: 11px; //
+  font-size: 11px; 
 }
 
 .progress-container {
   width: 100%;
-  height: 6px; //
-  background-color: rgba(255, 255, 255, 0.3); //
-  border-radius: 3px; //
-  overflow: hidden; //
-  margin-top: 6px; //
+  height: 6px; 
+  background-color: rgba(255, 255, 255, 0.3); 
+  border-radius: 3px; 
+  overflow: hidden; 
+  margin-top: 6px; 
 }
 
 .progress-bar {
   height: 100%;
   border-radius: 3px;
-  // The nutrient-specific classes below will set the default background color.
+  
 }
 
 .calories-bar {
@@ -112,9 +112,9 @@
   background-color: #d4ca3a;
 }
 
-// Style for exceeded progress bars
-// This selector is more specific than just '.calories-bar', '.protein-bar', etc.,
-// so it will override their background-color when the 'exceeded' class is present.
+
+
+
 .progress-bar.exceeded {
-  background-color: var(--ion-color-danger, #eb445a); // Using Ionic's danger color variable with a fallback
+  background-color: var(--ion-color-danger, #eb445a); 
 }

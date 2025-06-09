@@ -285,29 +285,38 @@ export class InicioPage implements OnInit, OnDestroy {
 
   // Actualizado para no cambiar el día seleccionado al cambiar de semana
   loadWeek(direction: 'prev' | 'next') {
-    console.log('InicioPage: Cambiando semana:', direction);
+  console.log('InicioPage: Cambiando semana:', direction);
+  
+  // Guardar la fecha completa del día activo antes de cambiar la semana
+  let selectedDate: Date | null = null;
+  const activeDay = this.week.find(d => d.active);
+  if (activeDay) {
+    selectedDate = new Date(activeDay.date);
+    console.log('InicioPage: Día activo antes del cambio:', selectedDate.toISOString());
+  }
+  
+  // Actualizar la semana base
+  this.baseMonday = addDays(this.baseMonday, direction === 'next' ? 7 : -7);
+  this.buildWeek();
+  
+  // Si había un día seleccionado, buscar la misma fecha exacta en la nueva semana
+  if (selectedDate) {
+    const targetDay = this.week.find(day => 
+      day.date.getDate() === selectedDate!.getDate() && 
+      day.date.getMonth() === selectedDate!.getMonth() &&
+      day.date.getFullYear() === selectedDate!.getFullYear()
+    );
     
-    // Determinar qué día de la semana está seleccionado actualmente
-    let selectedDayIndex = -1;
-    
-    // Guardar la referencia del día activo antes de cambiar la semana
-    const activeDay = this.week.find(d => d.active);
-    if (activeDay) {
-      // Determinar el índice del día activo (0-6, donde 0 es lunes)
-      const activeDayOfWeek = activeDay.date.getDay();
-      // Convertir de 0-6 (Do-Sa) a 0-6 (Lu-Do)
-      selectedDayIndex = (activeDayOfWeek === 0) ? 6 : activeDayOfWeek - 1;
-    }
-    
-    // Actualizar la semana base
-    this.baseMonday = addDays(this.baseMonday, direction === 'next' ? 7 : -7);
-    this.buildWeek();
-    
-    // Si había un día seleccionado, seleccionar el mismo día de la semana
-    if (selectedDayIndex >= 0 && selectedDayIndex < this.week.length) {
-      this.onDaySelected(this.week[selectedDayIndex]);
+    if (targetDay) {
+      console.log('InicioPage: Encontrada la misma fecha en la nueva semana:', targetDay.date.toISOString());
+      this.onDaySelected(targetDay);
+    } else {
+      console.log('InicioPage: La fecha exacta no existe en la nueva semana, manteniendo sin selección');
+      // No seleccionar ningún día si la fecha exacta no existe en la nueva semana
+      // El usuario tendrá que seleccionar manualmente un día si quiere cambiar la fecha
     }
   }
+}
 
   addMeal(meal: typeof this.meals[number]) {
     console.log('InicioPage: Añadiendo meal:', meal);

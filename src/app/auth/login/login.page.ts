@@ -18,7 +18,6 @@ export class LoginPage {
     password: ['', Validators.required]
   });
 
-  // para toggle de visibilidad de contraseña
   passwordType: 'password' | 'text' = 'password';
   passwordIcon = 'eye-off-outline';
 
@@ -44,14 +43,14 @@ export class LoginPage {
   
     const correo = this.loginForm.get('correo')!.value!;
     const password = this.loginForm.get('password')!.value!;
-    console.log('🐞 Lanzando login con:', { correo, password });
+    console.log('Lanzando login con:', { correo, password });
   
     // Mostrar indicador de carga
     this.presentLoading();
   
     this.auth.login({ correo, password }).subscribe({
       next: ({ token, user }) => {
-        console.log('✅ Login OK, token:', token, 'user:', user);
+        console.log('Login OK, token:', token, 'user:', user);
         this.auth.saveToken(token);
         // Ocultar indicador de carga
         this.dismissLoading();
@@ -59,7 +58,7 @@ export class LoginPage {
         this.router.navigate(['/tabs/inicio']);
       },
       error: (err: any) => {
-        console.error('❌ Error en login:', err);
+        console.error('Error en login:', err);
         // Ocultar indicador de carga
         this.dismissLoading();
         alert('Error de login: ' + (err.error?.message || err.message || JSON.stringify(err)));

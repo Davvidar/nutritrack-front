@@ -1,5 +1,5 @@
 /*
- * App Global CSS
+ * App Global CSS - ACTUALIZADO CON ESCÁNER CORREGIDO
  * ----------------------------------------------------------------------------
  * Put style rules here that you want to apply globally. These styles are for
  * the entire app and not just one component. Additionally, this file can be
@@ -8,6 +8,9 @@
  * For more information on global stylesheets, visit the documentation:
  * https://ionicframework.com/docs/layout/global-stylesheets
  */
+
+/* Import Poppins font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Core CSS required for Ionic components to work properly */
 /* styles.scss */
@@ -28,152 +31,30 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-
-
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-
-    
 }
 
-// src/app/tabs/inicio/search/search.page.scss
-
 // =============================================================================
-// VARIABLES GLOBALES DE NUTRITRACK
+// IMPORTAR VARIABLES DE TEMA
 // =============================================================================
 
+// Las variables de tema están definidas en theme/variables.scss
+@import 'theme/variables.scss';
+
+// Variables adicionales específicas para global.scss
 :root {
-  // Colores principales de NutriTrack
-  --nutri-primary: #6ab04c;
-  --nutri-primary-light: #7fc55e;
-  --nutri-primary-dark: #5a9d3e;
-  
-  // Colores de texto
-  --nutri-text-primary: #333333;
-  --nutri-text-secondary: #555555;
-  --nutri-text-tertiary: #777777;
-  --nutri-text-muted: #999999;
-  --nutri-text-light: #ffffff;
-  --nutri-text-dark: #2c3e50;
-  --nutri-text-medium: #555f6b;
-  
-  // Colores de fondo
-  --nutri-background-primary: #f4f5f7;
-  --nutri-background-secondary: #ffffff;
-  --nutri-card-background: #ffffff;
-  --nutri-background-accent: #f9f9f9;
-  --nutri-background-light-input: #f7f8fa;
-  
-  // Colores de macros
-  --nutri-macro-calories: #8c63d0;
-  --nutri-macro-protein: #5046c8;
-  --nutri-macro-carbs: #ff8c42;
-  --nutri-macro-fat: #d4ca3a;
-  
-  // Colores de estados
-  --nutri-success: #28a745;
-  --nutri-warning: #ffc107;
-  --nutri-danger: #dc3545;
-  --nutri-info: #17a2b8;
-  
-  // Bordes y sombras
-  --nutri-border-color: #e0e0e0;
-  --nutri-border-light: #e0e2e7;
-  --nutri-border-medium: #d0d0d0;
-  --nutri-border-radius: 12px;
-  --nutri-border-radius-sm: 8px;
-  --nutri-border-radius-lg: 16px;
-  
-  // Sombras
-  --nutri-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --nutri-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --nutri-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
-  --nutri-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
-  
-  // Transiciones
-  --nutri-transition-fast: 0.2s ease-out;
-  --nutri-transition-normal: 0.3s ease-out;
-  --nutri-transition-slow: 0.5s ease-out;
-  
-  // Espaciados
-  --nutri-spacing-xs: 4px;
-  --nutri-spacing-sm: 8px;
-  --nutri-spacing-md: 16px;
-  --nutri-spacing-lg: 24px;
-  --nutri-spacing-xl: 32px;
-  
-  // Inputs
-  --nutri-input-background: #f7f7f7;
-  --nutri-input-border: #e0e0e0;
-  --nutri-input-placeholder: #b0b0b0;
+  --nutri-input-background: var(--nutri-background-light-input);
+  --nutri-input-border: var(--nutri-border-medium);
+  --nutri-input-placeholder: var(--nutri-text-placeholder);
+  --nutri-input-focus: var(--nutri-brand-primary);
 }
 
 // =============================================================================
-// CLASES DE UTILIDAD
+// NOTA: Las clases de utilidad están definidas en theme/variables.scss
 // =============================================================================
-
-// Espaciado
-.nutri-spacing {
-  &-xs { margin: var(--nutri-spacing-xs) !important; }
-  &-sm { margin: var(--nutri-spacing-sm) !important; }
-  &-md { margin: var(--nutri-spacing-md) !important; }
-  &-lg { margin: var(--nutri-spacing-lg) !important; }
-  &-xl { margin: var(--nutri-spacing-xl) !important; }
-}
-
-.nutri-padding {
-  &-xs { padding: var(--nutri-spacing-xs) !important; }
-  &-sm { padding: var(--nutri-spacing-sm) !important; }
-  &-md { padding: var(--nutri-spacing-md) !important; }
-  &-lg { padding: var(--nutri-spacing-lg) !important; }
-  &-xl { padding: var(--nutri-spacing-xl) !important; }
-}
-
-// Texto
-.nutri-text {
-  &-primary { color: var(--nutri-text-primary) !important; }
-  &-secondary { color: var(--nutri-text-secondary) !important; }
-  &-tertiary { color: var(--nutri-text-tertiary) !important; }
-  &-muted { color: var(--nutri-text-muted) !important; }
-  &-light { color: var(--nutri-text-light) !important; }
-  &-dark { color: var(--nutri-text-dark) !important; }
-  &-medium { color: var(--nutri-text-medium) !important; }
-}
-
-// Fondos
-.nutri-bg {
-  &-primary { background-color: var(--nutri-background-primary) !important; }
-  &-secondary { background-color: var(--nutri-background-secondary) !important; }
-  &-card { background-color: var(--nutri-card-background) !important; }
-  &-accent { background-color: var(--nutri-background-accent) !important; }
-}
-
-// Bordes
-.nutri-border {
-  &-light { border: 1px solid var(--nutri-border-light) !important; }
-  &-medium { border: 1px solid var(--nutri-border-medium) !important; }
-  &-radius { border-radius: var(--nutri-border-radius) !important; }
-  &-radius-sm { border-radius: var(--nutri-border-radius-sm) !important; }
-  &-radius-lg { border-radius: var(--nutri-border-radius-lg) !important; }
-}
-
-// Sombras
-.nutri-shadow {
-  &-sm { box-shadow: var(--nutri-shadow-sm) !important; }
-  &-md { box-shadow: var(--nutri-shadow-md) !important; }
-  &-lg { box-shadow: var(--nutri-shadow-lg) !important; }
-  &-xl { box-shadow: var(--nutri-shadow-xl) !important; }
-}
-
-// Macros
-.nutri-macro {
-  &-calories { color: var(--nutri-macro-calories) !important; }
-  &-protein { color: var(--nutri-macro-protein) !important; }
-  &-carbs { color: var(--nutri-macro-carbs) !important; }
-  &-fat { color: var(--nutri-macro-fat) !important; }
-}
 
 // =============================================================================
 // COMPONENTES GLOBALES REUTILIZABLES
@@ -194,8 +75,8 @@
   }
   
   &.primary {
-    background-color: var(--nutri-primary);
-    color: var(--nutri-text-light);
+    background-color: var(--nutri-brand-primary);
+    color: var(--nutri-text-inverse);
   }
   
   &.secondary {
@@ -235,7 +116,7 @@
   
   &:focus {
     outline: none;
-    border-color: var(--nutri-primary);
+    border-color: var(--nutri-brand-primary);
     box-shadow: 0 0 0 3px rgba(106, 176, 76, 0.2);
   }
 }
@@ -246,6 +127,7 @@
 
 // Configuración base del body
 body {
+  font-family: 'Poppins', sans-serif;
   background-color: var(--nutri-background-primary);
   color: var(--nutri-text-primary);
 }
@@ -255,35 +137,50 @@ ion-app {
   background: var(--nutri-background-primary);
 }
 
-// Configurar variables de Ionic para usar nuestros colores
-:root {
-  --ion-color-primary: var(--nutri-primary);
-  --ion-color-primary-rgb: 106, 176, 76;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: var(--nutri-primary-dark);
-  --ion-color-primary-tint: var(--nutri-primary-light);
-}
+// NOTA: Las variables de Ionic están configuradas en theme/variables.scss
   
-  .ingredient-selector-modal {
-    --width: 90%;
-    --max-width: 500px;
-    --height: 80%;
-    --border-radius: 16px;
-  }
+.ingredient-selector-modal {
+  --width: 90%;
+  --max-width: 500px;
+  --height: 80%;
+  --border-radius: 16px;
+}
 
 // =============================================================================
-// ESTILOS PARA EL ESCÁNER DE CÓDIGOS DE BARRAS
+// ESTILOS PARA EL ESCÁNER DE CÓDIGOS DE BARRAS - VERSIÓN CORREGIDA
 // =============================================================================
+
+// **NUEVO: Clases para garantizar transparencia durante el escaneo**
+body.scanner-active,
+ion-app.scanner-active {
+  background: transparent !important;
+  background-color: transparent !important;
+}
 
 // Clases para ocultar elementos durante el escaneo
 .scanner-active {
   ion-content.scanner-hidden {
     display: none !important;
   }
+  
+  // Durante el escaneo, forzar transparencia en elementos comunes que pueden tener fondo
+  ion-toolbar,
+  ion-header,
+  ion-content,
+  ion-footer,
+  ion-tab-bar {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+  
+  // Ocultar completamente ciertos elementos durante el escaneo
+  .fab-button,
+  .floating-action-button {
+    display: none !important;
+  }
 }
 
-// UI del escáner
+// UI del escáner - **MEJORADA**
 .scanner-ui {
   position: fixed;
   top: 0;
@@ -291,7 +188,7 @@ ion-app {
   width: 100%;
   height: 100%;
   z-index: 9999;
-  background: transparent;
+  background: transparent !important; // **FORZAR transparencia**
   display: flex;
   flex-direction: column;
   
@@ -299,7 +196,7 @@ ion-app {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: transparent;
+    background: transparent !important; // **FORZAR transparencia**
   }
   
   .scanner-header {
@@ -312,7 +209,7 @@ ion-app {
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5); // Solo el header tiene fondo semi-transparente
     
     .scanner-title {
       color: white;
@@ -339,6 +236,7 @@ ion-app {
     align-items: center;
     justify-content: center;
     padding: 100px 40px 40px;
+    background: transparent !important; // **ASEGURAR transparencia**
     
     .scanner-frame {
       width: 250px;
@@ -346,7 +244,7 @@ ion-app {
       border: 2px solid white;
       border-radius: 12px;
       position: relative;
-      background: transparent;
+      background: transparent !important; // **FRAME transparente**
       
       // Esquinas del marco
       &::before,
@@ -427,5 +325,13 @@ ion-app {
   100% {
     transform: translateY(75px);
     opacity: 0;
+  }
+}
+
+// **SEGURIDAD: Si por alguna razón algún elemento sigue teniendo fondo blanco**
+.scanner-ui * {
+  &:not(.scanner-header):not(.scanner-instructions) {
+    background: transparent !important;
+    background-color: transparent !important;
   }
 }

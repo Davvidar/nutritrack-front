@@ -21,13 +21,13 @@ export class MetricsSummaryComponent implements OnChanges {
   @Input() dailyGoals: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   @Input() currentConsumption: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
-  // For the progress bar widths (capped at 100%)
+  
   caloriesProgress: number = 0;
   proteinProgress: number = 0;
   carbsProgress: number = 0;
   fatProgress: number = 0;
 
-  // Flags to indicate if the goal has been exceeded
+  
   caloriesExceeded: boolean = false;
   proteinExceeded: boolean = false;
   carbsExceeded: boolean = false;
@@ -40,15 +40,15 @@ export class MetricsSummaryComponent implements OnChanges {
   }
 
   private updateProgressAndExceededState() {
-    // Calculate progress (capped at 100% for bar width)
-    // Using (this.dailyGoals.nutrient || 1) to prevent division by zero if goal is 0.
+    
+    
     this.caloriesProgress = Math.min(100, (this.currentConsumption.calories / (this.dailyGoals.calories || 1)) * 100);
     this.proteinProgress = Math.min(100, (this.currentConsumption.protein / (this.dailyGoals.protein || 1)) * 100);
     this.carbsProgress = Math.min(100, (this.currentConsumption.carbs / (this.dailyGoals.carbs || 1)) * 100);
     this.fatProgress = Math.min(100, (this.currentConsumption.fat / (this.dailyGoals.fat || 1)) * 100);
 
-    // Determine exceeded state: current consumption is greater than the goal.
-    // If a goal is 0, any consumption will mark it as exceeded and turn the bar red and full.
+    
+    
     this.caloriesExceeded = this.currentConsumption.calories > this.dailyGoals.calories;
     this.proteinExceeded = this.currentConsumption.protein > this.dailyGoals.protein;
     this.carbsExceeded = this.currentConsumption.carbs > this.dailyGoals.carbs;

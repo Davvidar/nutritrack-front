@@ -1,5 +1,7 @@
+// src/app/components/profile-edit-modal/profile-edit-modal.component.ts - Versión Mejorada
+
 import { Component, Input, OnInit } from '@angular/core';
-import { IonicModule, ModalController, ToastController, AlertController } from '@ionic/angular';
+import { IonicModule, ModalController, ToastController, AlertController, LoadingController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, UserProfile } from '../../services/auth.service';
@@ -18,13 +20,41 @@ export class ProfileEditModalComponent implements OnInit {
   loading = false;
   error: string | null = null;
   
-  // Opciones para selects
+  // Opciones para selects con labels amigables
   sexos = ['masculino', 'femenino', 'otro'];
   objetivos = ['perder peso', 'mantenerse', 'ganar músculo'];
   actividades = ['sedentario', 'ligero', 'moderado', 'activo', 'muy activo'];
   
+  // Labels amigables para los selects
+  private sexoLabels = {
+    'masculino': 'Masculino',
+    'femenino': 'Femenino'
+
+  };
+  
+  private objetivoLabels = {
+    'perder peso': 'Perder peso',
+    'mantenerse': 'Mantener peso',
+    'ganar músculo': 'Ganar músculo'
+  };
+  
+  private actividadLabels = {
+    'sedentario': 'Sedentario (poco o ningún ejercicio)',
+    'ligero': 'Ligero (ejercicio ligero 1-3 días/semana)',
+    'moderado': 'Moderado (ejercicio moderado 3-5 días/semana)',
+    'activo': 'Activo (ejercicio fuerte 6-7 días/semana)',
+    'muy activo': 'Muy activo (ejercicio muy fuerte, trabajo físico)'
+  };
+  
   // Para detectar cambios en datos biométricos
-  originalBiometricData: { peso: number; altura: number; edad: number; sexo: string; actividad: string; objetivo: string } = {
+  originalBiometricData: { 
+    peso: number; 
+    altura: number; 
+    edad: number; 
+    sexo: string; 
+    actividad: string; 
+    objetivo: string;
+  } = {
     peso: 0,
     altura: 0,
     edad: 0,
@@ -38,7 +68,8 @@ export class ProfileEditModalComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private toastController: ToastController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
@@ -48,8 +79,8 @@ export class ProfileEditModalComponent implements OnInit {
   
   private initForm() {
     this.profileForm = this.fb.group({
-      nombre: [this.profile.nombre, Validators.required],
-      apellido: [this.profile.apellido, Validators.required],
+      nombre: [this.profile.nombre, [Validators.required, Validators.minLength(2)]],
+      apellido: [this.profile.apellido, [Validators.required, Validators.minLength(2)]],
       peso: [this.profile.peso, [Validators.required, Validators.min(30), Validators.max(300)]],
       altura: [this.profile.altura, [Validators.required, Validators.min(100), Validators.max(250)]],
       edad: [this.profile.edad, [Validators.required, Validators.min(12), Validators.max(120)]],
@@ -60,7 +91,6 @@ export class ProfileEditModalComponent implements OnInit {
   }
   
   private storeBiometricData() {
-    // Guardar valores originales para comparar después
     this.originalBiometricData = {
       peso: this.profile.peso,
       altura: this.profile.altura,
@@ -70,7 +100,53 @@ export class ProfileEditModalComponent implements OnInit {
       objetivo: this.profile.objetivo
     };
   }
+
+  getSexoLabel(sexo: string): string {
+    return this.sexoLabels[sexo as keyof typeof this.sexoLabels] || sexo;
+  }
   
+  getObjetivoLabel(objetivo: string): string {
+    return this.objetivoLabels[objetivo as keyof typeof this.objetivoLabels] || objetivo;
+  }
+  
+  getActividadLabel(actividad: string): string {
+    return this.actividadLabels[actividad as keyof typeof this.actividadLabels] || actividad;
+  }
+
+  hasPersonalErrors(): boolean {
+    const nombre = this.profileForm.get('nombre');
+    const apellido = this.profileForm.get('apellido');
+    return !!(
+      (nombre?.touched && nombre?.invalid) ||
+      (apellido?.touched && apellido?.invalid)
+    );
+  }
+  
+  hasBiometricErrors(): boolean {
+    const peso = this.profileForm.get('peso');
+    const altura = this.profileForm.get('altura');
+    const edad = this.profileForm.get('edad');
+    const sexo = this.profileForm.get('sexo');
+    
+    return !!(
+      (peso?.touched && peso?.invalid) ||
+      (altura?.touched && altura?.invalid) ||
+      (edad?.touched && edad?.invalid) ||
+      (sexo?.touched && sexo?.invalid)
+    );
+  }
+  
+  hasGoalsErrors(): boolean {
+    const objetivo = this.profileForm.get('objetivo');
+    const actividad = this.profileForm.get('actividad');
+    
+    return !!(
+      (objetivo?.touched && objetivo?.invalid) ||
+      (actividad?.touched && actividad?.invalid)
+    );
+  }
+  
+
   hasBiometricDataChanged(): boolean {
     const currentForm = this.profileForm.value;
     
@@ -84,7 +160,8 @@ export class ProfileEditModalComponent implements OnInit {
   
   async onSubmit() {
     if (this.profileForm.invalid) {
-      this.presentToast('Por favor, completa correctamente todos los campos obligatorios', 'warning');
+      await this.presentToast('Por favor, completa correctamente todos los campos obligatorios', 'warning');
+      this.markFormGroupTouched(this.profileForm);
       return;
     }
     
@@ -92,57 +169,59 @@ export class ProfileEditModalComponent implements OnInit {
     
     // Verificar si cambiaron datos biométricos
     if (this.hasBiometricDataChanged()) {
-      // Preguntar si quiere recalcular objetivos nutricionales
       const shouldRecalculate = await this.askForRecalculation();
-      
-      this.saveProfile(formValue, shouldRecalculate);
+      await this.saveProfile(formValue, shouldRecalculate);
     } else {
-      // Si no cambiaron datos biométricos, guardar sin recalcular
-      this.saveProfile(formValue, false);
+      await this.saveProfile(formValue, false);
     }
   }
   
   private async saveProfile(profileData: any, recalculateObjectives: boolean) {
-    this.loading = true;
-    
-    // Crear objeto con datos a actualizar
-    const updateData: Partial<UserProfile> = {
-      ...profileData
-    };
-    
-    // Si no queremos recalcular, enviamos explícitamente null para que el backend no recalcule
-    if (!recalculateObjectives) {
-      updateData.objetivosNutricionales = this.profile.objetivosNutricionales;
-    }
-    
-    this.authService.updateProfile(updateData).subscribe({
-      next: (updatedProfile) => {
-        this.loading = false;
-        this.presentToast('Perfil actualizado correctamente', 'primary');
-        this.modalController.dismiss(updatedProfile);
-      },
-      error: (err) => {
-        this.loading = false;
-        console.error('Error al actualizar perfil:', err);
-        this.error = 'Error al actualizar el perfil. Por favor, inténtalo de nuevo.';
-        this.presentToast(this.error, 'danger');
-      }
+    const loading = await this.loadingController.create({
+      message: 'Guardando cambios...',
+      spinner: 'crescent'
     });
+    await loading.present();
+    
+    try {
+      // Crear objeto con datos a actualizar
+      const updateData: Partial<UserProfile> = { ...profileData };
+      
+      // Si no queremos recalcular, enviamos explícitamente los objetivos actuales
+      if (!recalculateObjectives) {
+        updateData.objetivosNutricionales = this.profile.objetivosNutricionales;
+      }
+      
+      const updatedProfile = await this.authService.updateProfile(updateData).toPromise();
+      
+      await loading.dismiss();
+      await this.presentToast('Perfil actualizado correctamente', 'success');
+      this.modalController.dismiss(updatedProfile);
+      
+    } catch (err: any) {
+      await loading.dismiss();
+      console.error('Error al actualizar perfil:', err);
+      this.error = 'Error al actualizar el perfil. Por favor, inténtalo de nuevo.';
+      await this.presentToast(this.error, 'danger');
+    }
   }
   
   async askForRecalculation(): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.alertController.create({
-        header: 'Recalcular objetivos',
-        message: 'Has cambiado datos que afectan a tus objetivos nutricionales. ¿Quieres recalcular tus objetivos automáticamente?',
+        header: '🔄 Recalcular objetivos',
+        message: 'Has cambiado datos que afectan a tus objetivos nutricionales. ¿Quieres recalcular automáticamente tus objetivos de calorías y macronutrientes?',
+        cssClass: 'custom-alert',
         buttons: [
           {
-            text: 'No',
+            text: 'No, mantener actuales',
             role: 'cancel',
+            cssClass: 'secondary',
             handler: () => resolve(false)
           },
           {
-            text: 'Sí',
+            text: 'Sí, recalcular',
+            cssClass: 'primary',
             handler: () => resolve(true)
           }
         ]
@@ -150,17 +229,55 @@ export class ProfileEditModalComponent implements OnInit {
     });
   }
   
-  async presentToast(message: string, color: 'primary' | 'danger' | 'warning' = 'primary') {
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+      
+      if (control && typeof control === 'object' && 'controls' in control) {
+        this.markFormGroupTouched(control as FormGroup);
+      }
+    });
+  }
+  
+  async presentToast(message: string, color: 'primary' | 'success' | 'warning' | 'danger' = 'primary') {
+    const iconMap = {
+      primary: 'information-circle',
+      success: 'checkmark-circle',
+      warning: 'warning',
+      danger: 'alert-circle'
+    };
+    
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
+      duration: 3000,
       position: 'bottom',
-      color
+      color,
+      icon: iconMap[color],
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
     });
     await toast.present();
   }
   
   dismiss() {
     this.modalController.dismiss();
+  }
+
+  private isValidWeight(weight: number): boolean {
+    return weight >= 30 && weight <= 300;
+  }
+  
+  private isValidHeight(height: number): boolean {
+    return height >= 100 && height <= 250;
+  }
+  
+  private isValidAge(age: number): boolean {
+    return age >= 12 && age <= 120;
   }
 }

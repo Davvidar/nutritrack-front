@@ -1,10 +1,49 @@
-// src/app/components/weekly-weight-comparison/weekly-weight-comparison.component.ts - Actualizado
-import { Component, OnInit, OnDestroy } from '@angular/core';
+// src/app/components/weekly-weight-comparison/weekly-weight-comparison.component.ts - Con utilidades de fecha
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { DailyLogService } from 'src/app/services/daily-log.service';
 import { NutritionUpdateService } from 'src/app/services/nutrition-update.service';
 import { Subscription } from 'rxjs';
+
+// Utilidades de fecha integradas en el componente
+class DateUtils {
+  static toLocalDate(date: Date): Date {
+    const localDate = new Date(date);
+    localDate.setHours(0, 0, 0, 0);
+    return localDate;
+  }
+
+  static isSameDay(date1: Date, date2: Date): boolean {
+    if (!date1 || !date2) return false;
+    const d1 = DateUtils.toLocalDate(date1);
+    const d2 = DateUtils.toLocalDate(date2);
+    return d1.getTime() === d2.getTime();
+  }
+
+  static getDateNDaysAgo(date: Date, days: number): Date {
+    const result = DateUtils.toLocalDate(date);
+    result.setDate(result.getDate() - days);
+    return result;
+  }
+
+  static isDateInRange(date: Date, startDate: Date, endDate: Date): boolean {
+    const targetDate = DateUtils.toLocalDate(date);
+    const start = DateUtils.toLocalDate(startDate);
+    const end = DateUtils.toLocalDate(endDate);
+    return targetDate >= start && targetDate <= end;
+  }
+
+  static fromDateString(dateStr: string): Date {
+    const cleanStr = dateStr.split('_')[0]; // Limpiar timestamp si existe
+    // Crear fecha desde string YYYY-MM-DD o ISO
+    if (cleanStr.includes('-') && cleanStr.length === 10) {
+      const [year, month, day] = cleanStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return DateUtils.toLocalDate(new Date(cleanStr));
+  }
+}
 
 @Component({
   selector: 'app-weekly-weight-comparison',
@@ -21,12 +60,13 @@ export class WeeklyWeightComparisonComponent implements OnInit, OnDestroy {
   currentWeekDays: number = 0;
   loading: boolean = false;
 
-  // Nueva suscripción para cambios de peso
   private weightUpdateSubscription?: Subscription;
 
   constructor(
     private dailyLogService: DailyLogService,
-    private nutritionUpdateService: NutritionUpdateService // Agregado
+    private nutritionUpdateService: NutritionUpdateService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -42,7 +82,6 @@ export class WeeklyWeightComparisonComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Nuevo: Configurar suscripción a actualizaciones de peso
   private setupWeightUpdateSubscription(): void {
     console.log('WeeklyWeightComparison: *** CONFIGURANDO SUSCRIPCIÓN A ACTUALIZACIONES DE PESO ***');
     
@@ -51,26 +90,26 @@ export class WeeklyWeightComparisonComponent implements OnInit, OnDestroy {
         next: (dateStr: string) => {
           console.log('WeeklyWeightComparison: *** RECIBIDA NOTIFICACIÓN DE PESO ***', dateStr);
           
-          try {
-            const updatedDate = new Date(dateStr);
-            const today = new Date();
+          this.ngZone.run(() => {
+            try {
+              const updatedDate = DateUtils.fromDateString(dateStr);
+              
+              console.log('WeeklyWeightComparison: Fecha procesada:', {
+                original: dateStr,
+                fecha: updatedDate.toDateString(),
+                fechaISO: updatedDate.toISOString()
+              });
 
-            console.log('WeeklyWeightComparison: Comparando fechas:', {
-              hoy: today.toDateString(),
-              actualizada: updatedDate.toDateString(),
-              sonIguales: this.datesAreOnSameDay(today, updatedDate)
-            });
-
-            // Si el peso actualizado es de hoy O está dentro de las semanas que estamos monitoreando, recargar
-            if (this.shouldReloadForDate(updatedDate)) {
-              console.log('WeeklyWeightComparison: *** FECHA RELEVANTE - RECARGANDO DATOS ***');
-              this.loadWeeklyComparison();
-            } else {
-              console.log('WeeklyWeightComparison: Fecha no relevante, no recargando');
+              if (this.shouldReloadForDate(updatedDate)) {
+                console.log('WeeklyWeightComparison: *** FECHA RELEVANTE - RECARGANDO DATOS ***');
+                this.loadWeeklyComparison();
+              } else {
+                console.log('WeeklyWeightComparison: Fecha no relevante para comparación semanal');
+              }
+            } catch (err) {
+              console.error('WeeklyWeightComparison: Error al procesar notificación de peso:', err);
             }
-          } catch (err) {
-            console.error('WeeklyWeightComparison: Error al procesar notificación de peso:', err);
-          }
+          });
         },
         error: (err) => {
           console.error('WeeklyWeightComparison: Error en suscripción de peso:', err);
@@ -78,98 +117,102 @@ export class WeeklyWeightComparisonComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Determinar si la fecha actualizada afecta nuestros datos
+  // CORREGIDO: Lógica de fechas más robusta usando utilidades
   private shouldReloadForDate(updatedDate: Date): boolean {
-    const today = new Date();
+    const today = DateUtils.toLocalDate(new Date());
+    const updatedLocalDate = DateUtils.toLocalDate(updatedDate);
     
-    // Si es hoy, definitivamente recargar
-    if (this.datesAreOnSameDay(updatedDate, today)) {
-      return true;
-    }
+    console.log('WeeklyWeightComparison: Verificando si debe recargar:', {
+      fechaActualizada: updatedLocalDate.toDateString(),
+      fechaHoy: today.toDateString(),
+      esHoy: DateUtils.isSameDay(updatedLocalDate, today)
+    });
 
-    // Calcular el rango de fechas que nos interesan (últimas 2 semanas)
-    const currentWeekStart = this.getWeekStart(today);
-    const previousWeekStart = new Date(currentWeekStart);
-    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+    // Calcular el rango: desde 3 semanas atrás hasta HOY (sin incluir mañana)
+    const threeWeeksAgo = DateUtils.getDateNDaysAgo(today, 21);
+    
+    console.log('WeeklyWeightComparison: Rango de fechas relevantes:', {
+      desde: threeWeeksAgo.toDateString(),
+      hasta: today.toDateString(),
+      fechaActualizada: updatedLocalDate.toDateString()
+    });
 
-    // Si la fecha está dentro de las últimas 2 semanas, recargar
-    return updatedDate >= previousWeekStart && updatedDate <= today;
-  }
-
-  // Obtener el inicio de la semana (lunes)
-  private getWeekStart(date: Date): Date {
-    const weekStart = new Date(date);
-    const dayOfWeek = weekStart.getDay();
-    const daysFromMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-    weekStart.setDate(weekStart.getDate() - daysFromMonday);
-    weekStart.setHours(0, 0, 0, 0);
-    return weekStart;
-  }
-
-  private datesAreOnSameDay(first: Date, second: Date): boolean {
-    if (!first || !second) return false;
-    return first.getFullYear() === second.getFullYear() &&
-      first.getMonth() === second.getMonth() &&
-      first.getDate() === second.getDate();
+    // Verificar si está en el rango (desde 3 semanas atrás hasta hoy inclusive)
+    const isInRange = DateUtils.isDateInRange(updatedLocalDate, threeWeeksAgo, today);
+    
+    console.log('WeeklyWeightComparison: ¿Debe recargar?', isInRange);
+    return isInRange;
   }
 
   loadWeeklyComparison() {
     console.log('WeeklyWeightComparison: *** CARGANDO COMPARACIÓN SEMANAL ***');
     this.loading = true;
+    this.cdr.detectChanges();
     
     this.dailyLogService.getWeeklyWeightComparison().subscribe({
       next: (data) => {
         console.log('WeeklyWeightComparison: *** DATOS RECIBIDOS ***', data);
         
-        this.previousWeekAverage = data.previousWeekAverage;
-        this.currentWeekAverage = data.currentWeekAverage;
-        this.todayWeight = data.todayWeight;
-        this.previousWeekDays = data.previousWeekDays;
-        this.currentWeekDays = data.currentWeekDays;
-        this.loading = false;
-        
-        console.log('WeeklyWeightComparison: *** DATOS ACTUALIZADOS ***', {
-          previousWeek: this.previousWeekAverage,
-          currentWeek: this.currentWeekAverage,
-          today: this.todayWeight
+        this.ngZone.run(() => {
+          // Crear nuevas referencias para forzar detección de cambios
+          this.previousWeekAverage = data.previousWeekAverage !== null ? Number(data.previousWeekAverage) : null;
+          this.currentWeekAverage = data.currentWeekAverage !== null ? Number(data.currentWeekAverage) : null;
+          this.todayWeight = data.todayWeight !== null ? Number(data.todayWeight) : null;
+          this.previousWeekDays = Number(data.previousWeekDays || 0);
+          this.currentWeekDays = Number(data.currentWeekDays || 0);
+          this.loading = false;
+          
+          console.log('WeeklyWeightComparison: *** DATOS ACTUALIZADOS ***', {
+            previousWeek: this.previousWeekAverage,
+            currentWeek: this.currentWeekAverage,
+            today: this.todayWeight,
+            previousDays: this.previousWeekDays,
+            currentDays: this.currentWeekDays
+          });
+          
+          this.cdr.detectChanges();
         });
       },
       error: (err) => {
         console.error('WeeklyWeightComparison: Error cargando comparación semanal:', err);
-        this.loading = false;
+        
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.previousWeekAverage = null;
+          this.currentWeekAverage = null;
+          this.todayWeight = null;
+          this.previousWeekDays = 0;
+          this.currentWeekDays = 0;
+          this.cdr.detectChanges();
+        });
       }
     });
   }
 
-  // Calcular diferencia entre semana actual y anterior
   getWeeklyChange(): number | null {
     if (this.currentWeekAverage !== null && this.previousWeekAverage !== null) {
-      return this.currentWeekAverage - this.previousWeekAverage;
+      return Number((this.currentWeekAverage - this.previousWeekAverage).toFixed(1));
     }
     return null;
   }
 
-  // Calcular diferencia entre peso de hoy y media semanal actual
   getTodayVsWeekChange(): number | null {
     if (this.todayWeight !== null && this.currentWeekAverage !== null) {
-      return this.todayWeight - this.currentWeekAverage;
+      return Number((this.todayWeight - this.currentWeekAverage).toFixed(1));
     }
     return null;
   }
 
-  // Formatear peso con 1 decimal
   formatWeight(weight: number | null): string {
     return weight !== null ? weight.toFixed(1) : '--';
   }
 
-  // Formatear cambio con signo y 1 decimal
   formatChange(change: number | null): string {
     if (change === null) return '';
     const sign = change > 0 ? '+' : '';
     return `${sign}${change.toFixed(1)}`;
   }
 
-  // Método público para forzar actualización (útil para debugging)
   public forceRefresh(): void {
     console.log('WeeklyWeightComparison: *** ACTUALIZACIÓN FORZADA ***');
     this.loadWeeklyComparison();

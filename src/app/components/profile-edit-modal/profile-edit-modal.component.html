@@ -1,124 +1,249 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<!-- src/app/components/profile-edit-modal/profile-edit-modal.component.html - Versión Mejorada -->
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
     <ion-title>Editar Perfil</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">
+      <ion-button (click)="dismiss()" shape="round">
         <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content>
+  <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <ion-spinner name="crescent"></ion-spinner>
-    <p>Guardando cambios...</p>
+    <p>Guardando tus cambios...</p>
   </div>
 
+  <!-- Form Content -->
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
 
-    <section class="form-section">
+    <!-- Información Personal -->
+    <section class="form-section" [class.error]="hasPersonalErrors()">
       <ion-list-header class="ion-no-padding">
         <ion-label>Información Personal</ion-label>
       </ion-list-header>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Nombre <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="nombre" type="text" required placeholder="Introduce tu nombre"></ion-input>
-        <ion-note slot="error" *ngIf="profileForm.get('nombre')?.touched && profileForm.get('nombre')?.errors?.['required']">
+        <ion-label position="stacked">
+          Nombre <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input 
+          formControlName="nombre" 
+          type="text" 
+          required 
+          placeholder="Tu nombre"
+          autocomplete="given-name">
+        </ion-input>
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('nombre')?.touched && profileForm.get('nombre')?.errors?.['required']">
           El nombre es obligatorio
         </ion-note>
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Apellido <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="apellido" type="text" required placeholder="Introduce tu apellido"></ion-input>
-        <ion-note slot="error" *ngIf="profileForm.get('apellido')?.touched && profileForm.get('apellido')?.errors?.['required']">
+        <ion-label position="stacked">
+          Apellido <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input 
+          formControlName="apellido" 
+          type="text" 
+          required 
+          placeholder="Tu apellido"
+          autocomplete="family-name">
+        </ion-input>
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('apellido')?.touched && profileForm.get('apellido')?.errors?.['required']">
           El apellido es obligatorio
         </ion-note>
       </ion-item>
     </section>
 
-    <section class="form-section">
+    <!-- Datos Biométricos -->
+    <section class="form-section" [class.error]="hasBiometricErrors()">
       <ion-list-header class="ion-no-padding">
         <ion-label>Datos Biométricos</ion-label>
       </ion-list-header>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Peso (kg) <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="peso" type="number" required inputmode="decimal" placeholder="Ej: 70.5"></ion-input>
-        <ion-note slot="error" *ngIf="profileForm.get('peso')?.touched && profileForm.get('peso')?.errors?.['required']">
+        <ion-label position="stacked">
+          Peso (kg) <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input 
+          formControlName="peso" 
+          type="number" 
+          required 
+          inputmode="decimal" 
+          placeholder="Ej: 70.5"
+          min="30"
+          max="300"
+          step="0.1">
+        </ion-input>
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('peso')?.touched && profileForm.get('peso')?.errors?.['required']">
           El peso es obligatorio
         </ion-note>
-        <ion-note slot="error" *ngIf="profileForm.get('peso')?.touched && (profileForm.get('peso')?.errors?.['min'] || profileForm.get('peso')?.errors?.['max'])">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('peso')?.touched && (profileForm.get('peso')?.errors?.['min'] || profileForm.get('peso')?.errors?.['max'])">
           El peso debe estar entre 30 y 300 kg
         </ion-note>
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Altura (cm) <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="altura" type="number" required inputmode="decimal" placeholder="Ej: 175"></ion-input>
-        <ion-note slot="error" *ngIf="profileForm.get('altura')?.touched && profileForm.get('altura')?.errors?.['required']">
+        <ion-label position="stacked">
+          Altura (cm) <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input 
+          formControlName="altura" 
+          type="number" 
+          required 
+          inputmode="decimal" 
+          placeholder="Ej: 175"
+          min="100"
+          max="250">
+        </ion-input>
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('altura')?.touched && profileForm.get('altura')?.errors?.['required']">
           La altura es obligatoria
         </ion-note>
-        <ion-note slot="error" *ngIf="profileForm.get('altura')?.touched && (profileForm.get('altura')?.errors?.['min'] || profileForm.get('altura')?.errors?.['max'])">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('altura')?.touched && (profileForm.get('altura')?.errors?.['min'] || profileForm.get('altura')?.errors?.['max'])">
           La altura debe estar entre 100 y 250 cm
         </ion-note>
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Edad <ion-text color="danger">*</ion-text></ion-label>
-        <ion-input formControlName="edad" type="number" required inputmode="numeric" placeholder="Ej: 30"></ion-input>
-        <ion-note slot="error" *ngIf="profileForm.get('edad')?.touched && profileForm.get('edad')?.errors?.['required']">
+        <ion-label position="stacked">
+          Edad <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input 
+          formControlName="edad" 
+          type="number" 
+          required 
+          inputmode="numeric" 
+          placeholder="Ej: 30"
+          min="12"
+          max="120">
+        </ion-input>
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('edad')?.touched && profileForm.get('edad')?.errors?.['required']">
           La edad es obligatoria
         </ion-note>
-        <ion-note slot="error" *ngIf="profileForm.get('edad')?.touched && (profileForm.get('edad')?.errors?.['min'] || profileForm.get('edad')?.errors?.['max'])">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('edad')?.touched && (profileForm.get('edad')?.errors?.['min'] || profileForm.get('edad')?.errors?.['max'])">
           La edad debe estar entre 12 y 120 años
         </ion-note>
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Sexo <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="sexo" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu sexo">
-          <ion-select-option *ngFor="let s of sexos" [value]="s">{{ s | titlecase }}</ion-select-option>
+        <ion-label position="stacked">
+          Sexo <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-select 
+          formControlName="sexo" 
+          interface="action-sheet" 
+          cancelText="Cancelar" 
+          placeholder="Selecciona tu sexo"
+          [interfaceOptions]="{
+            header: 'Selecciona tu sexo',
+            subHeader: 'Esta información ayuda a calcular tus objetivos nutricionales'
+          }">
+          <ion-select-option *ngFor="let s of sexos" [value]="s">
+            {{ getSexoLabel(s) }}
+          </ion-select-option>
         </ion-select>
-        <ion-note slot="error" *ngIf="profileForm.get('sexo')?.touched && profileForm.get('sexo')?.errors?.['required']">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('sexo')?.touched && profileForm.get('sexo')?.errors?.['required']">
           El sexo es obligatorio
         </ion-note>
       </ion-item>
     </section>
 
-    <section class="form-section">
+    <!-- Objetivos y Actividad -->
+    <section class="form-section" [class.error]="hasGoalsErrors()">
       <ion-list-header class="ion-no-padding">
         <ion-label>Objetivos y Actividad</ion-label>
       </ion-list-header>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Objetivo <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="objetivo" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu objetivo">
-          <ion-select-option *ngFor="let o of objetivos" [value]="o">{{ o | titlecase }}</ion-select-option>
+        <ion-label position="stacked">
+          Objetivo <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-select 
+          formControlName="objetivo" 
+          interface="action-sheet" 
+          cancelText="Cancelar" 
+          placeholder="Selecciona tu objetivo"
+          [interfaceOptions]="{
+            header: 'Tu objetivo principal',
+            subHeader: 'Puedes cambiarlo cuando quieras'
+          }">
+          <ion-select-option *ngFor="let o of objetivos" [value]="o">
+            {{ getObjetivoLabel(o) }}
+          </ion-select-option>
         </ion-select>
-        <ion-note slot="error" *ngIf="profileForm.get('objetivo')?.touched && profileForm.get('objetivo')?.errors?.['required']">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('objetivo')?.touched && profileForm.get('objetivo')?.errors?.['required']">
           El objetivo es obligatorio
         </ion-note>
       </ion-item>
 
       <ion-item lines="none">
-        <ion-label position="stacked">Nivel de actividad <ion-text color="danger">*</ion-text></ion-label>
-        <ion-select formControlName="actividad" interface="action-sheet" cancelText="Cancelar" placeholder="Selecciona tu nivel">
-          <ion-select-option *ngFor="let a of actividades" [value]="a">{{ a | titlecase }}</ion-select-option>
+        <ion-label position="stacked">
+          Nivel de actividad <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-select 
+          formControlName="actividad" 
+          interface="action-sheet" 
+          cancelText="Cancelar" 
+          placeholder="Selecciona tu nivel"
+          [interfaceOptions]="{
+            header: 'Tu nivel de actividad',
+            subHeader: 'Incluye ejercicio y actividades diarias'
+          }">
+          <ion-select-option *ngFor="let a of actividades" [value]="a">
+            {{ getActividadLabel(a) }}
+          </ion-select-option>
         </ion-select>
-        <ion-note slot="error" *ngIf="profileForm.get('actividad')?.touched && profileForm.get('actividad')?.errors?.['required']">
+        <ion-note 
+          slot="error" 
+          *ngIf="profileForm.get('actividad')?.touched && profileForm.get('actividad')?.errors?.['required']">
           El nivel de actividad es obligatorio
         </ion-note>
       </ion-item>
     </section>
 
+    <!-- Acciones del Formulario -->
     <div class="form-actions">
-      <ion-button expand="block" type="submit" [disabled]="profileForm.invalid">
-        Guardar cambios
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="profileForm.invalid || loading"
+        size="large">
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+        {{ loading ? 'Guardando...' : 'Guardar cambios' }}
       </ion-button>
-      <ion-button expand="block" fill="outline" type="button" (click)="dismiss()">
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        type="button" 
+        (click)="dismiss()"
+        size="large">
+        <ion-icon name="close-circle-outline" slot="start"></ion-icon>
         Cancelar
       </ion-button>
     </div>

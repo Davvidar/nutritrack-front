@@ -4,7 +4,6 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DailyLogService } from 'src/app/services/daily-log.service';
-import { NutritionUpdateService } from 'src/app/services/nutrition-update.service'; // Agregado
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
@@ -46,8 +45,7 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
 
   constructor(
     private dailyLogService: DailyLogService,
-    private toastController: ToastController,
-    private nutritionUpdateService: NutritionUpdateService // Agregado
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
@@ -152,28 +150,29 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
+    console.log('WeightTracker: *** GUARDANDO PESO ***', {
+      fecha: this.selectedDate,
+      peso: weightValue
+    });
+
     this.dailyLogService.updateWeight(this.selectedDate, weightValue).subscribe({
-      next: () => {
-        console.log('WeightTracker: *** PESO ACTUALIZADO EXITOSAMENTE ***', {
-          fecha: this.selectedDate,
-          peso: weightValue
-        });
+      next: (response) => {
+        console.log('WeightTracker: *** PESO GUARDADO EXITOSAMENTE ***', response);
         
         // Actualizar estado local
         this.currentWeight = weightValue;
         this.editMode = false;
         this.loading = false;
         
-        // *** NUEVO: Emitir notificación de actualización de peso ***
-        console.log('WeightTracker: *** EMITIENDO NOTIFICACIÓN DE PESO ***');
-        this.nutritionUpdateService.notifyWeightUpdated(this.selectedDate);
+        // *** REMOVIDO: No emitir notificación aquí, el servicio ya lo hace ***
+        // this.nutritionUpdateService.notifyWeightUpdated(this.selectedDate);
         
         // Recargar historial y mostrar mensaje de éxito
         this.loadWeeklyHistory();
         this.presentToast('Peso actualizado correctamente', 'primary');
       },
       error: (err) => {
-        console.error('Error guardando peso:', err);
+        console.error('WeightTracker: Error guardando peso:', err);
         this.presentToast('Error al guardar el peso', 'danger');
         this.loading = false;
       }
@@ -207,7 +206,7 @@ export class WeightTrackerComponent implements OnInit, OnChanges {
     return this.isSameDay(new Date(dateString), new Date());
   }
 
- getChange(entry: { fecha: string; peso: number }): number | null {
+  getChange(entry: { fecha: string; peso: number }): number | null {
     const index = this.weeklyHistory.indexOf(entry);
     if (index > 0) {
       const previousEntry = this.weeklyHistory[index - 1];

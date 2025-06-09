@@ -1,99 +1,315 @@
+
+
+:host {
+  --modal-border-radius: 20px;
+  --section-border-radius: 16px;
+  --input-border-radius: 12px;
+  --button-border-radius: 12px;
+  
+
+  --primary-gradient: linear-gradient(135deg, #6ab04c 0%, #78c55a 50%, #86d968 100%);
+  --surface-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  --section-gradient: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  --danger-gradient: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+  
+
+  --primary-color: #6ab04c;
+  --background-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --border-color: #e9ecef;
+  --text-color: #212529;
+  --text-muted: #6c757d;
+  --error-color: #dc3545;
+  
+
+  --shadow-light: 0 2px 8px rgba(106, 176, 76, 0.08);
+  --shadow-medium: 0 4px 16px rgba(106, 176, 76, 0.12);
+  --shadow-strong: 0 8px 32px rgba(106, 176, 76, 0.16);
+  
+
+  --transition-fast: 0.2s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --transition-slow: 0.4s ease-out;
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+ion-header {
+  border-bottom: 1px solid var(--border-color);
+  
+  ion-toolbar {
+    --background: var(--primary-color);
+    --color: white;
+    --border-width: 0;
+    --min-height: 56px;
+    
+    ion-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+    }
+    
+    ion-buttons {
+      ion-button {
+        --color: white;
+        --background: transparent;
+        --border-radius: var(--button-border-radius);
+        --padding-start: var(--spacing-sm);
+        --padding-end: var(--spacing-sm);
+        
+        ion-icon {
+          font-size: 1.25rem;
+        }
+      }
+    }
+  }
+}
+
+ion-content {
+  --background: var(--surface-color);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--background-color);
+  margin: var(--spacing-lg);
+  border-radius: var(--section-border-radius);
+  border: 1px solid var(--border-color);
 
   ion-spinner {
-    width: 50px;
-    height: 50px;
-    --color: var(--ion-color-primary);
-    margin-bottom: 20px;
+    width: 32px;
+    height: 32px;
+    --color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
   }
 
   p {
-    color: var(--ion-color-medium);
-    font-size: 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
   }
 }
 
-/* Style for sections to add space between groups of form fields */
 .form-section {
-  margin-bottom: 10px; /* Add space below each section */
-/*   background: var(--ion-color-light);  *//* Use the light background for the section */
-  padding: 16px; /* Add padding inside the section */
-  border-radius: 10px; /* Match the border-radius of the original ion-item */
+  margin: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  background: var(--background-color);
+  border-radius: var(--section-border-radius);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
 ion-list-header {
-  // Removed default margin-top and margin-bottom to be controlled by .form-section padding
-  font-size: 18px;
-  letter-spacing: 0.1px;
-  font-weight: 600;
-  margin-bottom: 12px; /* Add space below the header within the section */
-
+  background: var(--primary-color);
+  padding: var(--spacing-md);
+  margin: 0;
+  border-bottom: 1px solid var(--border-color);
 
   ion-label {
-    color: var(--ion-color-primary);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: var(--button-border-radius);
+      margin-right: var(--spacing-sm);
+    }
   }
 }
 
 ion-item {
-  // Removed --background, border-radius, margin-bottom, --border-color
-  // These are now handled by the .form-section
-  --padding-start: 0; // Keep padding start at 0 for label alignment
-  --inner-padding-end: 0; // Remove default inner padding
-  width: 100%; // Ensure ion-item takes full width of its container
-  --min-height: 48px; // Ensure a minimum height for touch targets
+  --background: transparent;
+  --padding-start: var(--spacing-md);
+  --padding-end: var(--spacing-md);
+  --padding-top: var(--spacing-lg);
+  --padding-bottom: var(--spacing-lg);
+  --inner-padding-end: 0;
+  --border-width: 0;
+  --min-height: 88px;
+  
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+  }
+
 
   ion-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: var(--ion-color-dark);
+    margin-bottom: var(--spacing-sm);
+    
+    &[position="stacked"] {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: var(--spacing-xs);
+      
+      ion-text[color="danger"] {
+        color: var(--error-color) !important;
+        font-weight: 600;
+        margin-left: var(--spacing-xs);
+      }
+    }
   }
+
 
   ion-input, ion-select {
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    --border-radius: 8px;
-  /*   --background: #f7f7f7;  */// Keep the lighter background for the input itself
-    font-size: 16px;
-    color: var(--ion-color-dark);
-    border: 1px solid var(--ion-color-light-shade);
-    border-radius: 8px;
-    height: 48px;
-    width: 100%; // Ensure input/select takes full width
-    box-sizing: border-box; // Include padding and border in the element's total width and height
+    --background: var(--surface-color);
+    --color: var(--text-color);
+    --padding-start: var(--spacing-md);
+    --padding-end: var(--spacing-md);
+    --padding-top: var(--spacing-md);
+    --padding-bottom: var(--spacing-md);
+    --border-radius: var(--input-border-radius);
+    
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-border-radius);
+    font-size: 1rem;
+    font-weight: 400;
+    min-height: 48px;
+    
+    &:focus, &.ion-focused {
+      --background: var(--background-color);
+      border-color: var(--primary-color);
+    }
+    
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+  
+  ion-select {
+    --padding-end: var(--spacing-xl);
+    min-height: 52px;
+    
+    &::part(icon) {
+      color: var(--text-muted);
+    }
   }
 
-  ion-select {
-    --padding-end: 10px;
-  }
 
   ion-note[slot="error"] {
-    margin-top: 4px;
-    padding-left: 0; /* Align error message with the start of the input */
-    font-size: 12px;
-    color: var(--ion-color-danger); // Ensure error color is explicitly set
+    margin-top: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: var(--input-border-radius);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--error-color);
   }
 }
 
 .form-actions {
-  margin-top: 32px; /* Increased top margin for more separation */
-  margin-bottom: 16px;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: var(--background-color);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  border-radius: var(--section-border-radius);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Increased space between buttons */
+  gap: var(--spacing-md);
 
   ion-button {
-    margin-bottom: 0; // Remove individual margin if using gap
-    height: 52px; /* Slightly increased button height */
-    --border-radius: 10px;
+    --border-radius: var(--button-border-radius);
+    --padding-top: var(--spacing-sm);
+    --padding-bottom: var(--spacing-sm);
+    height: 48px;
     font-weight: 600;
-    font-size: 18px; /* Slightly increased font size */
+    font-size: 1rem;
+    text-transform: none;
+    
+  
+    &[expand="block"]:not([fill="outline"]) {
+      --background: var(--primary-color);
+      --color: white;
+      
+      &:disabled {
+        --background: var(--border-color) !important;
+        --color: var(--text-muted) !important;
+      }
+    }
+    
+  
+    &[fill="outline"] {
+      --border-color: var(--border-color);
+      --border-width: 1px;
+      --color: var(--text-muted);
+      --background: var(--background-color);
+    }
   }
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    margin: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .form-actions {
+    margin: 0 var(--spacing-sm) var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  ion-item {
+    --padding-start: var(--spacing-sm);
+    --padding-end: var(--spacing-sm);
+    --min-height: 64px;
+  }
+  
+  ion-list-header {
+    padding: var(--spacing-sm);
+    
+    ion-label {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  :host {
+    --modal-border-radius: 8px;
+    --section-border-radius: 6px;
+  }
+  
+  .form-section {
+    margin: var(--spacing-xs);
+  }
+  
+  .form-actions {
+    margin: 0 var(--spacing-xs) var(--spacing-xs);
+  }
+}
+
+
+.form-section.error {
+  border-color: var(--error-color);
+}
+
+
+ion-button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+ion-input:focus-visible, ion-select:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }

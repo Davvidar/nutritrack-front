@@ -2,17 +2,20 @@ ion-header.nutri-header {
   ion-toolbar.nutri-header {
     --border-width: 0;
     --background: var(--ion-color-primary);
-    --min-height: 55px;
+    --min-height: 45px; // Reducido de 55px a 45px
     
     .logo-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 8px 0;
+      padding: 4px 0; // Reducido de 8px a 4px
       
       .logo-image {
-        width: 40%;
-        max-width: 160px;
+        width: 35%; // Reducido de 40% a 35%
+        max-width: 140px; // Reducido de 160px a 140px
+        object-fit: contain; // Asegura que la imagen mantenga su proporción
+        image-rendering: -webkit-optimize-contrast; // Mejora la nitidez en webkit
+        image-rendering: crisp-edges; // Mejora la nitidez en otros navegadores
       }
     }
   }

@@ -61,6 +61,15 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: var(--nutri-brand-primary-shade);
   --ion-color-primary-tint: var(--nutri-brand-primary-tint);
+
+  // Variables de compatibilidad para global.scss
+  --nutri-primary: var(--nutri-brand-primary);
+  --nutri-primary-light: var(--nutri-brand-primary-light);
+  --nutri-primary-dark: var(--nutri-brand-primary-dark);
+  --nutri-text-light: var(--nutri-text-inverse);
+  --nutri-card-background: var(--nutri-background-elevated);
+  --nutri-background-light-input: var(--nutri-input-background);
+  --nutri-border-color: var(--nutri-border-medium);
 }
 
 // =============================================================================
