@@ -15,9 +15,7 @@ export class ConnectionService {
     // La inicialización se hace manualmente llamando initialize()
   }
 
-  /**
-   * Inicializa el monitoreo de conexión
-   */
+  
   initialize() {
     this.initializeConnectionMonitoring();
   }

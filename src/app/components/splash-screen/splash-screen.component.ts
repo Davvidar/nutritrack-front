@@ -46,19 +46,7 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
         animate('600ms 1000ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
       ])
     ]),
-    trigger('floatingAnimation', [
-      state('float1', style({ transform: 'translateY(0px) rotate(0deg)' })),
-      state('float2', style({ transform: 'translateY(-10px) rotate(5deg)' })),
-      state('float3', style({ transform: 'translateY(-5px) rotate(-3deg)' })),
-      state('float4', style({ transform: 'translateY(-8px) rotate(2deg)' })),
-      transition('void => *', [
-        style({ transform: 'translateY(50px) rotate(0deg)', opacity: 0 }),
-        animate('1500ms 1200ms ease-out', style({ opacity: 1 }))
-      ]),
-      transition('* <=> *', [
-        animate('3000ms ease-in-out')
-      ])
-    ])
+
   ]
 })
 export class SplashScreenComponent implements OnInit, OnDestroy {
@@ -74,8 +62,7 @@ export class SplashScreenComponent implements OnInit, OnDestroy {
     'Verificando autenticación...',
     'Cargando perfil de usuario...',
     'Sincronizando datos...',
-    'Preparando experiencia nutricional...',
-    '¡Ya casi estamos listos!'
+    '¡Ya casi está listo!'
   ];
 
   private currentMessageIndex = 0;
@@ -126,7 +113,7 @@ export class SplashScreenComponent implements OnInit, OnDestroy {
       clearInterval(this.progressInterval);
     }
     this.progress = 100;
-    this.loadingText = '¡Listo para comenzar!';
+    this.loadingText = '¡Listo!';
   }
 
   // Método para iniciar animación de salida

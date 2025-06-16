@@ -29,10 +29,7 @@ export const routes: Routes = [
         path: 'forgot-password', 
         loadComponent: () => import('./auth/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage) 
       },
-      { 
-        path: 'reset-password/:token', 
-        loadComponent: () => import('./auth/forgot-password/reset-password/reset-password.page').then(m => m.ResetPasswordPage) 
-      },
+  
       { 
         path: '', 
         redirectTo: 'login', 

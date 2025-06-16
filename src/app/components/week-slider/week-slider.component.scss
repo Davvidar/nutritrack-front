@@ -5,17 +5,17 @@
 
 .week-slider-container {
   width: 100%;
-background: var(--ion-color-primary);
-  /* Verde principal de NutriTrack */
+  background: var(--ion-color-primary);
+
   color: white;
   padding-bottom: 5px;
   user-select: none;
   overflow: hidden;
-  /* Para contener las animaciones */
+  
 }
 
 .week-header {
-text-align: center;
+  text-align: center;
   padding: 10px 16px;
 }
 
@@ -112,7 +112,7 @@ text-align: center;
       top: -1px;
       transform: translateX(-51%);
       width: 33px;
-      height: 40px;
+      height: 49px;
       border-radius: 15px;
       background-color: rgba(255, 255, 255, 0);
       border: 2px solid white;

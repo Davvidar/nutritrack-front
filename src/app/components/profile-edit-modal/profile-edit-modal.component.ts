@@ -21,7 +21,7 @@ export class ProfileEditModalComponent implements OnInit {
   error: string | null = null;
   
   // Opciones para selects con labels amigables
-  sexos = ['masculino', 'femenino', 'otro'];
+  sexos = ['masculino', 'femenino'];
   objetivos = ['perder peso', 'mantenerse', 'ganar músculo'];
   actividades = ['sedentario', 'ligero', 'moderado', 'activo', 'muy activo'];
   
@@ -29,7 +29,6 @@ export class ProfileEditModalComponent implements OnInit {
   private sexoLabels = {
     'masculino': 'Masculino',
     'femenino': 'Femenino'
-
   };
   
   private objetivoLabels = {
