@@ -46,20 +46,22 @@ export class ProductService {
     }
   }
 
-  /** Obtiene todos los productos (globales + propios) */
-  getAll(mis: boolean = false, favoritos: boolean = false, query: string = ''): Observable<Product[]> {
-    let params = new HttpParams();
-    if (query) params = params.set('query', query);
-    if (mis) params = params.set('mis', 'true');
-    if (favoritos) params = params.set('favoritos', 'true');
-    
-    return this.http.get<Product[]>(`${this.baseUrl}`, { 
-      headers: this.authService.getAuthHeaders(),
-      params 
-    });
+ getAll(mis: boolean = false, favoritos: boolean = false, query: string = ''): Observable<Product[]> {
+
+  if (mis || favoritos) {
+    return this.searchProducts(query, mis, favoritos);
   }
 
-  /** Obtiene producto por ID */
+  let params = new HttpParams();
+  if (query) params = params.set('query', query);
+  
+  return this.http.get<Product[]>(`${this.baseUrl}`, { 
+    headers: this.authService.getAuthHeaders(),
+    params 
+  });
+}
+
+  /*Obtiene producto por ID */
   getById(id: string): Observable<Product> {
     return this.http.get<Product>(
       `${this.baseUrl}/${id}`, 
@@ -110,22 +112,21 @@ export class ProductService {
   }
 
   /** Buscar productos */
-  searchProducts(query: string = '', mis: boolean = false, favoritos: boolean = false): Observable<Product[]> {
-    let params = new HttpParams();
-    if (query) params = params.set('query', query);
-    if (mis) params = params.set('mis', 'true');
-    if (favoritos) params = params.set('favoritos', 'true');
-    
-    return this.http.get<Product[]>(`${this.baseUrl}/search`, { 
-      headers: this.authService.getAuthHeaders(),
-      params 
-    });
-  }
+searchProducts(query: string = '', mis: boolean = false, favoritos: boolean = false): Observable<Product[]> {
+  let params = new HttpParams();
+  if (query) params = params.set('query', query);
+  if (mis) params = params.set('mis', 'true');
+  if (favoritos) params = params.set('favoritos', 'true');
+  
+  return this.http.get<Product[]>(`${this.baseUrl}/search`, { 
+    headers: this.authService.getAuthHeaders(),
+    params 
+  });
+}
   
   /** 
-   * Método extendido para paginación (simulación en cliente)
+   * Método para paginación
    * Aunque envía parámetros de paginación, el backend actual los ignorará
-   * pero el código está preparado para cuando el backend implemente paginación
    */
   searchProductsPaginated(query: string = '', mis: boolean = false, favoritos: boolean = false, page: number = 0, limit: number = 10): Observable<Product[]> {
     let params = new HttpParams();

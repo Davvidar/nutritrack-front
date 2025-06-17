@@ -260,64 +260,52 @@ export class SearchPage implements OnInit {
     });
   }
 
-  private loadFavorites(reset: boolean) {
-    // Obtener primero la lista de IDs favoritos
-    this.favoritesService.getFavorites().subscribe({
-      next: (favoriteItems) => {
-        // Filtrar solo productos favoritos
-        const productFavorites = favoriteItems.filter(fav => fav.tipo === 'product');
-        const productIds = productFavorites.map(fav => fav.refId);
-        
-        if (productIds.length === 0) {
-          this.loadingSearch = false;
-          this.allProducts = [];
-          this.totalItems = 0;
-          this.paginateResults(reset);
-          return;
-        }
-        
-        // Cargar los productos favoritos
-        this.productService.getAll().subscribe({
-          next: (products) => {
-            this.loadingSearch = false;
-            
-            // Filtrar solo los productos que están en favoritos
-            const favoriteProducts = products.filter(product => 
-              productIds.includes(product._id)
-            );
-            
-            // Aplicar búsqueda si hay query
-            let filteredProducts = favoriteProducts;
-            if (this.searchQuery) {
-              const query = this.searchQuery.toLowerCase();
-              filteredProducts = favoriteProducts.filter(product => 
-                product.nombre.toLowerCase().includes(query) || 
-                (product.marca && product.marca.toLowerCase().includes(query))
-              );
-            }
-            
-            this.allProducts = filteredProducts;
-            this.totalItems = filteredProducts.length;
-            this.paginateResults(reset);
-          },
-          error: (err) => {
-            this.loadingSearch = false;
-            this.loading = false;
-            console.error('Error al cargar favoritos:', err);
-            this.error = 'No se pudieron cargar los favoritos';
-            this.presentErrorToast('Error al cargar favoritos');
-          }
-        });
-      },
-      error: (err) => {
+private loadFavorites(reset: boolean) {
+  this.favoritesService.getFavorites().subscribe({
+    next: (favoriteItems) => {
+      // Filtrar solo productos favoritos
+      const productFavorites = favoriteItems.filter(fav => fav.tipo === 'product');
+      const productIds = productFavorites.map(fav => fav.refId);
+      
+      if (productIds.length === 0) {
         this.loadingSearch = false;
-        this.loading = false;
-        console.error('Error al obtener lista de favoritos:', err);
-        this.error = 'No se pudieron cargar los favoritos';
-        this.presentErrorToast('Error al cargar favoritos');
+        this.allProducts = [];
+        this.totalItems = 0;
+        this.paginateResults(reset);
+        return;
       }
-    });
-  }
+
+      this.productService.searchProducts(
+        this.searchQuery, 
+        false,           
+        true             
+      ).subscribe({
+        next: (products) => {
+          this.loadingSearch = false;
+          
+
+          this.allProducts = products;
+          this.totalItems = products.length;
+          this.paginateResults(reset);
+        },
+        error: (err) => {
+          this.loadingSearch = false;
+          this.loading = false;
+          console.error('Error al cargar favoritos:', err);
+          this.error = 'No se pudieron cargar los favoritos';
+          this.presentErrorToast('Error al cargar favoritos');
+        }
+      });
+    },
+    error: (err) => {
+      this.loadingSearch = false;
+      this.loading = false;
+      console.error('Error al obtener lista de favoritos:', err);
+      this.error = 'No se pudieron cargar los favoritos';
+      this.presentErrorToast('Error al cargar favoritos');
+    }
+  });
+}
 
   private paginateResults(reset: boolean) {
     const items = this.activeFilter === 'recipes' || this.segment === 'recetas' 

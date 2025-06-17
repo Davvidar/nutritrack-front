@@ -37,7 +37,7 @@ export class RecipeService {
     private authService: AuthService
   ) { }
 
-  /** Obtiene todas las recetas (globales + propias) */
+  /* Obtiene todas las recetas*/
   getAll(favoritos: boolean = false): Observable<Recipe[]> {
     let params = new HttpParams();
     if (favoritos) {
@@ -50,7 +50,7 @@ export class RecipeService {
     });
   }
 
-  /** Obtiene receta por ID */
+  /* Obtiene receta por ID */
   getById(id: string): Observable<Recipe> {
     return this.http.get<Recipe>(`${this.baseUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()
@@ -79,8 +79,7 @@ export class RecipeService {
   }
 
   /** 
-   * Busca recetas por nombre o ingredientes 
-   * (método preparado para cuando el backend lo implemente)
+   * Busca recetas por nombre o ingredientes
    */
   search(query: string = '', favoritos: boolean = false): Observable<Recipe[]> {
     let params = new HttpParams();
