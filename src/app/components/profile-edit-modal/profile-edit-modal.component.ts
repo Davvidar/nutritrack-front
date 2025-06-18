@@ -83,9 +83,9 @@ export class ProfileEditModalComponent implements OnInit {
       peso: [this.profile.peso, [Validators.required, Validators.min(30), Validators.max(300)]],
       altura: [this.profile.altura, [Validators.required, Validators.min(100), Validators.max(250)]],
       edad: [this.profile.edad, [Validators.required, Validators.min(12), Validators.max(120)]],
-      sexo: [this.profile.sexo, Validators.required],
-      objetivo: [this.profile.objetivo, Validators.required],
-      actividad: [this.profile.actividad, Validators.required]
+      sexo: [this.profile.sexo, [Validators.required]],
+      actividad: [this.profile.actividad, [Validators.required]],
+      objetivo: [this.profile.objetivo, [Validators.required]]
     });
   }
   
@@ -99,29 +99,19 @@ export class ProfileEditModalComponent implements OnInit {
       objetivo: this.profile.objetivo
     };
   }
-
-  getSexoLabel(sexo: string): string {
-    return this.sexoLabels[sexo as keyof typeof this.sexoLabels] || sexo;
-  }
   
-  getObjetivoLabel(objetivo: string): string {
-    return this.objetivoLabels[objetivo as keyof typeof this.objetivoLabels] || objetivo;
-  }
-  
-  getActividadLabel(actividad: string): string {
-    return this.actividadLabels[actividad as keyof typeof this.actividadLabels] || actividad;
-  }
-
+  // Métodos de validación
   hasPersonalErrors(): boolean {
     const nombre = this.profileForm.get('nombre');
     const apellido = this.profileForm.get('apellido');
+    
     return !!(
       (nombre?.touched && nombre?.invalid) ||
       (apellido?.touched && apellido?.invalid)
     );
   }
   
-  hasBiometricErrors(): boolean {
+    hasBiometricErrors(): boolean {
     const peso = this.profileForm.get('peso');
     const altura = this.profileForm.get('altura');
     const edad = this.profileForm.get('edad');
@@ -183,18 +173,28 @@ export class ProfileEditModalComponent implements OnInit {
     await loading.present();
     
     try {
-      // Crear objeto con datos a actualizar
-      const updateData: Partial<UserProfile> = { ...profileData };
       
-      // Si no queremos recalcular, enviamos explícitamente los objetivos actuales
+      const updateData: Partial<UserProfile> = { ...profileData };   
+      
       if (!recalculateObjectives) {
         updateData.objetivosNutricionales = this.profile.objetivosNutricionales;
+        console.log('Enviando con objetivos actuales mantenidos:', updateData.objetivosNutricionales);
+      } else {
+        console.log('Enviando SIN objetivosNutricionales para activar recálculo automático');
       }
+      
+      console.log('Datos que se envían al backend:', updateData);
       
       const updatedProfile = await this.authService.updateProfile(updateData).toPromise();
       
       await loading.dismiss();
-      await this.presentToast('Perfil actualizado correctamente', 'success');
+      
+      if (recalculateObjectives) {
+        await this.presentToast('Perfil actualizado y objetivos recalculados correctamente', 'success');
+      } else {
+        await this.presentToast('Perfil actualizado correctamente', 'success');
+      }
+      
       this.modalController.dismiss(updatedProfile);
       
     } catch (err: any) {
@@ -208,7 +208,7 @@ export class ProfileEditModalComponent implements OnInit {
   async askForRecalculation(): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.alertController.create({
-        header: '🔄 Recalcular objetivos',
+        header: 'Recalcular objetivos',
         message: 'Has cambiado datos que afectan a tus objetivos nutricionales. ¿Quieres recalcular automáticamente tus objetivos de calorías y macronutrientes?',
         cssClass: 'custom-alert',
         buttons: [
@@ -216,18 +216,36 @@ export class ProfileEditModalComponent implements OnInit {
             text: 'No, mantener actuales',
             role: 'cancel',
             cssClass: 'secondary',
-            handler: () => resolve(false)
+            handler: () => {
+              console.log('Usuario eligió NO recalcular objetivos');
+              resolve(false);
+            }
           },
           {
             text: 'Sí, recalcular',
             cssClass: 'primary',
-            handler: () => resolve(true)
+            handler: () => {
+              console.log('Usuario eligió SÍ recalcular objetivos');
+              resolve(true);
+            }
           }
         ]
       }).then(alert => alert.present());
     });
   }
   
+  // Método para obtener etiquetas amigables
+  getSexoLabel(sexo: string): string {
+    return this.sexoLabels[sexo as keyof typeof this.sexoLabels] || sexo;
+  }
+  
+  getObjetivoLabel(objetivo: string): string {
+    return this.objetivoLabels[objetivo as keyof typeof this.objetivoLabels] || objetivo;
+  }
+  
+  getActividadLabel(actividad: string): string {
+    return this.actividadLabels[actividad as keyof typeof this.actividadLabels] || actividad;
+  }
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(key => {

@@ -39,10 +39,8 @@ export class OpenFoodFactsService {
   
   constructor(private http: HttpClient) {}
   
-  /**
-   * Busca un producto por código de barras en Open Food Facts
-   * @param barcode Código de barras del producto
-   * @returns Observable con los datos del producto o null si no se encuentra
+  /*
+    Busca un producto por código de barras en Open Food Facts
    */
   searchByBarcode(barcode: string): Observable<OpenFoodFactsProduct | null> {
     const url = `${this.API_URL}/${barcode}.json`;
@@ -63,11 +61,8 @@ export class OpenFoodFactsService {
   }
   
   /**
-   * Busca productos por texto en Open Food Facts
-   * @param searchText Texto de búsqueda
-   * @param page Página de resultados (por defecto 1)
-   * @param pageSize Número de resultados por página
-   * @returns Observable con la lista de productos encontrados
+    Busca productos por texto en Open Food Facts
+
    */
   searchByText(searchText: string, page: number = 1, pageSize: number = 10): Observable<any[]> {
     const url = 'https://world.openfoodfacts.org/cgi/search.pl';
@@ -94,10 +89,9 @@ export class OpenFoodFactsService {
     );
   }
   
-  /**
-   * Convierte un resultado de búsqueda al formato local
-   * @param product Producto del resultado de búsqueda
-   * @returns Producto en formato local con indicador de fuente
+  /*
+    Convierte un resultado de búsqueda al formato local
+
    */
   private convertSearchResultToLocalFormat(product: any): any {
     const nutriments = product.nutriments || {};
@@ -130,10 +124,9 @@ export class OpenFoodFactsService {
     };
   }
   
-  /**
-   * Convierte un producto de Open Food Facts al formato de tu base de datos
-   * @param openFoodProduct Producto de Open Food Facts
-   * @returns Producto en el formato de tu aplicación
+  /*
+    Convierte un producto de Open Food Facts al formato de tu base de datos
+
    */
   convertToLocalProduct(openFoodProduct: OpenFoodFactsProduct): Partial<any> {
     const product = openFoodProduct.product;
@@ -167,10 +160,9 @@ export class OpenFoodFactsService {
     };
   }
   
-  /**
-   * Busca un producto y lo convierte al formato local si se encuentra
-   * @param barcode Código de barras
-   * @returns Observable con el producto convertido o null
+  /*
+    Busca un producto y lo convierte al formato local si se encuentra
+   
    */
   searchAndConvert(barcode: string): Observable<any | null> {
     return this.searchByBarcode(barcode).pipe(

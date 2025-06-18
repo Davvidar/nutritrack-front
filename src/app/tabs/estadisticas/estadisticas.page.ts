@@ -39,7 +39,7 @@ export class EstadisticasPage implements OnInit {
   // Variables para estadísticas
   userProfile: UserProfile | null = null;
   weightData: {fecha: string, peso: number}[] = [];
-  weeklyWeightData: {fecha: string, peso: number}[] = []; // Nueva: datos semanales
+  weeklyWeightData: {fecha: string, peso: number}[] = []; 
   nutritionData: any = null;
   
   // Variables de estado
